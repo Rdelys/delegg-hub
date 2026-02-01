@@ -65,7 +65,7 @@ Route::post('/admin/login', function (Request $request) {
         Auth::guard('admin')->login($admin);
         $request->session()->regenerate();
 
-        return redirect('/admin/dashboard');
+        return redirect('/admin/pages/dashboard');
     }
 
     return back()->with('error', 'Identifiants incorrects');
@@ -74,9 +74,10 @@ Route::post('/admin/login', function (Request $request) {
 
 // Vérification login admin
 Route::middleware('admin')->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
+    Route::get('/admin/pages/dashboard', function () {
+        return view('admin.pages.dashboard');
     });
+
 
     Route::post('/admin/logout', function (Request $request) {
         Auth::guard('admin')->logout();
@@ -87,3 +88,26 @@ Route::middleware('admin')->group(function () {
     });
 });
 
+Route::middleware('admin')->prefix('admin')->group(function () {
+
+    Route::get('/dashboard', function () {
+        return view('admin.pages.dashboard');
+    });
+
+    Route::get('/tdb', function () {
+        return view('admin.pages.tdb');
+    });
+
+    Route::get('/clients', function () {
+        return view('admin.pages.clients');
+    });
+
+    Route::get('/licences', function () {
+        return view('admin.pages.licences');
+    });
+
+    Route::get('/users', function () {
+        return view('admin.pages.users');
+    });
+
+});
