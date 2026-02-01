@@ -94,10 +94,6 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         return view('admin.pages.dashboard');
     });
 
-    Route::get('/tdb', function () {
-        return view('admin.pages.tdb');
-    });
-
     Route::get('/clients', function () {
         return view('admin.pages.clients');
     });
