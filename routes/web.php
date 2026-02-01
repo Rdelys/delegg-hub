@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Models\Admin;
+use Illuminate\Support\Facades\Hash;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,31 +47,43 @@ Route::get('/home', function () {
 |--------------------------------------------------------------------------
 */
 
-// Login admin
+// Page login admin
 Route::get('/admin/login', function () {
     return view('admin.login');
 });
 
-// Traitement login admin
 Route::post('/admin/login', function (Request $request) {
 
-    if (
-        $request->email === 'admin@test.com' &&
-        $request->password === 'admin123'
-    ) {
-        session(['admin_logged' => true]);
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    $admin = Admin::where('email', $request->email)->first();
+
+    if ($admin && Hash::check($request->password, $admin->password)) {
+        Auth::guard('admin')->login($admin);
+        $request->session()->regenerate();
+
         return redirect('/admin/dashboard');
     }
 
-    return back()->with('error', 'Identifiants admin incorrects');
+    return back()->with('error', 'Identifiants incorrects');
 });
 
-// Dashboard admin
-Route::get('/admin/dashboard', function () {
 
-    if (!session('admin_logged')) {
+// Vérification login admin
+Route::middleware('admin')->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard');
+    });
+
+    Route::post('/admin/logout', function (Request $request) {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         return redirect('/admin/login');
-    }
-
-    return view('admin.dashboard');
+    });
 });
+
