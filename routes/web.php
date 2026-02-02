@@ -102,8 +102,4 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         return view('admin.pages.licences');
     });
 
-    Route::get('/users', function () {
-        return view('admin.pages.users');
-    });
-
 });
