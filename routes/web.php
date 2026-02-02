@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LicenceController;
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Client\ClientProfileController;
+use App\Http\Controllers\Client\ClientUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,8 +42,20 @@ Route::middleware('client')->group(function () {
     Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
     Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
     Route::get('/google', fn () => view('client.google'))->name('client.google');
-    Route::get('/utilisateurs', fn () => view('client.utilisateurs'))->name('client.users');
+    
+    //Users
+    Route::get('/utilisateurs', [ClientUserController::class, 'index'])
+            ->name('client.users');
 
+    Route::post('/utilisateurs', [ClientUserController::class, 'store'])
+        ->name('client.users.store');
+
+    Route::post('/utilisateurs/{client}', [ClientUserController::class, 'update'])
+        ->name('client.users.update');
+
+    Route::delete('/utilisateurs/{client}', [ClientUserController::class, 'destroy'])
+        ->name('client.users.delete');
+        
     Route::post('/logout', [ClientAuthController::class, 'logout'])
         ->name('client.logout');
 });
