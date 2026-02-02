@@ -1,10 +1,15 @@
-<h1>
-    Bienvenue {{ session('client.first_name') }}
-</h1>
+@extends('client.layouts.app')
 
-<p>Email : {{ session('client.email') }}</p>
+@section('title', 'Accueil')
 
-<form method="POST" action="{{ route('client.logout') }}">
-    @csrf
-    <button type="submit">Déconnexion</button>
-</form>
+@section('content')
+<div class="card">
+    <h1>Bienvenue sur DELEGG HUB</h1>
+
+    <p style="margin-top:15px">
+        Bonjour <strong>{{ session('client.first_name') }}</strong>,<br>
+        vous êtes connecté à l’espace professionnel de
+        <strong>{{ session('client.company') }}</strong>.
+    </p>
+</div>
+@endsection
