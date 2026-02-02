@@ -24,9 +24,12 @@ Route::post('/login', [ClientAuthController::class, 'login'])
 
 Route::middleware('client')->group(function () {
 
-    Route::get('/home', function () {
-        return view('client.home');
-    })->name('client.home');
+    Route::get('/home', fn () => view('client.home'))->name('client.home');
+    Route::get('/profil', fn () => view('client.profil'))->name('client.profil');
+    Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
+    Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
+    Route::get('/google', fn () => view('client.google'))->name('client.google');
+    Route::get('/utilisateurs', fn () => view('client.utilisateurs'))->name('client.users');
 
     Route::post('/logout', [ClientAuthController::class, 'logout'])
         ->name('client.logout');
