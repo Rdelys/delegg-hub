@@ -12,10 +12,11 @@ class AdminViewServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('admin.*', function ($view) {
-            $view->with([
-                'clientsCount'  => Client::count(),
-                'licencesCount' => Licence::count(),
-            ]);
-        });
+    $view->with([
+        'clientsCount'  => Client::where('role', '!=', 'simpleutilisateur')->count(),
+        'licencesCount' => Licence::count(),
+    ]);
+});
+
     }
 }
