@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LicenceController;
 use App\Http\Controllers\Client\ClientAuthController;
+use App\Http\Controllers\Client\ClientProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +26,18 @@ Route::post('/login', [ClientAuthController::class, 'login'])
 Route::middleware('client')->group(function () {
 
     Route::get('/home', fn () => view('client.home'))->name('client.home');
-    Route::get('/profil', fn () => view('client.profil'))->name('client.profil');
+    
+    //Profil
+    Route::get('/profil', [ClientProfileController::class, 'index'])
+        ->name('client.profil');
+
+    Route::post('/profil', [ClientProfileController::class, 'update'])
+        ->name('client.profil.update');
+
+    Route::post('/profil/password', [ClientProfileController::class, 'updatePassword'])
+        ->name('client.profil.password');
+        
+        
     Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
     Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
     Route::get('/google', fn () => view('client.google'))->name('client.google');
