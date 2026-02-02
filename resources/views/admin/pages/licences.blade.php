@@ -60,7 +60,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Entreprise</th>
                         <th>Date début</th>
                         <th>Date fin</th>
@@ -72,7 +71,6 @@
                 <tbody>
                     @foreach($licences as $licence)
                         <tr>
-                            <td>{{ $licence->id }}</td>
                             <td>{{ $licence->client->company }}</td>
                             <td>{{ $licence->start_date->format('Y-m-d') }}</td>
                             <td>{{ $licence->end_date->format('Y-m-d') }}</td>
