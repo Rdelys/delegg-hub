@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Admin\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,9 +96,11 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         return view('admin.pages.dashboard');
     });
 
-    Route::get('/clients', function () {
-        return view('admin.pages.clients');
-    });
+        Route::get('/clients', [ClientController::class, 'index'])->name('admin.clients.index');
+    Route::post('/clients', [ClientController::class, 'store'])->name('admin.clients.store');
+    Route::put('/clients/{client}', [ClientController::class, 'update'])->name('admin.clients.update');
+    Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('admin.clients.destroy');
+
 
     Route::get('/licences', function () {
         return view('admin.pages.licences');
