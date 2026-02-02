@@ -566,11 +566,6 @@
                     <span>Licences</span>
                     <span class="menu-badge">0</span>
                 </a>
-                <a href="/admin/users" class="menu-item {{ request()->is('admin/users') ? 'active' : '' }}">
-                    <i class="fas fa-users"></i>
-                    <span>Utilisateurs</span>
-                    <span class="menu-badge">0</span>
-                </a>
             </div>
 
             <div class="menu-section">
