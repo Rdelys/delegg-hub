@@ -551,7 +551,6 @@
                 <a href="/admin/dashboard" class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Dashboard</span>
-                    <span class="menu-badge">0</span>
                 </a>
             </div>
 
@@ -560,12 +559,13 @@
                 <a href="/admin/clients" class="menu-item {{ request()->is('admin/clients') ? 'active' : '' }}">
                     <i class="fas fa-building"></i>
                     <span>Clients</span>
-                    <span class="menu-badge">0</span>
+                    <span class="menu-badge">{{ $clientsCount }}</span>
                 </a>
+
                 <a href="/admin/licences" class="menu-item {{ request()->is('admin/licences') ? 'active' : '' }}">
                     <i class="fas fa-key"></i>
                     <span>Licences</span>
-                    <span class="menu-badge">0</span>
+                    <span class="menu-badge">{{ $licencesCount }}</span>
                 </a>
             </div>
 
