@@ -106,5 +106,11 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::get('/licences', [LicenceController::class, 'index'])
         ->name('admin.licences.index');
 
+    Route::post('/licences', [LicenceController::class, 'store'])
+        ->name('admin.licences.store');
+
+    Route::delete('/licences/{licence}', [LicenceController::class, 'destroy'])
+        ->name('admin.licences.destroy');
+
 
 });
