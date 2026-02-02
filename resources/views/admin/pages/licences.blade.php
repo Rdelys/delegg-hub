@@ -23,11 +23,11 @@
     <div id="licenceForm" class="card hidden">
         <h2>Nouvelle licence</h2>
 
-        <form>
-            <div class="form-grid">
+        <form method="POST" action="{{ route('admin.licences.store') }}">
+            @csrf
 
-                <!-- ENTREPRISE DYNAMIQUE -->
-                <select required>
+            <div class="form-grid">
+                <select name="client_id" required>
                     <option value="">Sélectionner une entreprise</option>
                     @foreach($clients as $client)
                         @if($client->company)
@@ -38,11 +38,10 @@
                     @endforeach
                 </select>
 
-                <!-- DATES -->
-                <input type="date" required>
-                <input type="date" required>
-
+                <input type="date" name="start_date" required>
+                <input type="date" name="end_date" required>
             </div>
+
 
             <div class="form-actions">
                 <button type="button" onclick="toggleForm()" class="btn-light">
@@ -73,18 +72,21 @@
                 <tbody>
                     @foreach($licences as $licence)
                         <tr>
-                            <td>{{ $licence['id'] }}</td>
-                            <td>{{ $licence['company'] }}</td>
-                            <td>{{ $licence['start_date'] }}</td>
-                            <td>{{ $licence['end_date'] }}</td>
+                            <td>{{ $licence->id }}</td>
+                            <td>{{ $licence->client->company }}</td>
+                            <td>{{ $licence->start_date->format('Y-m-d') }}</td>
+                            <td>{{ $licence->end_date->format('Y-m-d') }}</td>
                             <td>
-                                <span class="badge badge-{{ $licence['status'] }}">
-                                    {{ $licence['status'] === 'active' ? 'Active' : 'Expirée' }}
+                                <span class="badge badge-{{ $licence->status }}">
+                                    {{ $licence->status === 'actif' ? 'Active' : 'Expirée' }}
                                 </span>
                             </td>
                             <td class="actions">
-                                <button class="btn-light">✏️</button>
-                                <button class="btn-light">🗑️</button>
+                                <form method="POST" action="{{ route('admin.licences.destroy', $licence) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn-light">🗑️</button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
