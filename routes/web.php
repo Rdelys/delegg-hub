@@ -6,6 +6,7 @@ use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\LicenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,8 +103,14 @@ Route::middleware('admin')->prefix('admin')->group(function () {
     Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('admin.clients.destroy');
 
 
-    Route::get('/licences', function () {
-        return view('admin.pages.licences');
-    });
+    Route::get('/licences', [LicenceController::class, 'index'])
+        ->name('admin.licences.index');
+
+    Route::post('/licences', [LicenceController::class, 'store'])
+        ->name('admin.licences.store');
+
+    Route::delete('/licences/{licence}', [LicenceController::class, 'destroy'])
+        ->name('admin.licences.destroy');
+
 
 });

@@ -22,4 +22,10 @@ class Client extends Model
     protected $hidden = [
         'password',
     ];
+
+    public function licences()
+    {
+        return $this->hasMany(Licence::class);
+    }
+
 }
