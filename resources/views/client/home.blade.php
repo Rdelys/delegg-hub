@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Home Client</title>
-</head>
-<body>
+<h1>
+    Bienvenue {{ session('client.first_name') }}
+</h1>
 
-<h1>Home Client</h1>
+<p>Email : {{ session('client.email') }}</p>
 
-<p>✅ Client connecté</p>
-
-<a href="/">Déconnexion</a>
-
-</body>
-</html>
+<form method="POST" action="{{ route('client.logout') }}">
+    @csrf
+    <button type="submit">Déconnexion</button>
+</form>

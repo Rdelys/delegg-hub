@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\LicenceController;
+use App\Http\Controllers\Client\ClientAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,34 +16,21 @@ use App\Http\Controllers\Admin\LicenceController;
 */
 
 // Page d’accueil = login client
-Route::get('/', function () {
-    return view('client.login');
+Route::get('/', [ClientAuthController::class, 'showLogin'])
+    ->name('client.login');
+
+Route::post('/login', [ClientAuthController::class, 'login'])
+    ->name('client.login.submit');
+
+Route::middleware('client')->group(function () {
+
+    Route::get('/home', function () {
+        return view('client.home');
+    })->name('client.home');
+
+    Route::post('/logout', [ClientAuthController::class, 'logout'])
+        ->name('client.logout');
 });
-
-// Traitement login client
-Route::post('/login', function (Request $request) {
-
-    if (
-        $request->email === 'client@test.com' &&
-        $request->password === '1234'
-    ) {
-        session(['client_logged' => true]);
-        return redirect('/home');
-    }
-
-    return back()->with('error', 'Identifiants client incorrects');
-});
-
-// Home client (après connexion)
-Route::get('/home', function () {
-
-    if (!session('client_logged')) {
-        return redirect('/');
-    }
-
-    return view('client.home');
-});
-
 
 /*
 |--------------------------------------------------------------------------
