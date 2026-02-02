@@ -49,7 +49,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th>
                         <th>Prénom</th>
                         <th>Nom</th>
                         <th>Email</th>
@@ -64,7 +63,6 @@
                 <tbody>
                     @forelse($clients as $client)
                         <tr>
-                            <td>{{ $client->id }}</td>
                             <td>{{ $client->first_name }}</td>
                             <td>{{ $client->last_name }}</td>
                             <td>{{ $client->email }}</td>
