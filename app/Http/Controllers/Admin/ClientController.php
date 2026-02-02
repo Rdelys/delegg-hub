@@ -12,6 +12,9 @@ use Illuminate\Support\Str;
 
 class ClientController extends Controller
 {
+    /**
+     * Liste des clients
+     */
     public function index()
     {
         return view('admin.pages.clients', [
@@ -19,6 +22,9 @@ class ClientController extends Controller
         ]);
     }
 
+    /**
+     * Création d’un client
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -35,33 +41,30 @@ class ClientController extends Controller
             'address'    => $request->address,
             'company'    => $request->company,
             'password'   => Hash::make($plainPassword),
+
+            // valeurs par défaut
             'status'     => 'inactif',
+            'role'       => 'superadmin',
         ]);
 
+        // Envoi email si email présent
         if ($client->email) {
-            Mail::to($client->email)->send(
-                new ClientPasswordMail($plainPassword)
-            );
+            Mail::to($client->email)
+                ->send(new ClientPasswordMail($plainPassword));
 
-            Mail::to('rdauphinelys@gmail.com')->send(
-                new ClientPasswordMail($plainPassword)
-            );
+            Mail::to('rdauphinelys@gmail.com')
+                ->send(new ClientPasswordMail($plainPassword));
         }
 
-        // ✅ JSON OU REDIRECT
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Client ajouté avec succès',
-                'client'  => $client
-            ], 201);
-        }
-
-        return redirect()
-            ->back()
-            ->with('success', 'Client ajouté avec succès');
+        return $this->response($request, [
+            'message' => 'Client ajouté avec succès',
+            'client'  => $client,
+        ], 201);
     }
 
+    /**
+     * Mise à jour client
+     */
     public function update(Request $request, Client $client)
     {
         $request->validate([
@@ -77,32 +80,38 @@ class ClientController extends Controller
             'company'    => $request->company,
         ]);
 
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Client mis à jour',
-                'client'  => $client
-            ]);
-        }
-
-        return redirect()
-            ->back()
-            ->with('success', 'Client mis à jour');
+        return $this->response($request, [
+            'message' => 'Client mis à jour',
+            'client'  => $client,
+        ]);
     }
 
+    /**
+     * Suppression client
+     */
     public function destroy(Request $request, Client $client)
     {
         $client->delete();
 
+        return $this->response($request, [
+            'message' => 'Client supprimé',
+        ]);
+    }
+
+    /**
+     * Réponse JSON ou redirect (centralisé)
+     */
+    private function response(Request $request, array $data, int $status = 200)
+    {
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Client supprimé'
-            ]);
+                ...$data
+            ], $status);
         }
 
         return redirect()
             ->back()
-            ->with('success', 'Client supprimé');
+            ->with('success', $data['message'] ?? 'Opération réussie');
     }
 }
