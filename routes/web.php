@@ -48,6 +48,10 @@ Route::middleware('client')->group(function () {
 
 Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
     ->name('client.web.scrape');
+
+    Route::get('/web/export/pdf', [WebScraperController::class, 'exportPdf'])
+    ->name('client.web.export.pdf');
+
     Route::get('/utilisateurs', [ClientUserController::class, 'index'])
             ->name('client.users');
 
