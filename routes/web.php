@@ -42,7 +42,8 @@ Route::middleware('client')->group(function () {
     Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
     Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
     Route::get('/google', fn () => view('client.google'))->name('client.google');
-    
+    Route::get('/web', fn () => view('client.web'))->name('client.web');
+
     //Users
     Route::get('/utilisateurs', [ClientUserController::class, 'index'])
             ->name('client.users');
