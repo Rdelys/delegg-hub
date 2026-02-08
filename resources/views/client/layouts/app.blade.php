@@ -204,6 +204,13 @@
                 </a>
             </li>
 
+            <li>
+                <a href="{{ route('client.web') }}" class="{{ request()->routeIs('client.web') ? 'active' : '' }}">
+<i class="fa-solid fa-earth-americas"></i>
+                    Site Web
+                </a>
+            </li>
+
             @if(session('client.role') === 'superadmin')
                 <li>
                     <a href="{{ route('client.users') }}" class="{{ request()->routeIs('client.users') ? 'active' : '' }}">
