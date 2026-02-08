@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\LicenceController;
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\ClientUserController;
+use App\Http\Controllers\WebScraperController;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,9 +43,15 @@ Route::middleware('client')->group(function () {
     Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
     Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
     Route::get('/google', fn () => view('client.google'))->name('client.google');
-    Route::get('/web', fn () => view('client.web'))->name('client.web');
+ Route::get('/web', [WebScraperController::class, 'index'])
+    ->name('client.web');
 
-    //Users
+Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
+    ->name('client.web.scrape');
+
+    Route::get('/web/export/pdf', [WebScraperController::class, 'exportPdf'])
+    ->name('client.web.export.pdf');
+
     Route::get('/utilisateurs', [ClientUserController::class, 'index'])
             ->name('client.users');
 
