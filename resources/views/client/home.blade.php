@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Home Client</title>
-</head>
-<body>
+@extends('client.layouts.app')
 
-<h1>Home Client</h1>
+@section('title', 'Accueil')
 
-<p>✅ Client connecté</p>
+@section('content')
+<div class="card">
+    <h1>Bienvenue sur DELEGG HUB</h1>
 
-<a href="/">Déconnexion</a>
-
-</body>
-</html>
+    <p style="margin-top:15px">
+        Bonjour <strong>{{ session('client.first_name') }}</strong>,<br>
+        vous êtes connecté à l’espace professionnel de
+        <strong>{{ session('client.company') }}</strong>.
+    </p>
+</div>
+@endsection

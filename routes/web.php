@@ -4,6 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Admin\ClientController;
+use App\Http\Controllers\Admin\LicenceController;
+use App\Http\Controllers\Client\ClientAuthController;
+use App\Http\Controllers\Client\ClientProfileController;
+use App\Http\Controllers\Client\ClientUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,34 +18,47 @@ use Illuminate\Support\Facades\Hash;
 */
 
 // Page d’accueil = login client
-Route::get('/', function () {
-    return view('client.login');
+Route::get('/', [ClientAuthController::class, 'showLogin'])
+    ->name('client.login');
+
+Route::post('/login', [ClientAuthController::class, 'login'])
+    ->name('client.login.submit');
+
+Route::middleware('client')->group(function () {
+
+    Route::get('/home', fn () => view('client.home'))->name('client.home');
+    
+    //Profil
+    Route::get('/profil', [ClientProfileController::class, 'index'])
+        ->name('client.profil');
+
+    Route::post('/profil', [ClientProfileController::class, 'update'])
+        ->name('client.profil.update');
+
+    Route::post('/profil/password', [ClientProfileController::class, 'updatePassword'])
+        ->name('client.profil.password');
+        
+        
+    Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
+    Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
+    Route::get('/google', fn () => view('client.google'))->name('client.google');
+    
+    //Users
+    Route::get('/utilisateurs', [ClientUserController::class, 'index'])
+            ->name('client.users');
+
+    Route::post('/utilisateurs', [ClientUserController::class, 'store'])
+        ->name('client.users.store');
+
+    Route::post('/utilisateurs/{client}', [ClientUserController::class, 'update'])
+        ->name('client.users.update');
+
+    Route::delete('/utilisateurs/{client}', [ClientUserController::class, 'destroy'])
+        ->name('client.users.delete');
+        
+    Route::post('/logout', [ClientAuthController::class, 'logout'])
+        ->name('client.logout');
 });
-
-// Traitement login client
-Route::post('/login', function (Request $request) {
-
-    if (
-        $request->email === 'client@test.com' &&
-        $request->password === '1234'
-    ) {
-        session(['client_logged' => true]);
-        return redirect('/home');
-    }
-
-    return back()->with('error', 'Identifiants client incorrects');
-});
-
-// Home client (après connexion)
-Route::get('/home', function () {
-
-    if (!session('client_logged')) {
-        return redirect('/');
-    }
-
-    return view('client.home');
-});
-
 
 /*
 |--------------------------------------------------------------------------
@@ -94,16 +113,20 @@ Route::middleware('admin')->prefix('admin')->group(function () {
         return view('admin.pages.dashboard');
     });
 
-    Route::get('/clients', function () {
-        return view('admin.pages.clients');
-    });
+        Route::get('/clients', [ClientController::class, 'index'])->name('admin.clients.index');
+    Route::post('/clients', [ClientController::class, 'store'])->name('admin.clients.store');
+    Route::put('/clients/{client}', [ClientController::class, 'update'])->name('admin.clients.update');
+    Route::delete('/clients/{client}', [ClientController::class, 'destroy'])->name('admin.clients.destroy');
 
-    Route::get('/licences', function () {
-        return view('admin.pages.licences');
-    });
 
-    Route::get('/users', function () {
-        return view('admin.pages.users');
-    });
+    Route::get('/licences', [LicenceController::class, 'index'])
+        ->name('admin.licences.index');
+
+    Route::post('/licences', [LicenceController::class, 'store'])
+        ->name('admin.licences.store');
+
+    Route::delete('/licences/{licence}', [LicenceController::class, 'destroy'])
+        ->name('admin.licences.destroy');
+
 
 });
