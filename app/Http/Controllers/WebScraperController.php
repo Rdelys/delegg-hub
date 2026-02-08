@@ -9,32 +9,43 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class WebScraperController extends Controller
 {
-    public function index()
+   public function index()
 {
-    $results = \App\Models\ScrapedContact::latest()->paginate(10);
+    $clientId = session('client.id');
+
+    $results = ScrapedContact::where('client_id', $clientId)
+        ->latest()
+        ->paginate(10);
 
     return view('client.web', compact('results'));
 }
 
 
+
     public function scrape(Request $request)
-    {
-        $request->validate([
-            'url' => 'required|url'
-        ]);
+{
+    $request->validate([
+        'url' => 'required|url'
+    ]);
 
-        Artisan::call('scrape:run', [
-            'url' => $request->url
-        ]);
+    Artisan::call('scrape:run', [
+        'url' => $request->url,
+        '--client' => session('client.id'), // 👈 clé
+    ]);
 
-        return redirect()
-            ->route('client.web')
-            ->with('success', 'Scraping terminé');
-    }
+    return redirect()
+        ->route('client.web')
+        ->with('success', 'Scraping terminé');
+}
+
 
     public function exportPdf()
 {
-    $results = ScrapedContact::latest()->get();
+    $clientId = session('client.id');
+
+    $results = ScrapedContact::where('client_id', $clientId)
+        ->latest()
+        ->get();
 
     $pdf = Pdf::loadView('client.web-pdf', [
         'results' => $results
@@ -42,5 +53,6 @@ class WebScraperController extends Controller
 
     return $pdf->download('web-scraper-results.pdf');
 }
+
 }
 

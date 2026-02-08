@@ -6,6 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class ScrapedContact extends Model
 {
-// app/Models/ScrapedContact.php
-protected $fillable = ['name', 'email', 'source_url'];
+    protected $fillable = [
+        'client_id',
+        'name',
+        'email',
+        'source_url',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 }
