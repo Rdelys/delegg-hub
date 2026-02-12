@@ -220,6 +220,33 @@
             transform: translateY(-1px);
             transition-duration: 0.1s;
         }
+
+        /* Password toggle */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper input {
+    padding-right: 50px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    user-select: none;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+}
+
     </style>
 </head>
 
@@ -240,9 +267,27 @@
         <form method="POST" action="/login">
             @csrf
             <input type="email" name="email" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Mot de passe" required>
+<div class="password-wrapper">
+    <input type="password" name="password" id="password" placeholder="Mot de passe" required>
+    <span class="toggle-password" onclick="togglePassword()">🙈</span>
+</div>
             <button type="submit">Se connecter</button>
         </form>
     </div>
 </body>
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById("password");
+    const toggleIcon = document.querySelector(".toggle-password");
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.textContent = "👁";
+    } else {
+        passwordInput.type = "password";
+        toggleIcon.textContent = "🙈";
+    }
+}
+</script>
+
 </html>
