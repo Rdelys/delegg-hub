@@ -53,6 +53,9 @@ Route::post('/google/scrape', [GoogleScraperController::class, 'scrape'])
     Route::get('/google/export/pdf', [\App\Http\Controllers\GoogleScraperController::class, 'exportPdf'])
     ->name('client.google.export.pdf');
 
+    Route::delete('/google/delete-selected', [GoogleScraperController::class, 'deleteSelected'])
+    ->name('client.google.delete.selected');
+
     Route::get('/web', [WebScraperController::class, 'index'])
     ->name('client.web');
 
