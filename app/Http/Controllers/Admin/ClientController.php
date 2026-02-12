@@ -18,9 +18,12 @@ class ClientController extends Controller
     public function index()
     {
         return view('admin.pages.clients', [
-            'clients' => Client::latest()->get()
+            'clients' => Client::where('role', '!=', 'simpleutilisateur')
+                            ->latest()
+                            ->get()
         ]);
     }
+
 
     /**
      * Création d’un client

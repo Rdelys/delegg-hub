@@ -22,7 +22,7 @@ class ScrapeWebsite extends Command
 
         // Lancer Scrapy
         $cmd = 'cd ../scraper && scrapy crawl contacts -a url="' . $url . '" -O result.json';
-        exec($cmd . ' > NUL 2>&1');
+exec($cmd . ' > /dev/null 2>&1');
 
         $path = base_path('scraper/result.json');
 

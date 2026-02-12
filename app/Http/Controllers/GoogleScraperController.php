@@ -73,4 +73,19 @@ public function exportPdf()
         return $pdf->download('google-maps-entreprises.pdf');
     }
 
+    public function deleteSelected(Request $request)
+{
+    $request->validate([
+        'selected' => 'required|array'
+    ]);
+
+    $clientId = session('client.id');
+
+    GooglePlace::where('client_id', $clientId)
+        ->whereIn('id', $request->selected)
+        ->delete();
+
+    return back()->with('success', 'Sélection supprimée avec succès');
+}
+
 }
