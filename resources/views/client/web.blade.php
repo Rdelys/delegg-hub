@@ -25,29 +25,29 @@
 
     {{-- FORM --}}
     <form method="POST" action="{{ route('client.web.scrape') }}" class="ws-form">
-        @csrf
+    @csrf
 
-        <label class="ws-label">URL du site à analyser</label>
+    <label class="ws-label">Choisir un site depuis Google Scraper</label>
+    <select name="website_select" class="ws-input" style="margin-bottom:15px;">
+        <option value="">-- Sélectionner un site --</option>
+        @foreach($websites as $site)
+            <option value="{{ $site }}">{{ $site }}</option>
+        @endforeach
+    </select>
 
-        <div class="ws-form-row">
-            <input
-                type="url"
-                name="url"
-                required
-                placeholder="https://exemple.com"
-                class="ws-input"
-            >
+    <label class="ws-label">Ou saisir une URL manuellement</label>
+    <div class="ws-form-row">
+        <input type="url" name="url" placeholder="https://exemple.com" class="ws-input">
+        <button type="submit" class="ws-button">
+            <i class="fa-solid fa-play"></i> Lancer
+        </button>
+    </div>
 
-            <button type="submit" class="ws-button">
-                <i class="fa-solid fa-play"></i>
-                Lancer
-            </button>
-        </div>
+    <p class="ws-hint">
+        Les pages contact, mentions légales et à propos sont analysées automatiquement.
+    </p>
+</form>
 
-        <p class="ws-hint">
-            Les pages contact, mentions légales et à propos sont analysées automatiquement.
-        </p>
-    </form>
 <div class="ws-header" style="display:flex; justify-content:space-between; align-items:center;">
     <div>
         <h1 class="ws-title">Web Scraper</h1>
@@ -66,10 +66,24 @@
     {{-- RESULTS --}}
     <h2 class="ws-section-title">Résultats</h2>
 
+    <form method="POST" action="{{ route('client.web.delete.selected') }}">
+    @csrf
+    @method('DELETE')
+
+    <div style="margin-bottom:15px;">
+        <button type="submit" class="ws-button" 
+                onclick="return confirm('Supprimer les éléments sélectionnés ?')">
+            <i class="fa-solid fa-trash"></i> Supprimer sélection
+        </button>
+    </div>
+
     <div class="ws-table-wrapper">
         <table class="ws-table">
             <thead>
                 <tr>
+                    <th>
+                        <input type="checkbox" onclick="toggleAll(this)">
+                    </th>
                     <th>Nom</th>
                     <th>Email</th>
                     <th>Source</th>
@@ -77,26 +91,30 @@
             </thead>
             <tbody>
                 @forelse($results as $row)
-                    <tr>
-                        <td class="ws-strong">{{ $row->name ?? '—' }}</td>
-                        <td class="ws-email">{{ $row->email }}</td>
-                        <td>
-                            <a href="{{ $row->source_url }}" target="_blank" class="ws-link">
-                                Ouvrir
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            </a>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selected[]" value="{{ $row->id }}">
+                    </td>
+                    <td class="ws-strong">{{ $row->name ?? '—' }}</td>
+                    <td class="ws-email">{{ $row->email }}</td>
+                    <td>
+                        <a href="{{ $row->source_url }}" target="_blank" class="ws-link">
+                            Ouvrir <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </td>
+                </tr>
                 @empty
-                    <tr>
-                        <td colspan="3" class="ws-empty">
-                            Aucun résultat pour le moment
-                        </td>
-                    </tr>
+                <tr>
+                    <td colspan="4" class="ws-empty">
+                        Aucun résultat pour le moment
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+</form>
+
 
     {{-- PAGINATION --}}
     @if ($results->hasPages())
@@ -295,4 +313,11 @@
     }
 }
 </style>
+<script>
+function toggleAll(source) {
+    checkboxes = document.querySelectorAll('input[name="selected[]"]');
+    checkboxes.forEach(cb => cb.checked = source.checked);
+}
+</script>
+
 @endsection
