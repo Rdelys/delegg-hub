@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\LicenceController;
 use App\Http\Controllers\Client\ClientAuthController;
 use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\ClientUserController;
+use App\Http\Controllers\WebScraperController;
+use App\Http\Controllers\GoogleScraperController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,9 +43,31 @@ Route::middleware('client')->group(function () {
         
     Route::get('/insee', fn () => view('client.insee'))->name('client.insee');
     Route::get('/chambre-metiers', fn () => view('client.chambre-metiers'))->name('client.chambre');
-    Route::get('/google', fn () => view('client.google'))->name('client.google');
-    
-    //Users
+   
+Route::get('/google', [GoogleScraperController::class, 'index'])
+    ->name('client.google');
+
+Route::post('/google/scrape', [GoogleScraperController::class, 'scrape'])
+    ->name('client.google.scrape');
+ 
+    Route::get('/google/export/pdf', [\App\Http\Controllers\GoogleScraperController::class, 'exportPdf'])
+    ->name('client.google.export.pdf');
+
+    Route::delete('/google/delete-selected', [GoogleScraperController::class, 'deleteSelected'])
+    ->name('client.google.delete.selected');
+
+    Route::get('/web', [WebScraperController::class, 'index'])
+    ->name('client.web');
+
+Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
+    ->name('client.web.scrape');
+
+    Route::get('/web/export/pdf', [WebScraperController::class, 'exportPdf'])
+    ->name('client.web.export.pdf');
+
+    Route::delete('/web/delete-selected', [WebScraperController::class, 'deleteSelected'])
+    ->name('client.web.delete.selected');
+
     Route::get('/utilisateurs', [ClientUserController::class, 'index'])
             ->name('client.users');
 
