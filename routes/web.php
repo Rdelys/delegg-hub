@@ -160,3 +160,12 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 
 
 });
+
+// CRM
+Route::get('/crm/dashboard', fn () => view('client.crm.dashboard'))->name('client.crm.dashboard');
+Route::get('/crm/leads', fn () => view('client.crm.leads'))->name('client.crm.leads');
+
+// MAILS
+Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
+Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');
+Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
