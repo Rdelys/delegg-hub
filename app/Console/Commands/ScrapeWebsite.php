@@ -27,11 +27,11 @@ class ScrapeWebsite extends Command
         unlink($path);
     }
 
-    // ✅ Lancer Scrapy
-    $cmd = 'cd ' . base_path('scraper') .
-       ' && scrapy crawl contacts -a url="' . $url . '" -O result.json --nolog';
+   $cmd = 'cd ' . base_path('scraper') .
+       ' && scrapy crawl contacts -a url="' . escapeshellarg($url) . '" -O result.json --nolog';
 
-    exec($cmd);
+exec($cmd);
+
 
     // 🔎 Vérifier si le nouveau fichier existe
     if (!file_exists($path)) {
@@ -47,13 +47,18 @@ class ScrapeWebsite extends Command
     }
 
     foreach ($data as $item) {
-        ScrapedContact::create([
-            'client_id'  => $clientId,
-            'name'       => $item['name'] ?? null,
-            'email'      => $item['email'] ?? null,
-            'source_url' => $item['source_url'] ?? $url,
-        ]);
-    }
+
+    ScrapedContact::create([
+        'client_id'  => $clientId,
+        'name'       => $item['name'] ?? null,
+        'email'      => $item['email'] ?? null,
+        'source_url' => $item['source_url'] ?? $url,
+        'facebook'   => $item['facebook'] ?? null,
+        'instagram'  => $item['instagram'] ?? null,
+        'linkedin'   => $item['linkedin'] ?? null,
+    ]);
+}
+
 
     $this->info('Scraping terminé');
     return Command::SUCCESS;
