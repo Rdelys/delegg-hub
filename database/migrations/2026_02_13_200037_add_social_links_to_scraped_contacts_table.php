@@ -1,0 +1,23 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::table('scraped_contacts', function (Blueprint $table) {
+            $table->string('facebook')->nullable()->after('source_url');
+            $table->string('instagram')->nullable()->after('facebook');
+            $table->string('linkedin')->nullable()->after('instagram');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('scraped_contacts', function (Blueprint $table) {
+            $table->dropColumn(['facebook','instagram','linkedin']);
+        });
+    }
+};

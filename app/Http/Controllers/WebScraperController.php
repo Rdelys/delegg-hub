@@ -33,7 +33,7 @@ class WebScraperController extends Controller
         'website_select' => 'nullable|url'
     ]);
 
-$url = $request->url ?: $request->website_select;
+$url = $request->url;
 
     if (!$url) {
         return back()->withErrors(['url' => 'Veuillez saisir ou sélectionner une URL']);

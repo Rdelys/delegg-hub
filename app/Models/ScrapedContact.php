@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class ScrapedContact extends Model
 {
     protected $fillable = [
-        'client_id',
-        'name',
-        'email',
-        'source_url',
-    ];
+    'client_id',
+    'name',
+    'email',
+    'source_url',
+    'facebook',
+    'instagram',
+    'linkedin',
+];
+
 
     public function client()
     {
