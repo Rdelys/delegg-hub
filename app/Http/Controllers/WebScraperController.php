@@ -83,5 +83,54 @@ public function deleteSelected(Request $request)
         ->with('success', 'Éléments supprimés avec succès');
 }
 
+public function exportExcel()
+{
+    $clientId = session('client.id');
+
+    $results = ScrapedContact::where('client_id', $clientId)
+        ->latest()
+        ->get();
+
+    $fileName = 'web-scraper-results.xlsx';
+    $filePath = storage_path('app/' . $fileName);
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // En-têtes
+    $headers = [
+        'Nom',
+        'Email',
+        'Facebook',
+        'Instagram',
+        'LinkedIn',
+        'Source'
+    ];
+
+    $col = 'A';
+    foreach ($headers as $header) {
+        $sheet->setCellValue($col . '1', $header);
+        $col++;
+    }
+
+    // Données
+    $rowNumber = 2;
+
+    foreach ($results as $row) {
+        $sheet->setCellValue('A' . $rowNumber, $row->name);
+        $sheet->setCellValue('B' . $rowNumber, $row->email);
+        $sheet->setCellValue('C' . $rowNumber, $row->facebook);
+        $sheet->setCellValue('D' . $rowNumber, $row->instagram);
+        $sheet->setCellValue('E' . $rowNumber, $row->linkedin);
+        $sheet->setCellValue('F' . $rowNumber, $row->source_url);
+        $rowNumber++;
+    }
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save($filePath);
+
+    return response()->download($filePath)->deleteFileAfterSend(true);
+}
+
 }
 

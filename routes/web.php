@@ -65,6 +65,9 @@ Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
     Route::get('/web/export/pdf', [WebScraperController::class, 'exportPdf'])
     ->name('client.web.export.pdf');
 
+    Route::get('/web/export/excel', [WebScraperController::class, 'exportExcel'])
+    ->name('client.web.export.excel');
+
     Route::delete('/web/delete-selected', [WebScraperController::class, 'deleteSelected'])
     ->name('client.web.delete.selected');
 

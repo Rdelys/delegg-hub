@@ -15,6 +15,10 @@
                 <i class="fa-solid fa-file-pdf"></i>
                 <span>Export PDF</span>
             </a>
+            <a href="{{ route('client.web.export.excel') }}" class="btn btn-primary">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Export Excel</span>
+            </a>
         @endif
     </div>
 
