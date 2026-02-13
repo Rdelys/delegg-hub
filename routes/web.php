@@ -56,6 +56,9 @@ Route::post('/google/scrape', [GoogleScraperController::class, 'scrape'])
     Route::delete('/google/delete-selected', [GoogleScraperController::class, 'deleteSelected'])
     ->name('client.google.delete.selected');
 
+    Route::get('/google/export/excel', [GoogleScraperController::class, 'exportExcel'])
+    ->name('client.google.export.excel');
+
     Route::get('/web', [WebScraperController::class, 'index'])
     ->name('client.web');
 

@@ -111,4 +111,62 @@ public function exportPdf()
     return back()->with('success', 'Sélection supprimée avec succès');
 }
 
+public function exportExcel()
+{
+    $clientId = session('client.id');
+
+    $places = GooglePlace::where('client_id', $clientId)
+        ->orderByDesc('rating')
+        ->get();
+
+    $fileName = 'google-maps-entreprises.xlsx';
+    $filePath = storage_path('app/' . $fileName);
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Headers
+    $headers = [
+        'Entreprise',
+        'Catégorie',
+        'Adresse',
+        'Téléphone',
+        'Site Web',
+        'Note',
+        'Nombre d\'avis',
+        'Website Scrappé'
+    ];
+
+    $col = 'A';
+    foreach ($headers as $header) {
+        $sheet->setCellValue($col . '1', $header);
+        $col++;
+    }
+
+    // Data
+    $rowNumber = 2;
+
+    foreach ($places as $p) {
+        $sheet->setCellValue('A' . $rowNumber, $p->name);
+        $sheet->setCellValue('B' . $rowNumber, $p->category);
+        $sheet->setCellValue('C' . $rowNumber, $p->address);
+        $sheet->setCellValue('D' . $rowNumber, $p->phone);
+        $sheet->setCellValue('E' . $rowNumber, $p->website);
+        $sheet->setCellValue('F' . $rowNumber, $p->rating);
+        $sheet->setCellValue('G' . $rowNumber, $p->reviews_count);
+        $sheet->setCellValue('H' . $rowNumber, $p->website_scraped ? 'Oui' : 'Non');
+        $rowNumber++;
+    }
+
+    // Auto width
+    foreach (range('A','H') as $columnID) {
+        $sheet->getColumnDimension($columnID)->setAutoSize(true);
+    }
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save($filePath);
+
+    return response()->download($filePath)->deleteFileAfterSend(true);
+}
+
 }
