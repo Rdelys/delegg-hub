@@ -13,8 +13,9 @@ class GoogleScraperController extends Controller
     public function index()
     {
         $places = GooglePlace::where('client_id', session('client.id'))
-            ->latest()
-            ->paginate(10);
+    ->orderByDesc('rating')
+    ->paginate(10);
+
 
         return view('client.google', compact('places'));
     }
@@ -47,29 +48,31 @@ class GoogleScraperController extends Controller
 
     foreach ($results as $place) {
 
-        $created = GooglePlace::create([
-            'client_id' => $clientId,
-            'name' => $place['title'] ?? null,
-            'category' => $place['type'] ?? null,
-            'address' => $place['address'] ?? null,
-            'phone' => $place['phone'] ?? null,
-            'website' => $place['website'] ?? null,
+    $created = GooglePlace::create([
+        'client_id'     => $clientId,
+        'name'          => $place['title'] ?? null,
+        'category'      => $place['type'] ?? null,
+        'address'       => $place['address'] ?? null,
+        'phone'         => $place['phone'] ?? null,
+        'website'       => $place['website'] ?? null,
+        'rating'        => $place['rating'] ?? null,
+        'reviews_count' => $place['reviews'] ?? null,
+    ]);
+
+    if ($created->website) {
+
+        Artisan::call('scrape:run', [
+            'url' => $created->website,
+            '--client' => $clientId,
         ]);
 
-        // 🔥 LANCEMENT SCRAPING WEB SI WEBSITE EXISTE
-        if ($created->website) {
-
-            Artisan::call('scrape:run', [
-                'url' => $created->website,
-                '--client' => $clientId,
-            ]);
-
-            $created->update([
-                'website_scraped' => true,
-                'website_scraped_at' => now(),
-            ]);
-        }
+        $created->update([
+            'website_scraped' => true,
+            'website_scraped_at' => now(),
+        ]);
     }
+}
+
 
     return redirect()->route('client.google')
         ->with('success', 'Scraping Google + Web terminé');
