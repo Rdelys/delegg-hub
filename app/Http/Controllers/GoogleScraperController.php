@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\GooglePlace;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Artisan;
 
 class GoogleScraperController extends Controller
 {
@@ -24,6 +25,8 @@ class GoogleScraperController extends Controller
         'query' => 'required|string'
     ]);
 
+    $clientId = session('client.id');
+
     $response = Http::get('https://serpapi.com/search.json', [
         'engine' => 'google_maps',
         'q' => $request->input('query'),
@@ -38,23 +41,40 @@ class GoogleScraperController extends Controller
 
     $results = $response->json('local_results');
 
-    if (empty($results)) {
-        return back()->with('success', 'Aucun résultat trouvé');
+    if (!$results) {
+        return back()->with('success', 'Aucun résultat');
     }
 
     foreach ($results as $place) {
-        \App\Models\GooglePlace::create([
-            'client_id' => session('client.id'),
-            'name'      => $place['title'] ?? null,
-            'category'  => $place['type'] ?? null,
-            'address'   => $place['address'] ?? null,
-            'phone'     => $place['phone'] ?? null,
-            'website'   => $place['website'] ?? null,
+
+        $created = GooglePlace::create([
+            'client_id' => $clientId,
+            'name' => $place['title'] ?? null,
+            'category' => $place['type'] ?? null,
+            'address' => $place['address'] ?? null,
+            'phone' => $place['phone'] ?? null,
+            'website' => $place['website'] ?? null,
         ]);
+
+        // 🔥 LANCEMENT SCRAPING WEB SI WEBSITE EXISTE
+        if ($created->website) {
+
+            Artisan::call('scrape:run', [
+                'url' => $created->website,
+                '--client' => $clientId,
+            ]);
+
+            $created->update([
+                'website_scraped' => true,
+                'website_scraped_at' => now(),
+            ]);
+        }
     }
 
-    return back()->with('success', 'Analyse Google Maps terminée');
+    return redirect()->route('client.google')
+        ->with('success', 'Scraping Google + Web terminé');
 }
+
 
 public function exportPdf()
     {

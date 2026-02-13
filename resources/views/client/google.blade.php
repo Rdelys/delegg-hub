@@ -47,6 +47,11 @@
                 </button>
             </div>
         </form>
+        <div id="loader" class="gs-loader hidden">
+    <div class="spinner"></div>
+    <p>Scraping en cours... Analyse Google + Sites web</p>
+</div>
+
 
         {{-- RESULTS --}}
         @if(isset($places) && $places->count())
@@ -83,6 +88,8 @@
                             <th>Adresse</th>
                             <th>Téléphone</th>
                             <th>Site web</th>
+                            <th>Statut Web</th>
+
                         </tr>
                         </thead>
 
@@ -110,6 +117,22 @@
                                         <span class="gs-muted">—</span>
                                     @endif
                                 </td>
+                                <td>
+@if($p->website)
+    @if($p->website_scraped)
+        <span class="gs-badge-success">
+            <i class="fa-solid fa-check"></i> Scrappé
+        </span>
+    @else
+        <span class="gs-badge-pending">
+            <i class="fa-solid fa-clock"></i> En attente
+        </span>
+    @endif
+@else
+    <span class="gs-muted">—</span>
+@endif
+</td>
+
                             </tr>
                         @endforeach
                         </tbody>
@@ -645,6 +668,54 @@ if(selectAll){
     width: 100%;
 }
 
-</style>
+.gs-badge-success{
+    background:#d1fae5;
+    color:#065f46;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
 
+.gs-badge-pending{
+    background:#fef3c7;
+    color:#92400e;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
+.gs-loader{
+    margin-top:20px;
+    text-align:center;
+}
+
+.spinner{
+    width:40px;
+    height:40px;
+    border:4px solid #e5e7eb;
+    border-top:4px solid #2563eb;
+    border-radius:50%;
+    animation: spin 1s linear infinite;
+    margin:0 auto 10px;
+}
+
+@keyframes spin{
+    to{ transform:rotate(360deg);}
+}
+
+.hidden{ display:none; }
+
+</style>
+<script>
+    const form = document.querySelector('.gs-form');
+const loader = document.getElementById('loader');
+
+if(form){
+    form.addEventListener('submit',function(){
+        loader.classList.remove('hidden');
+    });
+}
+
+</script>
 @endsection
