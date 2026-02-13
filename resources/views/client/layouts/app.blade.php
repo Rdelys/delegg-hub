@@ -31,19 +31,28 @@
         }
 
         .layout {
-            display: flex;
-            min-height: 100vh;
-        }
+    display: flex;
+    height: 100vh; /* IMPORTANT */
+    overflow: hidden; /* Empêche le scroll global */
+}
+
 
         /* SIDEBAR */
         .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            color: var(--text-light);
-            padding: 24px 20px;
-            display: flex;
-            flex-direction: column;
-        }
+    width: 260px;
+    background: var(--sidebar-bg);
+    color: var(--text-light);
+    padding: 24px 20px;
+    display: flex;
+    flex-direction: column;
+
+    position: fixed;        /* FIXE */
+    top: 0;
+    left: 0;
+    height: 100vh;          /* Pleine hauteur */
+    overflow-y: auto;       /* Scroll si menu long */
+}
+
 
         .brand {
             font-size: 18px;
@@ -131,9 +140,13 @@
 
         /* CONTENT */
         .content {
-            flex: 1;
-            padding: 40px;
-        }
+    flex: 1;
+    padding: 40px;
+
+    margin-left: 260px;     /* Compense la sidebar fixe */
+    height: 100vh;
+    overflow-y: auto;       /* Scroll UNIQUEMENT ici */
+}
 
         .card {
             background: #fff;
@@ -201,6 +214,13 @@
                 <a href="{{ route('client.google') }}" class="{{ request()->routeIs('client.google') ? 'active' : '' }}">
                     <i class="fa-brands fa-google"></i>
                     Google
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('client.web') }}" class="{{ request()->routeIs('client.web') ? 'active' : '' }}">
+<i class="fa-solid fa-earth-americas"></i>
+                    Site Web
                 </a>
             </li>
 
