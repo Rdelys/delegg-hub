@@ -33,20 +33,40 @@ class WebScraperController extends Controller
         'website_select' => 'nullable|url'
     ]);
 
-$url = $request->url;
+    $url = $request->url;
 
     if (!$url) {
         return back()->withErrors(['url' => 'Veuillez saisir ou sélectionner une URL']);
     }
+
+    // Nettoyer l'URL
+    $url = trim($url);
+    if (!preg_match('/^https?:\/\//', $url)) {
+        $url = 'https://' . $url;
+    }
+
+    \Log::info('🔍 Début scraping URL: ' . $url);
 
     Artisan::call('scrape:run', [
         'url' => $url,
         '--client' => session('client.id'),
     ]);
 
+    $output = Artisan::output();
+    \Log::info('📝 Output scraping: ' . $output);
+
+    // Vérifier si des résultats ont été trouvés
+    $count = ScrapedContact::where('client_id', session('client.id'))
+        ->where('source_url', 'LIKE', '%' . parse_url($url, PHP_URL_HOST) . '%')
+        ->count();
+
+    $message = $count > 0 
+        ? "Scraping terminé - {$count} résultat(s) trouvé(s)"
+        : "Scraping terminé - Aucun email trouvé sur ce site";
+
     return redirect()
         ->route('client.web')
-        ->with('success', 'Scraping terminé');
+        ->with('success', $message);
 }
 
 
