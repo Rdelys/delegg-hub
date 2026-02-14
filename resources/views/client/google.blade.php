@@ -21,6 +21,32 @@
                 <i class="fa-solid fa-file-excel"></i>
                 <span>Export Excel</span>
             </a>
+
+            {{-- Dans la section page-header, après les boutons d'export --}}
+@if(isset($places) && $places->count())
+    <div class="btn-group">
+        <a href="{{ route('client.google.export.pdf') }}" class="btn btn-pdf">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>PDF</span>
+        </a>
+
+        <a href="{{ route('client.google.export.excel') }}" class="btn btn-excel">
+            <i class="fa-solid fa-file-excel"></i>
+            <span>Excel</span>
+        </a>
+
+        {{-- Nouveaux boutons pour le scraping --}}
+        <button type="button" class="btn btn-scraping" id="retryScrapingBtn">
+            <i class="fa-solid fa-rotate"></i>
+            <span>Relancer scraping</span>
+        </button>
+
+        <button type="button" class="btn btn-stats" id="scrapingStatsBtn">
+            <i class="fa-solid fa-chart-simple"></i>
+            <span>Statistiques</span>
+        </button>
+    </div>
+@endif
         @endif
     </div>
 
@@ -1198,6 +1224,140 @@
         }, 3000);
     }
 })();
+
+// Dans la section script, après initializeButtonEffects()
+
+// Retry scraping
+const retryBtn = document.getElementById('retryScrapingBtn');
+if (retryBtn) {
+    retryBtn.addEventListener('click', function() {
+        showConfirmation(
+            'Relancer le scraping',
+            'Voulez-vous relancer le scraping pour tous les sites web non traités ?',
+            function() {
+                retryBtn.disabled = true;
+                retryBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scraping en cours...';
+                
+                fetch('{{ route("client.google.retry-scraping") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showNotification(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                })
+                .catch(error => {
+                    showNotification('Erreur lors du lancement du scraping', 'error');
+                    retryBtn.disabled = false;
+                    retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                });
+            }
+        );
+    });
+}
+
+// Scraping stats
+const statsBtn = document.getElementById('scrapingStatsBtn');
+if (statsBtn) {
+    statsBtn.addEventListener('click', function() {
+        fetch('{{ route("client.google.scraping-stats") }}')
+        .then(response => response.json())
+        .then(stats => {
+            showStatsModal(stats);
+        });
+    });
+}
+
+// Fonction de confirmation
+function showConfirmation(title, message, onConfirm) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>${title}</h3>
+            <p>${message}</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelBtn">Annuler</button>
+                <button class="btn btn-primary" id="confirmBtn">Confirmer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+        modal.remove();
+        onConfirm();
+    });
+}
+
+// Fonction pour afficher les stats
+function showStatsModal(stats) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content stats-modal">
+            <h3><i class="fa-solid fa-chart-simple"></i> Statistiques de scraping</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">${stats.total}</div>
+                    <div class="stat-label">Total entreprises</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${stats.with_website}</div>
+                    <div class="stat-label">Avec site web</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-value">${stats.scraped}</div>
+                    <div class="stat-label">Sites scrappés</div>
+                </div>
+                
+                <div class="stat-card highlight">
+                    <div class="stat-value">${stats.pending}</div>
+                    <div class="stat-label">En attente</div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-value">${stats.with_email}</div>
+                    <div class="stat-label">Emails trouvés</div>
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Progression</span>
+                    <span>${Math.round((stats.scraped / stats.with_website) * 100 || 0)}%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${(stats.scraped / stats.with_website) * 100 || 0}%"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-primary" id="closeStatsBtn">Fermer</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    document.getElementById('closeStatsBtn').addEventListener('click', () => {
+        modal.remove();
+    });
+}
 </script>
 
 <style>
@@ -1323,6 +1483,39 @@
     background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
     color: var(--warning-700);
     border-color: var(--warning-200);
+}
+
+/* Dans le style, après btn-excel */
+.btn-group {
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+}
+
+.btn-scraping {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--primary-600);
+}
+
+.btn-scraping:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-stats {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.btn-stats:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-500);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 </style>
 @endsection

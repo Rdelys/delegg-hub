@@ -181,4 +181,59 @@ class GoogleScraperController extends Controller
 
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
+
+    // Dans app/Http/Controllers/GoogleScraperController.php
+
+public function retryScraping(Request $request)
+{
+    $clientId = session('client.id');
+    
+    // Compter les sites à scraper
+    $pendingCount = GooglePlace::where('client_id', $clientId)
+        ->whereNotNull('website')
+        ->whereNull('contact_scraped_at')
+        ->count();
+
+    if ($pendingCount === 0) {
+        return back()->with('info', 'Aucun site web en attente de scraping');
+    }
+
+    // Lancer la commande en arrière-plan
+    try {
+        Artisan::queue('scrape:retry-websites', [
+            '--client' => $clientId,
+            '--limit' => 50, // Limite pour éviter la surcharge
+        ]);
+
+        return back()->with('success', "Scraping lancé pour {$pendingCount} sites web. Les résultats seront traités en arrière-plan.");
+        
+    } catch (\Exception $e) {
+        Log::error('Erreur lancement scraping: ' . $e->getMessage());
+        return back()->with('error', 'Erreur lors du lancement du scraping');
+    }
+}
+
+public function getScrapingStats()
+{
+    $clientId = session('client.id');
+    
+    $stats = [
+        'total' => GooglePlace::where('client_id', $clientId)->count(),
+        'with_website' => GooglePlace::where('client_id', $clientId)
+            ->whereNotNull('website')
+            ->count(),
+        'scraped' => GooglePlace::where('client_id', $clientId)
+            ->whereNotNull('contact_scraped_at')
+            ->count(),
+        'pending' => GooglePlace::where('client_id', $clientId)
+            ->whereNotNull('website')
+            ->whereNull('contact_scraped_at')
+            ->count(),
+        'with_email' => GooglePlace::where('client_id', $clientId)
+            ->whereNotNull('email')
+            ->count(),
+    ];
+    
+    return response()->json($stats);
+}
 }

@@ -169,3 +169,11 @@ Route::get('/crm/leads', fn () => view('client.crm.leads'))->name('client.crm.le
 Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
 Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');
 Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
+
+// routes/web.php
+
+Route::post('/google/retry-scraping', [GoogleScraperController::class, 'retryScraping'])
+    ->name('client.google.retry-scraping');
+
+Route::get('/google/scraping-stats', [GoogleScraperController::class, 'getScrapingStats'])
+    ->name('client.google.scraping-stats');
