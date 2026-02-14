@@ -77,83 +77,117 @@
             {{-- Table Container with Horizontal Scroll --}}
             <div class="table-container">
                 <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="checkbox-col">
-                                <input type="checkbox" id="select-all" class="checkbox">
-                            </th>
-                            <th>Entreprise</th>
-                            <th>Catégorie</th>
-                            <th>Adresse</th>
-                            <th>Téléphone</th>
-                            <th>Site web</th>
-                            <th>Note</th>
-                            <th>Avis</th>
-                            <th>Statut Web</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($places as $p)
-                            <tr>
-                                <td class="checkbox-col">
-                                    <input type="checkbox" 
-                                           name="selected[]" 
-                                           value="{{ $p->id }}" 
-                                           class="checkbox row-checkbox">
-                                </td>
-                                <td class="company-name">{{ $p->name ?? '—' }}</td>
-                                <td>{{ $p->category ?? '—' }}</td>
-                                <td>{{ $p->address ?? '—' }}</td>
-                                <td>{{ $p->phone ?? '—' }}</td>
-                                <td>
-                                    @if($p->website)
-                                        <a href="{{ $p->website }}" 
-                                           target="_blank" 
-                                           class="website-link">
-                                            {{ Str::limit($p->website, 30) }}
-                                        </a>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($p->rating)
-                                        <span class="rating-badge">
-                                            ⭐ {{ number_format($p->rating, 1) }}
-                                        </span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($p->reviews_count)
-                                        <span class="reviews-count">
-                                            {{ $p->reviews_count }} avis
-                                        </span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($p->website)
-                                        @if($p->website_scraped)
-                                            <span class="status-badge status-success">
-                                                <i class="fa-solid fa-check"></i>
-                                                Scrappé
-                                            </span>
-                                        @else
-                                            <span class="status-badge status-pending">
-                                                <i class="fa-solid fa-clock"></i>
-                                                En attente
-                                            </span>
-                                        @endif
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
+                    {{-- Dans le tableau, ajoutez les colonnes email et réseaux sociaux --}}
+<thead>
+    <tr>
+        <th class="checkbox-col">
+            <input type="checkbox" id="select-all" class="checkbox">
+        </th>
+        <th>Entreprise</th>
+        <th>Catégorie</th>
+        <th>Adresse</th>
+        <th>Téléphone</th>
+        <th>Site web</th>
+        <th>Email</th>
+        <th>Réseaux</th>
+        <th>Note</th>
+        <th>Avis</th>
+        <th>Statut</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach($places as $p)
+        <tr>
+            <td class="checkbox-col">
+                <input type="checkbox" name="selected[]" value="{{ $p->id }}" class="checkbox row-checkbox">
+            </td>
+            <td class="company-name">{{ $p->name ?? '—' }}</td>
+            <td>{{ $p->category ?? '—' }}</td>
+            <td>{{ $p->address ?? '—' }}</td>
+            <td>{{ $p->phone ?? '—' }}</td>
+            <td>
+                @if($p->website)
+                    <a href="{{ $p->website }}" target="_blank" class="website-link">
+                        {{ Str::limit($p->website, 30) }}
+                    </a>
+                @else
+                    <span class="text-muted">—</span>
+                @endif
+            </td>
+            <td>
+                @if($p->email)
+                    <span class="email-badge" title="{{ $p->email }}">
+                        {{ Str::limit($p->email, 20) }}
+                    </span>
+                @else
+                    <span class="text-muted">—</span>
+                @endif
+            </td>
+            <td>
+                <div class="social-links">
+                    @if($p->facebook)
+                        <a href="{{ $p->facebook }}" target="_blank" class="social-link facebook">
+                            <i class="fa-brands fa-facebook"></i>
+                        </a>
+                    @endif
+                    @if($p->instagram)
+                        <a href="{{ $p->instagram }}" target="_blank" class="social-link instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                    @endif
+                    @if($p->linkedin)
+                        <a href="{{ $p->linkedin }}" target="_blank" class="social-link linkedin">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    @endif
+                    @if(!$p->facebook && !$p->instagram && !$p->linkedin)
+                        <span class="text-muted">—</span>
+                    @endif
+                </div>
+            </td>
+            <td>
+                @if($p->rating)
+                    <span class="rating-badge">
+                        ⭐ {{ number_format($p->rating, 1) }}
+                    </span>
+                @else
+                    <span class="text-muted">—</span>
+                @endif
+            </td>
+            <td>
+                @if($p->reviews_count)
+                    <span class="reviews-count">
+                        {{ $p->reviews_count }} avis
+                    </span>
+                @else
+                    <span class="text-muted">—</span>
+                @endif
+            </td>
+            <td>
+                @if($p->website)
+                    @if($p->contact_scraped_at)
+                        <span class="status-badge status-success">
+                            <i class="fa-solid fa-check"></i>
+                            Contacts OK
+                        </span>
+                    @elseif($p->website_scraped)
+                        <span class="status-badge status-warning">
+                            <i class="fa-solid fa-clock"></i>
+                            En attente
+                        </span>
+                    @else
+                        <span class="status-badge status-pending">
+                            <i class="fa-solid fa-hourglass"></i>
+                            Planifié
+                        </span>
+                    @endif
+                @else
+                    <span class="text-muted">—</span>
+                @endif
+            </td>
+        </tr>
+    @endforeach
+</tbody>
                 </table>
             </div>
 
@@ -1227,6 +1261,68 @@
 
 .notification-error i {
     color: var(--danger-600);
+}
+
+/* Badges email */
+.email-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--spacing-1) var(--spacing-3);
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    color: var(--primary-700);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid var(--primary-200);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Social links */
+.social-links {
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    color: white;
+    transition: var(--transition-base);
+    text-decoration: none;
+}
+
+.social-link i {
+    font-size: 1rem;
+}
+
+.social-link.facebook {
+    background: #1877f2;
+}
+
+.social-link.instagram {
+    background: linear-gradient(45deg, #f09433, #d62976, #962fbf, #4f5bd5);
+}
+
+.social-link.linkedin {
+    background: #0077b5;
+}
+
+.social-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.status-badge.status-warning {
+    background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
+    color: var(--warning-700);
+    border-color: var(--warning-200);
 }
 </style>
 @endsection
