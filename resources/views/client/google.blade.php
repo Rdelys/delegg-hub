@@ -1125,6 +1125,7 @@
         initializeTableSelection();
         initializeFormLoader();
         initializeButtonEffects();
+        initializeScrapingButtons();
     });
 
     // Table selection management
@@ -1223,144 +1224,397 @@
             }, 300);
         }, 3000);
     }
-})();
 
-// Dans la section script, après initializeButtonEffects()
+    // Fonction de confirmation
+    function showConfirmation(title, message, onConfirm) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3><i class="fa-solid fa-question-circle"></i> ${title}</h3>
+                <p>${message}</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelBtn">Annuler</button>
+                    <button class="btn btn-primary" id="confirmBtn">Confirmer</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            modal.remove();
+            onConfirm();
+        });
+    }
 
-// Retry scraping
-const retryBtn = document.getElementById('retryScrapingBtn');
-if (retryBtn) {
-    retryBtn.addEventListener('click', function() {
-        showConfirmation(
-            'Relancer le scraping',
-            'Voulez-vous relancer le scraping pour tous les sites web non traités ?',
-            function() {
-                retryBtn.disabled = true;
-                retryBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scraping en cours...';
+    // Fonction pour afficher les stats
+    function showStatsModal(stats) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content stats-modal">
+                <h3><i class="fa-solid fa-chart-simple"></i> Statistiques de scraping</h3>
                 
-                fetch('{{ route("client.google.retry-scraping") }}', {
-                    method: 'POST',
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total || 0}</div>
+                        <div class="stat-label">Total entreprises</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.with_website || 0}</div>
+                        <div class="stat-label">Avec site web</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.scraped || 0}</div>
+                        <div class="stat-label">Sites scrappés</div>
+                    </div>
+                    
+                    <div class="stat-card highlight">
+                        <div class="stat-value">${stats.pending || 0}</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-value">${stats.with_email || 0}</div>
+                        <div class="stat-label">Emails trouvés</div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span>${Math.round((stats.scraped / stats.with_website) * 100 || 0)}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(stats.scraped / stats.with_website) * 100 || 0}%"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="closeStatsBtn">Fermer</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('closeStatsBtn').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Fermer en cliquant en dehors
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    // Initialisation des boutons de scraping
+    function initializeScrapingButtons() {
+        // Retry scraping
+        const retryBtn = document.getElementById('retryScrapingBtn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', function() {
+                showConfirmation(
+                    'Relancer le scraping',
+                    'Voulez-vous relancer le scraping pour tous les sites web non traités ?',
+                    function() {
+                        retryBtn.disabled = true;
+                        retryBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scraping en cours...';
+                        
+                        fetch('{{ route("client.google.retry-scraping") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            showNotification(data.message || 'Scraping lancé avec succès', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            showNotification('Erreur lors du lancement du scraping', 'error');
+                            retryBtn.disabled = false;
+                            retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                        });
+                    }
+                );
+            });
+        }
+
+        // Scraping stats
+        const statsBtn = document.getElementById('scrapingStatsBtn');
+        if (statsBtn) {
+            statsBtn.addEventListener('click', function() {
+                statsBtn.disabled = true;
+                statsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+                
+                fetch('{{ route("client.google.scraping-stats") }}', {
                     headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
+                        'Accept': 'application/json'
                     }
                 })
                 .then(response => response.json())
-                .then(data => {
-                    showNotification(data.message, 'success');
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 2000);
+                .then(stats => {
+                    showStatsModal(stats);
+                    statsBtn.disabled = false;
+                    statsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> Statistiques';
                 })
                 .catch(error => {
-                    showNotification('Erreur lors du lancement du scraping', 'error');
-                    retryBtn.disabled = false;
-                    retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                    console.error('Erreur stats:', error);
+                    showNotification('Erreur lors du chargement des statistiques', 'error');
+                    statsBtn.disabled = false;
+                    statsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> Statistiques';
                 });
-            }
-        );
-    });
-}
+            });
+        }
+    }
 
-// Scraping stats
-const statsBtn = document.getElementById('scrapingStatsBtn');
-if (statsBtn) {
-    statsBtn.addEventListener('click', function() {
-        fetch('{{ route("client.google.scraping-stats") }}')
-        .then(response => response.json())
-        .then(stats => {
-            showStatsModal(stats);
-        });
-    });
-}
-
-// Fonction de confirmation
-function showConfirmation(title, message, onConfirm) {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>${title}</h3>
-            <p>${message}</p>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" id="cancelBtn">Annuler</button>
-                <button class="btn btn-primary" id="confirmBtn">Confirmer</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    document.getElementById('cancelBtn').addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    document.getElementById('confirmBtn').addEventListener('click', () => {
-        modal.remove();
-        onConfirm();
-    });
-}
-
-// Fonction pour afficher les stats
-function showStatsModal(stats) {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `
-        <div class="modal-content stats-modal">
-            <h3><i class="fa-solid fa-chart-simple"></i> Statistiques de scraping</h3>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">${stats.total}</div>
-                    <div class="stat-label">Total entreprises</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${stats.with_website}</div>
-                    <div class="stat-label">Avec site web</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-value">${stats.scraped}</div>
-                    <div class="stat-label">Sites scrappés</div>
-                </div>
-                
-                <div class="stat-card highlight">
-                    <div class="stat-value">${stats.pending}</div>
-                    <div class="stat-label">En attente</div>
-                </div>
-                
-                <div class="stat-card success">
-                    <div class="stat-value">${stats.with_email}</div>
-                    <div class="stat-label">Emails trouvés</div>
-                </div>
-            </div>
-            
-            <div class="progress-section">
-                <div class="progress-label">
-                    <span>Progression</span>
-                    <span>${Math.round((stats.scraped / stats.with_website) * 100 || 0)}%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${(stats.scraped / stats.with_website) * 100 || 0}%"></div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn btn-primary" id="closeStatsBtn">Fermer</button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    
-    document.getElementById('closeStatsBtn').addEventListener('click', () => {
-        modal.remove();
-    });
-}
+})();
 </script>
 
 <style>
+    /* Modal styles - À ajouter dans la section style */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-6);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-2xl);
+    animation: slideUp 0.3s ease;
+    position: relative;
+    border: 1px solid var(--gray-200);
+}
+
+.modal-content h3 {
+    margin-bottom: var(--spacing-4);
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.modal-content h3 i {
+    color: var(--primary-600);
+    font-size: 1.5rem;
+}
+
+.modal-content p {
+    margin-bottom: var(--spacing-6);
+    color: var(--gray-600);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
+    margin-top: var(--spacing-6);
+}
+
+/* Stats modal */
+.stats-modal {
+    max-width: 600px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.stat-card {
+    background: var(--gray-50);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-card.highlight {
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-color: var(--primary-200);
+}
+
+.stat-card.highlight .stat-value {
+    color: var(--primary-700);
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, var(--success-50), var(--success-100));
+    border-color: var(--success-200);
+}
+
+.stat-card.success .stat-value {
+    color: var(--success-700);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-1);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.progress-section {
+    margin-bottom: var(--spacing-6);
+    background: var(--gray-50);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-2);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+/* Boutons du modal */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    color: white;
+    border: none;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    color: var(--gray-700);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive pour mobile */
+@media (max-width: 640px) {
+    .modal-content {
+        width: 95%;
+        padding: var(--spacing-4);
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-2);
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions button {
+        width: 100%;
+    }
+}
 /* Additional animations for buttons */
 .btn .ripple {
     position: absolute;
