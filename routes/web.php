@@ -58,7 +58,11 @@ Route::post('/google/scrape', [GoogleScraperController::class, 'scrape'])
 
     Route::get('/google/export/excel', [GoogleScraperController::class, 'exportExcel'])
     ->name('client.google.export.excel');
+Route::post('/google/retry-scraping', [GoogleScraperController::class, 'retryScraping'])
+    ->name('client.google.retry-scraping');
 
+Route::get('/google/scraping-stats', [GoogleScraperController::class, 'getScrapingStats'])
+    ->name('client.google.scraping-stats');
     Route::get('/web', [WebScraperController::class, 'index'])
     ->name('client.web');
 
@@ -172,8 +176,3 @@ Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.ma
 
 // routes/web.php
 
-Route::post('/google/retry-scraping', [GoogleScraperController::class, 'retryScraping'])
-    ->name('client.google.retry-scraping');
-
-Route::get('/google/scraping-stats', [GoogleScraperController::class, 'getScrapingStats'])
-    ->name('client.google.scraping-stats');
