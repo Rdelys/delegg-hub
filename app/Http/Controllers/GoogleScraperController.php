@@ -48,7 +48,6 @@ class GoogleScraperController extends Controller
         }
 
         foreach ($results as $place) {
-            // Créer ou mettre à jour l'entrée Google Place
             $googlePlace = GooglePlace::updateOrCreate(
                 [
                     'client_id' => $clientId,
@@ -64,10 +63,9 @@ class GoogleScraperController extends Controller
                 ]
             );
 
-            // Si un site web existe, lancer le scraping des contacts
             if ($googlePlace->website && !$googlePlace->contact_scraped_at) {
                 try {
-                    Artisan::call('scrape:website', [
+                    Artisan::queue('scrape:website', [
                         'google_place_id' => $googlePlace->id,
                         'url' => $googlePlace->website,
                         '--client' => $clientId,
@@ -128,7 +126,6 @@ class GoogleScraperController extends Controller
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Headers
         $headers = [
             'Entreprise',
             'Catégorie',
@@ -151,7 +148,6 @@ class GoogleScraperController extends Controller
             $col++;
         }
 
-        // Data
         $rowNumber = 2;
 
         foreach ($places as $p) {
@@ -171,7 +167,6 @@ class GoogleScraperController extends Controller
             $rowNumber++;
         }
 
-        // Auto width
         foreach (range('A', 'M') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
@@ -182,87 +177,82 @@ class GoogleScraperController extends Controller
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
 
-    // Dans app/Http/Controllers/GoogleScraperController.php
-
-public function retryScraping(Request $request)
-{
-    $clientId = session('client.id');
-    
-    // Vérifier si l'utilisateur est authentifié
-    if (!$clientId) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Session expirée'
-        ], 401);
-    }
-    
-    // Compter les sites à scraper
-    $pendingCount = GooglePlace::where('client_id', $clientId)
-        ->whereNotNull('website')
-        ->whereNull('contact_scraped_at')
-        ->count();
-
-    if ($pendingCount === 0) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Aucun site web en attente de scraping'
-        ], 200);
-    }
-
-    // Lancer la commande en arrière-plan
-    try {
-        Artisan::queue('scrape:retry-websites', [
-            '--client' => $clientId,
-            '--limit' => 50,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => "Scraping lancé pour {$pendingCount} sites web",
-            'count' => $pendingCount
-        ]);
+    public function retryScraping(Request $request)
+    {
+        $clientId = session('client.id');
         
-    } catch (\Exception $e) {
-        Log::error('Erreur lancement scraping: ' . $e->getMessage());
+        if (!$clientId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Session expirée'
+            ], 401);
+        }
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur lors du lancement du scraping'
-        ], 500);
-    }
-}
+        $pendingCount = GooglePlace::where('client_id', $clientId)
+            ->whereNotNull('website')
+            ->whereNull('contact_scraped_at')
+            ->count();
 
-public function getScrapingStats()
-{
-    $clientId = session('client.id');
-    
-    if (!$clientId) {
-        return response()->json(['error' => 'Non authentifié'], 401);
+        if ($pendingCount === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucun site web en attente de scraping'
+            ]);
+        }
+
+        try {
+            Artisan::queue('scrape:retry-websites', [
+                '--client' => $clientId,
+                '--limit' => 50,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Scraping lancé pour {$pendingCount} sites web",
+                'count' => $pendingCount
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Erreur lancement scraping: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du lancement du scraping'
+            ], 500);
+        }
     }
-    
-    try {
-        $stats = [
-            'total' => GooglePlace::where('client_id', $clientId)->count(),
-            'with_website' => GooglePlace::where('client_id', $clientId)
-                ->whereNotNull('website')
-                ->count(),
-            'scraped' => GooglePlace::where('client_id', $clientId)
-                ->whereNotNull('contact_scraped_at')
-                ->count(),
-            'pending' => GooglePlace::where('client_id', $clientId)
-                ->whereNotNull('website')
-                ->whereNull('contact_scraped_at')
-                ->count(),
-            'with_email' => GooglePlace::where('client_id', $clientId)
-                ->whereNotNull('email')
-                ->count(),
-        ];
+
+    public function getScrapingStats()
+    {
+        $clientId = session('client.id');
         
-        return response()->json($stats);
+        if (!$clientId) {
+            return response()->json(['error' => 'Non authentifié'], 401);
+        }
         
-    } catch (\Exception $e) {
-        Log::error('Erreur stats: ' . $e->getMessage());
-        return response()->json(['error' => 'Erreur serveur'], 500);
+        try {
+            $stats = [
+                'total' => GooglePlace::where('client_id', $clientId)->count(),
+                'with_website' => GooglePlace::where('client_id', $clientId)
+                    ->whereNotNull('website')
+                    ->count(),
+                'scraped' => GooglePlace::where('client_id', $clientId)
+                    ->whereNotNull('contact_scraped_at')
+                    ->count(),
+                'pending' => GooglePlace::where('client_id', $clientId)
+                    ->whereNotNull('website')
+                    ->whereNull('contact_scraped_at')
+                    ->count(),
+                'with_email' => GooglePlace::where('client_id', $clientId)
+                    ->whereNotNull('email')
+                    ->count(),
+            ];
+            
+            return response()->json($stats);
+            
+        } catch (\Exception $e) {
+            Log::error('Erreur stats: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur serveur'], 500);
+        }
     }
-}
 }

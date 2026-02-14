@@ -12,8 +12,7 @@ class RetryWebsiteScraping extends Command
 {
     protected $signature = 'scrape:retry-websites 
                             {--client= : ID du client}
-                            {--limit=50 : Nombre maximum de sites à scraper}
-                            {--force : Forcer le scraping même si déjà fait}';
+                            {--limit=50 : Nombre maximum de sites à scraper}';
     
     protected $description = 'Relancer le scraping des sites web non traités';
 
@@ -21,21 +20,13 @@ class RetryWebsiteScraping extends Command
     {
         $clientId = $this->option('client');
         $limit = (int) $this->option('limit');
-        $force = $this->option('force');
 
-        $query = GooglePlace::query();
+        $query = GooglePlace::query()
+            ->whereNotNull('website')
+            ->whereNull('contact_scraped_at');
 
         if ($clientId) {
             $query->where('client_id', $clientId);
-        }
-
-        // Sites avec website mais sans contacts scrappés
-        if (!$force) {
-            $query->whereNotNull('website')
-                  ->whereNull('contact_scraped_at');
-        } else {
-            // Forcer le scraping même si déjà fait
-            $query->whereNotNull('website');
         }
 
         $total = $query->count();
@@ -52,9 +43,6 @@ class RetryWebsiteScraping extends Command
 
         foreach ($places as $place) {
             try {
-                $this->line("\n");
-                $this->info("📡 Scraping: {$place->website}");
-
                 Artisan::call('scrape:website', [
                     'google_place_id' => $place->id,
                     'url' => $place->website,
@@ -65,18 +53,14 @@ class RetryWebsiteScraping extends Command
                 
                 if (str_contains($output, 'Emails trouvés')) {
                     $success++;
-                    $this->info("✅ Succès: {$place->website}");
                 } else {
                     $failed++;
-                    $this->warn("⚠️ Aucun contact trouvé: {$place->website}");
                 }
 
-                // Pause pour éviter de surcharger
-                sleep(2);
+                sleep(1);
 
             } catch (\Exception $e) {
                 $failed++;
-                $this->error("❌ Erreur: {$place->website} - {$e->getMessage()}");
                 Log::error('Erreur retry scraping: ' . $e->getMessage());
             }
 
@@ -84,18 +68,8 @@ class RetryWebsiteScraping extends Command
         }
 
         $bar->finish();
-
         $this->newLine(2);
-        $this->info("📊 Résultats du scraping:");
-        $this->table(
-            ['Statut', 'Nombre'],
-            [
-                ['✅ Succès', $success],
-                ['⚠️ Sans résultat', $failed - $failed],
-                ['❌ Échec', $failed],
-                ['📊 Total', $places->count()],
-            ]
-        );
+        $this->info("📊 Résultats: {$success} succès, {$failed} échecs");
 
         return Command::SUCCESS;
     }
