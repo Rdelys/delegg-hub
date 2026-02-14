@@ -29,12 +29,12 @@ class GoogleScraperController extends Controller
     $clientId = session('client.id');
 
     $response = Http::get('https://serpapi.com/search.json', [
-        'engine' => 'google_maps',
-        'q' => $request->input('query'),
-        'hl' => 'fr',
-        'gl' => 'fr',
-        'api_key' => env('SERPAPI_KEY'),
-    ]);
+    'engine' => 'google_maps',
+    'q' => $request->input('query'),
+    'hl' => 'fr',
+    'gl' => 'fr',
+    'api_key' => config('services.serpapi.key'), // Use config() instead of env()
+]);
 
     if (!$response->ok()) {
         return back()->with('success', 'Erreur SerpAPI');
