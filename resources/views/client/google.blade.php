@@ -12,15 +12,31 @@
         </div>
         
         @if(isset($places) && $places->count())
-            <a href="{{ route('client.google.export.pdf') }}" class="btn btn-pdf">
-                <i class="fa-solid fa-file-pdf"></i>
-                <span>Export PDF</span>
-            </a>
+            <div class="btn-group">
+                <a href="{{ route('client.google.export.pdf') }}" class="btn btn-pdf">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>PDF</span>
+                </a>
 
-            <a href="{{ route('client.google.export.excel') }}" class="btn btn-excel">
-                <i class="fa-solid fa-file-excel"></i>
-                <span>Export Excel</span>
-            </a>
+                <a href="{{ route('client.google.export.excel') }}" class="btn btn-excel">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Excel</span>
+                </a>
+
+                <button type="button" class="btn btn-scraping" id="retryScrapingBtn">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Relancer scraping</span>
+                </button>
+
+                <button type="button" class="btn btn-stats" id="scrapingStatsBtn">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Statistiques</span>
+                </button>
+
+                <button type="button" class="btn btn-reset" id="resetColumnsBtn" title="Réinitialiser les colonnes">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                </button>
+            </div>
         @endif
     </div>
 
@@ -29,6 +45,20 @@
         <div class="alert alert-success">
             <i class="fa-solid fa-circle-check"></i>
             <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if(session('info'))
+        <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>{{ session('info') }}</span>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-exclamation-circle"></i>
+            <span>{{ session('error') }}</span>
         </div>
     @endif
 
@@ -74,96 +104,157 @@
                 </button>
             </div>
 
-            {{-- Table Container with Horizontal Scroll --}}
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th class="checkbox-col">
-                                <input type="checkbox" id="select-all" class="checkbox">
-                            </th>
-                            <th>Entreprise</th>
-                            <th>Catégorie</th>
-                            <th>Adresse</th>
-                            <th>Téléphone</th>
-                            <th>Site web</th>
-                            <th>Note</th>
-                            <th>Avis</th>
-                            <th>Statut Web</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($places as $p)
+            {{-- Table Container with Resizable Columns --}}
+            <div class="table-container-wrapper">
+                <div class="table-scroll-container">
+                    <table class="data-table" id="resizableTable">
+                        <thead>
                             <tr>
-                                <td class="checkbox-col">
-                                    <input type="checkbox" 
-                                           name="selected[]" 
-                                           value="{{ $p->id }}" 
-                                           class="checkbox row-checkbox">
-                                </td>
-                                <td class="company-name">{{ $p->name ?? '—' }}</td>
-                                <td>{{ $p->category ?? '—' }}</td>
-                                <td>{{ $p->address ?? '—' }}</td>
-                                <td>{{ $p->phone ?? '—' }}</td>
-                                <td>
-                                    @if($p->website)
-                                        <a href="{{ $p->website }}" 
-                                           target="_blank" 
-                                           class="website-link">
-                                            {{ Str::limit($p->website, 30) }}
-                                        </a>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($p->rating)
-                                        <span class="rating-badge">
-                                            ⭐ {{ number_format($p->rating, 1) }}
-                                        </span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($p->reviews_count)
-                                        <span class="reviews-count">
-                                            {{ $p->reviews_count }} avis
-                                        </span>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($p->website)
-                                        @if($p->website_scraped)
-                                            <span class="status-badge status-success">
-                                                <i class="fa-solid fa-check"></i>
-                                                Scrappé
+                                <th class="checkbox-col" style="width: 50px; min-width: 50px; max-width: 50px;">
+                                    <input type="checkbox" id="select-all" class="checkbox">
+                                </th>
+                                <th class="resizable" data-index="1">Entreprise</th>
+                                <th class="resizable" data-index="2">Catégorie</th>
+                                <th class="resizable" data-index="3">Adresse</th>
+                                <th class="resizable" data-index="4">Téléphone</th>
+                                <th class="resizable" data-index="5">Site web</th>
+                                <th class="resizable" data-index="6">Email</th>
+                                <th class="resizable" data-index="7">Réseaux</th>
+                                <th class="resizable" data-index="8" style="width: 80px; min-width: 80px;">Note</th>
+                                <th class="resizable" data-index="9" style="width: 80px; min-width: 80px;">Avis</th>
+                                <th class="resizable" data-index="10" style="width: 120px; min-width: 120px;">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($places as $p)
+                                <tr>
+                                    <td class="checkbox-col">
+                                        <input type="checkbox" name="selected[]" value="{{ $p->id }}" class="checkbox row-checkbox">
+                                    </td>
+                                    <td class="company-name">{{ $p->name ?? '—' }}</td>
+                                    <td>{{ $p->category ?? '—' }}</td>
+                                    <td>{{ $p->address ?? '—' }}</td>
+                                    <td>
+                                        @if($p->phone)
+                                            <a href="tel:{{ $p->phone }}" class="phone-link">
+                                                <i class="fa-solid fa-phone"></i> {{ $p->phone }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->website)
+                                            <a href="{{ $p->website }}" target="_blank" class="website-link" title="{{ $p->website }}">
+                                                <i class="fa-solid fa-globe"></i>
+                                                {{ Str::limit(preg_replace('#^https?://#', '', $p->website), 20) }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->email)
+                                            <span class="email-badge" title="{{ $p->email }}">
+                                                <i class="fa-solid fa-envelope"></i>
+                                                {{ Str::limit($p->email, 15) }}
                                             </span>
                                         @else
-                                            <span class="status-badge status-pending">
-                                                <i class="fa-solid fa-clock"></i>
-                                                En attente
-                                            </span>
+                                            <span class="text-muted">—</span>
                                         @endif
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                    </td>
+                                    <td>
+                                        <div class="social-links">
+                                            @if($p->facebook)
+                                                <a href="{{ $p->facebook }}" target="_blank" class="social-link facebook" title="Facebook">
+                                                    <i class="fa-brands fa-facebook-f"></i>
+                                                </a>
+                                            @endif
+                                            @if($p->instagram)
+                                                <a href="{{ $p->instagram }}" target="_blank" class="social-link instagram" title="Instagram">
+                                                    <i class="fa-brands fa-instagram"></i>
+                                                </a>
+                                            @endif
+                                            @if($p->linkedin)
+                                                <a href="{{ $p->linkedin }}" target="_blank" class="social-link linkedin" title="LinkedIn">
+                                                    <i class="fa-brands fa-linkedin-in"></i>
+                                                </a>
+                                            @endif
+                                            @if(!$p->facebook && !$p->instagram && !$p->linkedin)
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($p->rating)
+                                            <span class="rating-badge" title="{{ $p->rating }} étoiles">
+                                                <i class="fa-solid fa-star"></i>
+                                                {{ number_format($p->rating, 1) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->reviews_count)
+                                            <span class="reviews-count" title="{{ $p->reviews_count }} avis">
+                                                <i class="fa-solid fa-comment"></i>
+                                                {{ number_format($p->reviews_count) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->website)
+                                            @if($p->contact_scraped_at)
+                                                <span class="status-badge status-success" title="Scrapé le {{ $p->contact_scraped_at->format('d/m/Y H:i') }}">
+                                                    <i class="fa-solid fa-check-circle"></i>
+                                                    Contacts OK
+                                                </span>
+                                            @elseif($p->website_scraped)
+                                                <span class="status-badge status-warning">
+                                                    <i class="fa-solid fa-clock"></i>
+                                                    En attente
+                                                </span>
+                                            @else
+                                                <span class="status-badge status-pending">
+                                                    <i class="fa-solid fa-hourglass-half"></i>
+                                                    Planifié
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {{-- Column Width Controls --}}
+            <div class="column-controls">
+                <div class="column-width-presets">
+                    <span class="preset-label">Largeur des colonnes:</span>
+                    <button type="button" class="preset-btn" data-width="compact">Compact</button>
+                    <button type="button" class="preset-btn" data-width="normal">Normal</button>
+                    <button type="button" class="preset-btn" data-width="wide">Large</button>
+                </div>
             </div>
 
             {{-- Pagination --}}
             @if ($places->hasPages())
                 <div class="pagination-wrapper">
                     @if ($places->onFirstPage())
-                        <span class="pagination-item disabled">‹</span>
+                        <span class="pagination-item disabled">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </span>
                     @else
-                        <a href="{{ $places->previousPageUrl() }}" class="pagination-item">‹</a>
+                        <a href="{{ $places->previousPageUrl() }}" class="pagination-item">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
                     @endif
 
                     @foreach ($places->getUrlRange(
@@ -178,32 +269,36 @@
                     @endforeach
 
                     @if ($places->hasMorePages())
-                        <a href="{{ $places->nextPageUrl() }}" class="pagination-item">›</a>
+                        <a href="{{ $places->nextPageUrl() }}" class="pagination-item">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
                     @else
-                        <span class="pagination-item disabled">›</span>
+                        <span class="pagination-item disabled">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </span>
                     @endif
                 </div>
             @endif
         </form>
     @else
         <div class="empty-state">
-            <i class="fa-solid fa-magnifying-glass"></i>
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-map-location-dot"></i>
+            </div>
             <h3>Aucun résultat</h3>
-            <p>Commencez par effectuer une recherche</p>
+            <p>Commencez par effectuer une recherche Google Maps</p>
         </div>
     @endif
 </div>
 
 <style>
 /*=============================================================================
-  GOOGLE MAPS - PROFESSIONAL PREMIUM STYLE
+  GOOGLE MAPS - ULTRA PREMIUM STYLE AVEC COLONNES REDIMENSIONNABLES
   =============================================================================*/
 
-/*---------------------------------------
-  DESIGN SYSTEM VARIABLES
----------------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-    /* Primary Colors */
     --primary-50: #eff6ff;
     --primary-100: #dbeafe;
     --primary-200: #bfdbfe;
@@ -215,7 +310,6 @@
     --primary-800: #1e40af;
     --primary-900: #1e3a8a;
     
-    /* Success Colors */
     --success-50: #f0fdf4;
     --success-100: #dcfce7;
     --success-200: #bbf7d0;
@@ -227,7 +321,6 @@
     --success-800: #166534;
     --success-900: #14532d;
     
-    /* Danger Colors */
     --danger-50: #fef2f2;
     --danger-100: #fee2e2;
     --danger-200: #fecaca;
@@ -239,7 +332,6 @@
     --danger-800: #991b1b;
     --danger-900: #7f1d1d;
     
-    /* Warning Colors */
     --warning-50: #fffbeb;
     --warning-100: #fef3c7;
     --warning-200: #fde68a;
@@ -251,7 +343,6 @@
     --warning-800: #92400e;
     --warning-900: #78350f;
     
-    /* Gray Scale */
     --gray-50: #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -263,25 +354,22 @@
     --gray-800: #1f2937;
     --gray-900: #111827;
     
-    /* Shadows */
     --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
     
-    /* Border Radius */
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
     --radius-2xl: 1.5rem;
     
-    /* Transitions */
     --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     
-    /* Spacing */
     --spacing-1: 0.25rem;
     --spacing-2: 0.5rem;
     --spacing-3: 0.75rem;
@@ -293,20 +381,14 @@
     --spacing-12: 3rem;
 }
 
-/*---------------------------------------
-  BASE STYLES
----------------------------------------*/
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/*---------------------------------------
-  MAIN CONTAINER
----------------------------------------*/
 .google-maps-container {
-    max-width: 1440px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: var(--spacing-6);
     min-height: 100vh;
@@ -326,21 +408,18 @@
     }
 }
 
-/*---------------------------------------
-  HEADER SECTION
----------------------------------------*/
+/* Header */
 .page-header {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-4);
     margin-bottom: var(--spacing-8);
-    background: white;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
     padding: var(--spacing-6);
     border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--gray-200);
-    backdrop-filter: blur(8px);
-    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 @media (min-width: 768px) {
@@ -348,7 +427,6 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding: var(--spacing-6) var(--spacing-8);
     }
 }
 
@@ -368,12 +446,6 @@
     letter-spacing: -0.03em;
 }
 
-@media (min-width: 640px) {
-    .page-title {
-        font-size: 2.5rem;
-    }
-}
-
 .page-subtitle {
     font-size: 1rem;
     color: var(--gray-500);
@@ -381,36 +453,34 @@
     font-weight: 400;
 }
 
-@media (min-width: 640px) {
-    .page-subtitle {
-        font-size: 1.125rem;
-    }
+/* Button Group */
+.btn-group {
+    display: flex;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
 }
 
-/*---------------------------------------
-  BUTTONS
----------------------------------------*/
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    padding: var(--spacing-3) var(--spacing-5);
+    padding: var(--spacing-3) var(--spacing-4);
     font-size: 0.9375rem;
     font-weight: 600;
     line-height: 1.5;
     border-radius: var(--radius-lg);
     border: 1px solid transparent;
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: var(--transition-smooth);
     text-decoration: none;
     white-space: nowrap;
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
 }
 
-.btn::after {
+.btn::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -418,12 +488,12 @@
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
 
-.btn:active::after {
+.btn:active::before {
     width: 300px;
     height: 300px;
 }
@@ -438,7 +508,7 @@
     background: var(--danger-50);
     border-color: var(--danger-600);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-excel {
@@ -451,7 +521,47 @@
     background: var(--success-50);
     border-color: var(--success-600);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-scraping {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--primary-600);
+}
+
+.btn-scraping:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-stats {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.btn-stats:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-500);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-reset {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+    padding: var(--spacing-3);
+}
+
+.btn-reset:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-500);
+    transform: translateY(-2px) rotate(90deg);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-delete {
@@ -464,7 +574,7 @@
     background: var(--danger-50);
     border-color: var(--danger-600);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
 }
 
 .btn-delete:disabled {
@@ -477,9 +587,7 @@
     transform: none;
 }
 
-/*---------------------------------------
-  ALERTS
----------------------------------------*/
+/* Alerts */
 .alert {
     display: flex;
     align-items: center;
@@ -489,7 +597,7 @@
     margin-bottom: var(--spacing-6);
     background: white;
     border: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     animation: slideIn 0.3s ease-out;
 }
 
@@ -510,13 +618,23 @@
     color: var(--success-700);
 }
 
+.alert-info {
+    border-left: 4px solid var(--primary-600);
+    background: linear-gradient(to right, var(--primary-50), white);
+    color: var(--primary-700);
+}
+
+.alert-danger {
+    border-left: 4px solid var(--danger-600);
+    background: linear-gradient(to right, var(--danger-50), white);
+    color: var(--danger-700);
+}
+
 .alert i {
     font-size: 1.25rem;
 }
 
-/*---------------------------------------
-  SEARCH FORM
----------------------------------------*/
+/* Search Form */
 .search-form {
     margin-bottom: var(--spacing-8);
 }
@@ -528,14 +646,13 @@
     background: white;
     padding: var(--spacing-2);
     border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-lg);
     border: 1px solid var(--gray-200);
 }
 
 @media (min-width: 480px) {
     .search-box {
         flex-direction: row;
-        padding: var(--spacing-1);
     }
 }
 
@@ -548,11 +665,6 @@
     transition: var(--transition-base);
     background: transparent;
     color: var(--gray-900);
-}
-
-.search-input::placeholder {
-    color: var(--gray-400);
-    font-weight: 400;
 }
 
 .search-input:focus {
@@ -568,14 +680,12 @@
     border-radius: var(--radius-xl);
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition-base);
+    transition: var(--transition-smooth);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
     width: 100%;
-    position: relative;
-    overflow: hidden;
 }
 
 @media (min-width: 480px) {
@@ -591,13 +701,7 @@
     box-shadow: var(--shadow-lg);
 }
 
-.search-button:active {
-    transform: translateY(0);
-}
-
-/*---------------------------------------
-  LOADER
----------------------------------------*/
+/* Loader */
 .loader {
     text-align: center;
     padding: var(--spacing-8);
@@ -634,9 +738,7 @@
     display: none;
 }
 
-/*---------------------------------------
-  TABLE TOOLBAR
----------------------------------------*/
+/* Table Toolbar */
 .table-toolbar {
     display: flex;
     flex-direction: column;
@@ -646,7 +748,7 @@
     background: white;
     border-radius: var(--radius-xl);
     border: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
 }
 
 @media (min-width: 640px) {
@@ -654,7 +756,6 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding: var(--spacing-3) var(--spacing-5);
     }
 }
 
@@ -675,34 +776,31 @@
     margin-right: var(--spacing-1);
 }
 
-/*---------------------------------------
-  TABLE CONTAINER
----------------------------------------*/
-.table-container {
+/* Table Container */
+.table-container-wrapper {
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-xl);
     background: white;
-    margin-bottom: var(--spacing-6);
+    margin-bottom: var(--spacing-4);
     box-shadow: var(--shadow-lg);
-    transition: var(--transition-base);
+    overflow: hidden;
 }
 
-.table-container:hover {
-    box-shadow: var(--shadow-xl);
+.table-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
 }
 
-/*---------------------------------------
-  DATA TABLE
----------------------------------------*/
+/* Resizable Table */
 .data-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 0.9375rem;
-    min-width: 1000px;
+    table-layout: fixed;
 }
 
 .data-table thead {
@@ -711,7 +809,7 @@
 }
 
 .data-table th {
-    padding: var(--spacing-4) var(--spacing-5);
+    padding: var(--spacing-4) var(--spacing-3);
     text-align: left;
     font-weight: 700;
     font-size: 0.875rem;
@@ -719,18 +817,46 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     white-space: nowrap;
-    position: sticky;
-    top: 0;
+    position: relative;
+    user-select: none;
     background: inherit;
-    z-index: 10;
+    border-right: 1px solid var(--gray-200);
+}
+
+.data-table th:last-child {
+    border-right: none;
+}
+
+.data-table th.resizable {
+    cursor: col-resize;
+}
+
+.data-table th.resizable::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    transition: background 0.2s;
+}
+
+.data-table th.resizable:hover::after,
+.data-table th.resizable.resizing::after {
+    background: var(--primary-400);
+    cursor: col-resize;
 }
 
 .data-table td {
-    padding: var(--spacing-4) var(--spacing-5);
+    padding: var(--spacing-3) var(--spacing-3);
     border-bottom: 1px solid var(--gray-200);
     color: var(--gray-700);
     vertical-align: middle;
     transition: background-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .data-table tbody tr {
@@ -739,17 +865,64 @@
 
 .data-table tbody tr:hover {
     background: var(--gray-50);
-    transform: scale(1);
-    box-shadow: var(--shadow-sm);
 }
 
 .data-table tbody tr:last-child td {
     border-bottom: none;
 }
 
+/* Column Width Presets */
+.column-controls {
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.column-width-presets {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    background: white;
+    padding: var(--spacing-2);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+}
+
+.preset-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-right: var(--spacing-2);
+}
+
+.preset-btn {
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.preset-btn:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-300);
+}
+
+.preset-btn.active {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: white;
+}
+
 /* Checkbox column */
 .checkbox-col {
-    width: 50px;
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
     text-align: center;
 }
 
@@ -768,79 +941,114 @@
     transform: scale(1.1);
 }
 
-.checkbox:checked {
-    background-color: var(--primary-600);
-    border-color: var(--primary-600);
-}
-
 /* Company name */
 .company-name {
     font-weight: 700;
     color: var(--gray-900);
 }
 
-/* Website link */
-.website-link {
+/* Links */
+.website-link, .phone-link {
     color: var(--primary-600);
     text-decoration: none;
     font-weight: 500;
     transition: var(--transition-base);
-    display: inline-block;
-    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
 }
 
-.website-link::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: var(--primary-600);
-    transition: width 0.2s ease;
-}
-
-.website-link:hover {
+.website-link:hover, .phone-link:hover {
     color: var(--primary-700);
-}
-
-.website-link:hover::after {
-    width: 100%;
+    text-decoration: underline;
 }
 
 /* Badges */
+.email-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    color: var(--primary-700);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid var(--primary-200);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .rating-badge {
     display: inline-flex;
     align-items: center;
-    padding: var(--spacing-2) var(--spacing-3);
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
     background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
     color: var(--warning-700);
     border-radius: 9999px;
     font-weight: 700;
     font-size: 0.875rem;
-    white-space: nowrap;
     border: 1px solid var(--warning-200);
-    box-shadow: var(--shadow-xs);
 }
 
 .reviews-count {
     display: inline-flex;
     align-items: center;
-    padding: var(--spacing-2) var(--spacing-3);
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
     background: var(--gray-100);
     color: var(--gray-700);
     border-radius: 9999px;
     font-size: 0.875rem;
-    white-space: nowrap;
     border: 1px solid var(--gray-200);
     font-weight: 600;
 }
 
+/* Social links */
+.social-links {
+    display: flex;
+    gap: var(--spacing-1);
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    color: white;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.social-link.facebook {
+    background: #1877f2;
+}
+
+.social-link.instagram {
+    background: linear-gradient(45deg, #f09433, #d62976, #962fbf, #4f5bd5);
+}
+
+.social-link.linkedin {
+    background: #0077b5;
+}
+
+.social-link:hover {
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+/* Status badges */
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-3);
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
     border-radius: 9999px;
     font-weight: 600;
     font-size: 0.875rem;
@@ -855,10 +1063,16 @@
     border-color: var(--success-200);
 }
 
-.status-pending {
+.status-warning {
     background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
     color: var(--warning-700);
     border-color: var(--warning-200);
+}
+
+.status-pending {
+    background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+    color: var(--gray-700);
+    border-color: var(--gray-200);
 }
 
 .text-muted {
@@ -866,9 +1080,7 @@
     font-style: italic;
 }
 
-/*---------------------------------------
-  PAGINATION
----------------------------------------*/
+/* Pagination */
 .pagination-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -884,7 +1096,7 @@
     justify-content: center;
     min-width: 2.75rem;
     height: 2.75rem;
-    padding: 0 var(--spacing-3);
+    padding: 0 var(--spacing-2);
     border-radius: var(--radius-lg);
     background: white;
     border: 1px solid var(--gray-200);
@@ -917,9 +1129,7 @@
     background: var(--gray-100);
 }
 
-/*---------------------------------------
-  EMPTY STATE
----------------------------------------*/
+/* Empty State */
 .empty-state {
     text-align: center;
     padding: var(--spacing-12) var(--spacing-6);
@@ -941,20 +1151,25 @@
     }
 }
 
-.empty-state i {
-    font-size: 4rem;
-    color: var(--gray-300);
-    margin-bottom: var(--spacing-4);
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--spacing-4);
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--primary-600);
     animation: pulse 2s infinite;
 }
 
 @keyframes pulse {
     0%, 100% {
-        opacity: 1;
         transform: scale(1);
     }
     50% {
-        opacity: 0.8;
         transform: scale(1.05);
     }
 }
@@ -971,44 +1186,254 @@
     font-size: 1rem;
 }
 
-/*---------------------------------------
-  RESPONSIVE ADJUSTMENTS
----------------------------------------*/
-@media (max-width: 640px) {
-    .page-header {
-        padding: var(--spacing-4);
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-6);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-2xl);
+    animation: slideUp 0.3s ease;
+    border: 1px solid var(--gray-200);
+}
+
+.modal-content h3 {
+    margin-bottom: var(--spacing-4);
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.modal-content h3 i {
+    color: var(--primary-600);
+}
+
+.modal-content p {
+    margin-bottom: var(--spacing-6);
+    color: var(--gray-600);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
+    margin-top: var(--spacing-6);
+}
+
+/* Stats Modal */
+.stats-modal {
+    max-width: 600px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.stat-card {
+    background: var(--gray-50);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    transition: var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-card.highlight {
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-color: var(--primary-200);
+}
+
+.stat-card.highlight .stat-value {
+    color: var(--primary-700);
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, var(--success-50), var(--success-100));
+    border-color: var(--success-200);
+}
+
+.stat-card.success .stat-value {
+    color: var(--success-700);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-1);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.progress-section {
+    margin-bottom: var(--spacing-6);
+    background: var(--gray-50);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-2);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+/* Button Primary/Secondary */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    color: white;
+    border: none;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    color: var(--gray-700);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    border-left: 4px solid var(--primary-600);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    min-width: 300px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-left-color: var(--success-600);
+    background: linear-gradient(to right, var(--success-50), white);
+}
+
+.notification-error {
+    border-left-color: var(--danger-600);
+    background: linear-gradient(to right, var(--danger-50), white);
+}
+
+.notification i {
+    font-size: 1.25rem;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-    
-    .btn {
-        width: 100%;
-        padding: var(--spacing-3) var(--spacing-4);
-    }
-    
-    .table-toolbar .btn {
-        width: 100%;
-    }
-    
-    .checkbox {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-    
-    .data-table th,
-    .data-table td {
-        padding: var(--spacing-3) var(--spacing-4);
-    }
-    
-    .rating-badge,
-    .reviews-count,
-    .status-badge {
-        padding: var(--spacing-1) var(--spacing-2);
-        font-size: 0.8125rem;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/*---------------------------------------
-  SCROLLBAR STYLING
----------------------------------------*/
+/* Ripple Effect */
+.btn .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -1029,30 +1454,50 @@
     background: var(--gray-500);
 }
 
-/*---------------------------------------
-  FOCUS STATES
----------------------------------------*/
+/* Focus States */
 :focus-visible {
     outline: 2px solid var(--primary-500);
     outline-offset: 2px;
 }
 
-/*---------------------------------------
-  ANIMATIONS
----------------------------------------*/
-@keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
+/* Responsive */
+@media (max-width: 640px) {
+    .page-header {
+        padding: var(--spacing-4);
     }
-    100% {
-        background-position: 1000px 0;
+    
+    .btn {
+        width: 100%;
     }
-}
-
-.loading {
-    animation: shimmer 2s infinite;
-    background: linear-gradient(to right, var(--gray-100) 4%, var(--gray-200) 25%, var(--gray-100) 36%);
-    background-size: 1000px 100%;
+    
+    .btn-group {
+        width: 100%;
+    }
+    
+    .table-toolbar .btn {
+        width: 100%;
+    }
+    
+    .checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .column-controls {
+        justify-content: center;
+    }
+    
+    .column-width-presets {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .notification {
+        min-width: auto;
+        width: 90%;
+        left: 5%;
+        right: 5%;
+    }
 }
 </style>
 
@@ -1065,6 +1510,9 @@
         initializeTableSelection();
         initializeFormLoader();
         initializeButtonEffects();
+        initializeScrapingButtons();
+        initializeResizableColumns();
+        initializeColumnPresets();
     });
 
     // Table selection management
@@ -1141,6 +1589,198 @@
         });
     }
 
+    // Resizable Columns
+    function initializeResizableColumns() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const cols = table.querySelectorAll('th.resizable');
+        let isResizing = false;
+        let currentCol = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        cols.forEach(col => {
+            col.addEventListener('mousedown', function(e) {
+                // Only if clicking near the right edge
+                const rect = this.getBoundingClientRect();
+                const threshold = 10;
+                
+                if (e.clientX > rect.right - threshold) {
+                    isResizing = true;
+                    currentCol = this;
+                    startX = e.clientX;
+                    startWidth = this.offsetWidth;
+                    
+                    this.classList.add('resizing');
+                    
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                    
+                    e.preventDefault();
+                }
+            });
+        });
+
+        function onMouseMove(e) {
+            if (!isResizing || !currentCol) return;
+            
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(50, startWidth + diff); // Minimum 50px
+            
+            currentCol.style.width = newWidth + 'px';
+            
+            // Save to localStorage
+            saveColumnWidths();
+        }
+
+        function onMouseUp() {
+            if (isResizing) {
+                isResizing = false;
+                if (currentCol) {
+                    currentCol.classList.remove('resizing');
+                }
+                
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+        }
+
+        // Load saved widths
+        loadColumnWidths();
+    }
+
+    function saveColumnWidths() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const widths = {};
+        const cols = table.querySelectorAll('th.resizable');
+        
+        cols.forEach(col => {
+            const index = col.dataset.index;
+            widths[index] = col.style.width;
+        });
+
+        localStorage.setItem('googleMapsColumnWidths', JSON.stringify(widths));
+    }
+
+    function loadColumnWidths() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const saved = localStorage.getItem('googleMapsColumnWidths');
+        if (!saved) return;
+
+        try {
+            const widths = JSON.parse(saved);
+            const cols = table.querySelectorAll('th.resizable');
+            
+            cols.forEach(col => {
+                const index = col.dataset.index;
+                if (widths[index]) {
+                    col.style.width = widths[index];
+                }
+            });
+        } catch (e) {
+            console.error('Error loading column widths:', e);
+        }
+    }
+
+    // Column Presets
+    function initializeColumnPresets() {
+        const presetBtns = document.querySelectorAll('.preset-btn');
+        const resetBtn = document.getElementById('resetColumnsBtn');
+
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const width = this.dataset.width;
+                setColumnPreset(width);
+                
+                presetBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                resetColumnWidths();
+            });
+        }
+    }
+
+    function setColumnPreset(preset) {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const cols = table.querySelectorAll('th.resizable');
+        const widths = {
+            compact: {
+                '1': '150px',   // Entreprise
+                '2': '120px',   // Catégorie
+                '3': '150px',   // Adresse
+                '4': '120px',   // Téléphone
+                '5': '150px',   // Site web
+                '6': '150px',   // Email
+                '7': '100px',   // Réseaux
+                '8': '80px',    // Note
+                '9': '80px',    // Avis
+                '10': '120px'   // Statut
+            },
+            normal: {
+                '1': '200px',
+                '2': '150px',
+                '3': '200px',
+                '4': '150px',
+                '5': '200px',
+                '6': '200px',
+                '7': '120px',
+                '8': '80px',
+                '9': '80px',
+                '10': '120px'
+            },
+            wide: {
+                '1': '250px',
+                '2': '200px',
+                '3': '250px',
+                '4': '200px',
+                '5': '250px',
+                '6': '250px',
+                '7': '150px',
+                '8': '100px',
+                '9': '100px',
+                '10': '150px'
+            }
+        };
+
+        cols.forEach(col => {
+            const index = col.dataset.index;
+            if (widths[preset][index]) {
+                col.style.width = widths[preset][index];
+            }
+        });
+
+        saveColumnWidths();
+    }
+
+    function resetColumnWidths() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const cols = table.querySelectorAll('th.resizable');
+        cols.forEach(col => {
+            col.style.width = '';
+        });
+
+        localStorage.removeItem('googleMapsColumnWidths');
+        
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        showNotification('Colonnes réinitialisées', 'success');
+    }
+
     // Notification system
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
@@ -1163,70 +1803,184 @@
             }, 300);
         }, 3000);
     }
+
+    // Confirmation modal
+    function showConfirmation(title, message, onConfirm) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3><i class="fa-solid fa-question-circle"></i> ${title}</h3>
+                <p>${message}</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelBtn">Annuler</button>
+                    <button class="btn btn-primary" id="confirmBtn">Confirmer</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            modal.remove();
+            onConfirm();
+        });
+    }
+
+    // Stats modal
+    function showStatsModal(stats) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content stats-modal">
+                <h3><i class="fa-solid fa-chart-simple"></i> Statistiques de scraping</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total || 0}</div>
+                        <div class="stat-label">Total entreprises</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.with_website || 0}</div>
+                        <div class="stat-label">Avec site web</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.scraped || 0}</div>
+                        <div class="stat-label">Sites scrappés</div>
+                    </div>
+                    
+                    <div class="stat-card highlight">
+                        <div class="stat-value">${stats.pending || 0}</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-value">${stats.with_email || 0}</div>
+                        <div class="stat-label">Emails trouvés</div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span>${Math.round((stats.scraped / stats.with_website) * 100 || 0)}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(stats.scraped / stats.with_website) * 100 || 0}%"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="closeStatsBtn">Fermer</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('closeStatsBtn').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    // Scraping buttons
+    function initializeScrapingButtons() {
+        const retryBtn = document.getElementById('retryScrapingBtn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', function() {
+                showConfirmation(
+                    'Relancer le scraping',
+                    'Voulez-vous relancer le scraping pour tous les sites web non traités ?',
+                    function() {
+                        retryBtn.disabled = true;
+                        retryBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scraping en cours...';
+                        
+                        fetch('{{ route("client.google.retry-scraping") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(`HTTP ${response.status}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                showNotification(data.message, 'success');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                showNotification(data.message, 'error');
+                                retryBtn.disabled = false;
+                                retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            showNotification('Erreur lors du lancement du scraping', 'error');
+                            retryBtn.disabled = false;
+                            retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                        });
+                    }
+                );
+            });
+        }
+
+        const statsBtn = document.getElementById('scrapingStatsBtn');
+        if (statsBtn) {
+            statsBtn.addEventListener('click', function() {
+                statsBtn.disabled = true;
+                statsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+                
+                fetch('{{ route("client.google.scraping-stats") }}', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau');
+                    }
+                    return response.json();
+                })
+                .then(stats => {
+                    showStatsModal(stats);
+                    statsBtn.disabled = false;
+                    statsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> Statistiques';
+                })
+                .catch(error => {
+                    console.error('Erreur stats:', error);
+                    showNotification('Erreur lors du chargement des statistiques', 'error');
+                    statsBtn.disabled = false;
+                    statsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> Statistiques';
+                });
+            });
+        }
+    }
 })();
 </script>
-
-<style>
-/* Additional animations for buttons */
-.btn .ripple {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.4);
-    transform: scale(0);
-    animation: ripple 0.6s linear;
-    pointer-events: none;
-}
-
-@keyframes ripple {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-
-/* Notification styles */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 1rem 1.5rem;
-    background: white;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xl);
-    border-left: 4px solid var(--primary-600);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    transform: translateX(120%);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    z-index: 9999;
-    min-width: 300px;
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-.notification-success {
-    border-left-color: var(--success-600);
-    background: linear-gradient(to right, var(--success-50), white);
-}
-
-.notification-error {
-    border-left-color: var(--danger-600);
-    background: linear-gradient(to right, var(--danger-50), white);
-}
-
-.notification i {
-    font-size: 1.25rem;
-}
-
-.notification-success i {
-    color: var(--success-600);
-}
-
-.notification-error i {
-    color: var(--danger-600);
-}
-</style>
 @endsection

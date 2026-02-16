@@ -21,19 +21,33 @@ class ScrapeWebsite extends Command
     }
 
     $path = base_path('scraper/result.json');
+    $scraperPath = base_path('scraper');
 
-    // ✅ SUPPRIMER L’ANCIEN FICHIER
+    // ✅ NETTOYAGE COMPLET
     if (file_exists($path)) {
         unlink($path);
     }
+    
+    // Supprimer aussi les fichiers temporaires Scrapy
+    $tempFiles = glob($scraperPath . '/*.json.tmp');
+    foreach ($tempFiles as $file) {
+        unlink($file);
+    }
 
-   $cmd = 'cd ' . base_path('scraper') .
-       ' && scrapy crawl contacts -a url="' . escapeshellarg($url) . '" -O result.json --nolog';
+    // ✅ FORCER l'utilisation de la nouvelle URL
+    $cmd = sprintf(
+        'cd %s && scrapy crawl contacts -a url=%s -O result.json --nolog',
+        escapeshellarg($scraperPath),
+        escapeshellarg($url)
+    );
 
-exec($cmd);
+    $this->info("Exécution: " . $cmd);
+    exec($cmd . ' 2>&1', $output, $returnCode);
+    
+    // Log pour debug
+    $this->info("Return code: " . $returnCode);
+    $this->info("Output: " . implode("\n", $output));
 
-
-    // 🔎 Vérifier si le nouveau fichier existe
     if (!file_exists($path)) {
         $this->error('Fichier result.json introuvable');
         return Command::FAILURE;
@@ -47,20 +61,18 @@ exec($cmd);
     }
 
     foreach ($data as $item) {
+        ScrapedContact::create([
+            'client_id'  => $clientId,
+            'name'       => $item['name'] ?? null,
+            'email'      => $item['email'] ?? null,
+            'source_url' => $item['source_url'] ?? $url,
+            'facebook'   => $item['facebook'] ?? null,
+            'instagram'  => $item['instagram'] ?? null,
+            'linkedin'   => $item['linkedin'] ?? null,
+        ]);
+    }
 
-    ScrapedContact::create([
-        'client_id'  => $clientId,
-        'name'       => $item['name'] ?? null,
-        'email'      => $item['email'] ?? null,
-        'source_url' => $item['source_url'] ?? $url,
-        'facebook'   => $item['facebook'] ?? null,
-        'instagram'  => $item['instagram'] ?? null,
-        'linkedin'   => $item['linkedin'] ?? null,
-    ]);
-}
-
-
-    $this->info('Scraping terminé');
+    $this->info('Scraping terminé pour: ' . $url);
     return Command::SUCCESS;
 }
 
