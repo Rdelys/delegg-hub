@@ -3,648 +3,1984 @@
 @section('title', 'Google Maps')
 
 @section('content')
-
-<div class="google-wrapper">
-
-    <div class="google-card">
-
-        {{-- HEADER --}}
-        <div class="gs-header">
-            <div>
-                <h1 class="gs-title">Google Maps</h1>
-                <p class="gs-subtitle">
-                    Recherche intelligente d'entreprises locales
-                </p>
-            </div>
-
-            @if(isset($places) && $places->count())
-                <a href="{{ route('client.google.export.pdf') }}" class="gs-btn gs-btn-pdf">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    Export PDF
-                </a>
-            @endif
+<div class="google-maps-container">
+    {{-- Header Section --}}
+    <div class="page-header">
+        <div class="header-content">
+            <h1 class="page-title">Google Maps</h1>
+            <p class="page-subtitle">Recherche intelligente d'entreprises locales</p>
         </div>
+        
+        @if(isset($places) && $places->count())
+            <div class="btn-group">
+                <a href="{{ route('client.google.export.pdf') }}" class="btn btn-pdf">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>PDF</span>
+                </a>
 
-        {{-- SUCCESS --}}
-        @if(session('success'))
-            <div class="gs-alert-success">
-                <i class="fa-solid fa-circle-check"></i>
-                {{ session('success') }}
-            </div>
-        @endif
+                <a href="{{ route('client.google.export.excel') }}" class="btn btn-excel">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Excel</span>
+                </a>
 
-        {{-- FORM --}}
-        <form method="POST" action="{{ route('client.google.scrape') }}" class="gs-form">
-            @csrf
-            <div class="gs-search-box">
-                <input type="text"
-                       name="query"
-                       required
-                       placeholder="Ex : plombier Paris"
-                       value="{{ old('query') }}">
-                <button type="submit">
-                    <i class="fa-solid fa-magnifying-glass"></i>
+                <button type="button" class="btn btn-scraping" id="retryScrapingBtn">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Relancer scraping</span>
+                </button>
+
+                <button type="button" class="btn btn-stats" id="scrapingStatsBtn">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Statistiques</span>
+                </button>
+
+                <button type="button" class="btn btn-reset" id="resetColumnsBtn" title="Réinitialiser les colonnes">
+                    <i class="fa-solid fa-arrows-left-right"></i>
                 </button>
             </div>
-        </form>
+        @endif
+    </div>
 
-        {{-- RESULTS --}}
-        @if(isset($places) && $places->count())
+    {{-- Success Message --}}
+    @if(session('success'))
+        <div class="alert alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
 
-            <form method="POST"
-                  action="{{ route('client.google.delete.selected') }}"
-                  onsubmit="return confirm('Supprimer les lignes sélectionnées ?')">
-                @csrf
-                @method('DELETE')
+    @if(session('info'))
+        <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle"></i>
+            <span>{{ session('info') }}</span>
+        </div>
+    @endif
 
-                <div class="gs-toolbar">
-                    <div class="gs-count">
-                        <span id="selected-count">0</span> sélectionné(s)
-                    </div>
+    @if(session('error'))
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-exclamation-circle"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    @endif
 
-                    <button type="submit"
-                            id="delete-btn"
-                            class="gs-btn gs-btn-danger"
-                            disabled>
-                        <i class="fa-solid fa-trash"></i>
-                        Supprimer
-                    </button>
+    {{-- Search Form --}}
+    <form method="POST" action="{{ route('client.google.scrape') }}" class="search-form" id="searchForm">
+        @csrf
+        <div class="search-box">
+            <input type="text" 
+                   name="query" 
+                   required 
+                   placeholder="Ex : plombier Paris" 
+                   value="{{ old('query') }}"
+                   class="search-input">
+            <button type="submit" class="search-button">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </div>
+    </form>
+
+    {{-- Loader --}}
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Scraping en cours... Analyse Google + Sites web</p>
+    </div>
+
+    {{-- Results Section --}}
+    @if(isset($places) && $places->count())
+        <form method="POST" 
+              action="{{ route('client.google.delete.selected') }}" 
+              onsubmit="return confirm('Supprimer les lignes sélectionnées ?')"
+              class="results-form">
+            @csrf
+            @method('DELETE')
+
+            {{-- Toolbar --}}
+            <div class="table-toolbar">
+                <div class="selection-info">
+                    <span id="selected-count">0</span> sélectionné(s)
                 </div>
+                <button type="submit" id="delete-btn" class="btn btn-delete" disabled>
+                    <i class="fa-solid fa-trash"></i>
+                    <span>Supprimer</span>
+                </button>
+            </div>
 
-                <div class="gs-table-wrapper">
-                    <table class="gs-table">
+            {{-- Table Container with Resizable Columns --}}
+            <div class="table-container-wrapper">
+                <div class="table-scroll-container">
+                    <table class="data-table" id="resizableTable">
                         <thead>
-                        <tr>
-                            <th width="50">
-                                <input type="checkbox" id="select-all">
-                            </th>
-                            <th>Entreprise</th>
-                            <th>Catégorie</th>
-                            <th>Adresse</th>
-                            <th>Téléphone</th>
-                            <th>Site web</th>
-                        </tr>
-                        </thead>
-
-                        <tbody>
-                        @foreach($places as $p)
                             <tr>
-                                <td>
-                                    <input type="checkbox"
-                                           name="selected[]"
-                                           value="{{ $p->id }}"
-                                           class="row-checkbox">
-                                </td>
-                                <td class="gs-strong">{{ $p->name ?? '—' }}</td>
-                                <td>{{ $p->category ?? '—' }}</td>
-                                <td>{{ $p->address ?? '—' }}</td>
-                                <td>{{ $p->phone ?? '—' }}</td>
-                                <td>
-                                    @if($p->website)
-                                        <a href="{{ $p->website }}"
-                                           target="_blank"
-                                           class="gs-link">
-                                            {{ $p->website }}
-                                        </a>
-                                    @else
-                                        <span class="gs-muted">—</span>
-                                    @endif
-                                </td>
+                                <th class="checkbox-col" style="width: 50px; min-width: 50px; max-width: 50px;">
+                                    <input type="checkbox" id="select-all" class="checkbox">
+                                </th>
+                                <th class="resizable" data-index="1">Entreprise</th>
+                                <th class="resizable" data-index="2">Catégorie</th>
+                                <th class="resizable" data-index="3">Adresse</th>
+                                <th class="resizable" data-index="4">Téléphone</th>
+                                <th class="resizable" data-index="5">Site web</th>
+                                <th class="resizable" data-index="6">Email</th>
+                                <th class="resizable" data-index="7">Réseaux</th>
+                                <th class="resizable" data-index="8" style="width: 80px; min-width: 80px;">Note</th>
+                                <th class="resizable" data-index="9" style="width: 80px; min-width: 80px;">Avis</th>
+                                <th class="resizable" data-index="10" style="width: 120px; min-width: 120px;">Statut</th>
                             </tr>
-                        @endforeach
+                        </thead>
+                        <tbody>
+                            @foreach($places as $p)
+                                <tr>
+                                    <td class="checkbox-col">
+                                        <input type="checkbox" name="selected[]" value="{{ $p->id }}" class="checkbox row-checkbox">
+                                    </td>
+                                    <td class="company-name">{{ $p->name ?? '—' }}</td>
+                                    <td>{{ $p->category ?? '—' }}</td>
+                                    <td>{{ $p->address ?? '—' }}</td>
+                                    <td>
+                                        @if($p->phone)
+                                            <a href="tel:{{ $p->phone }}" class="phone-link">
+                                                <i class="fa-solid fa-phone"></i> {{ $p->phone }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->website)
+                                            <a href="{{ $p->website }}" target="_blank" class="website-link" title="{{ $p->website }}">
+                                                <i class="fa-solid fa-globe"></i>
+                                                {{ Str::limit(preg_replace('#^https?://#', '', $p->website), 20) }}
+                                            </a>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->email)
+                                            <span class="email-badge" title="{{ $p->email }}">
+                                                <i class="fa-solid fa-envelope"></i>
+                                                {{ Str::limit($p->email, 15) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="social-links">
+                                            @if($p->facebook)
+                                                <a href="{{ $p->facebook }}" target="_blank" class="social-link facebook" title="Facebook">
+                                                    <i class="fa-brands fa-facebook-f"></i>
+                                                </a>
+                                            @endif
+                                            @if($p->instagram)
+                                                <a href="{{ $p->instagram }}" target="_blank" class="social-link instagram" title="Instagram">
+                                                    <i class="fa-brands fa-instagram"></i>
+                                                </a>
+                                            @endif
+                                            @if($p->linkedin)
+                                                <a href="{{ $p->linkedin }}" target="_blank" class="social-link linkedin" title="LinkedIn">
+                                                    <i class="fa-brands fa-linkedin-in"></i>
+                                                </a>
+                                            @endif
+                                            @if(!$p->facebook && !$p->instagram && !$p->linkedin)
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($p->rating)
+                                            <span class="rating-badge" title="{{ $p->rating }} étoiles">
+                                                <i class="fa-solid fa-star"></i>
+                                                {{ number_format($p->rating, 1) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->reviews_count)
+                                            <span class="reviews-count" title="{{ $p->reviews_count }} avis">
+                                                <i class="fa-solid fa-comment"></i>
+                                                {{ number_format($p->reviews_count) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->website)
+                                            @if($p->contact_scraped_at)
+                                                <span class="status-badge status-success" title="Scrapé le {{ $p->contact_scraped_at->format('d/m/Y H:i') }}">
+                                                    <i class="fa-solid fa-check-circle"></i>
+                                                    Contacts OK
+                                                </span>
+                                            @elseif($p->website_scraped)
+                                                <span class="status-badge status-warning">
+                                                    <i class="fa-solid fa-clock"></i>
+                                                    En attente
+                                                </span>
+                                            @else
+                                                <span class="status-badge status-pending">
+                                                    <i class="fa-solid fa-hourglass-half"></i>
+                                                    Planifié
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
-
-                {{-- PAGINATION PREMIUM --}}
-                @if ($places->hasPages())
-                    <div class="gs-pagination">
-
-                        @if ($places->onFirstPage())
-                            <span class="pg disabled">‹</span>
-                        @else
-                            <a href="{{ $places->previousPageUrl() }}" class="pg">‹</a>
-                        @endif
-
-                        @foreach ($places->getUrlRange(
-                            max(1, $places->currentPage() - 2),
-                            min($places->lastPage(), $places->currentPage() + 2)
-                        ) as $page => $url)
-
-                            @if ($page == $places->currentPage())
-                                <span class="pg active">{{ $page }}</span>
-                            @else
-                                <a href="{{ $url }}" class="pg">{{ $page }}</a>
-                            @endif
-
-                        @endforeach
-
-                        @if ($places->hasMorePages())
-                            <a href="{{ $places->nextPageUrl() }}" class="pg">›</a>
-                        @else
-                            <span class="pg disabled">›</span>
-                        @endif
-
-                    </div>
-                @endif
-
-            </form>
-
-        @else
-            <div class="gs-empty">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <h3>Aucun résultat</h3>
             </div>
-        @endif
 
-    </div>
+            {{-- Column Width Controls --}}
+            <div class="column-controls">
+                <div class="column-width-presets">
+                    <span class="preset-label">Largeur des colonnes:</span>
+                    <button type="button" class="preset-btn" data-width="compact">Compact</button>
+                    <button type="button" class="preset-btn" data-width="normal">Normal</button>
+                    <button type="button" class="preset-btn" data-width="wide">Large</button>
+                </div>
+            </div>
+
+            {{-- Pagination --}}
+            @if ($places->hasPages())
+                <div class="pagination-wrapper">
+                    @if ($places->onFirstPage())
+                        <span class="pagination-item disabled">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </span>
+                    @else
+                        <a href="{{ $places->previousPageUrl() }}" class="pagination-item">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    @endif
+
+                    @foreach ($places->getUrlRange(
+                        max(1, $places->currentPage() - 2),
+                        min($places->lastPage(), $places->currentPage() + 2)
+                    ) as $page => $url)
+                        @if ($page == $places->currentPage())
+                            <span class="pagination-item active">{{ $page }}</span>
+                        @else
+                            <a href="{{ $url }}" class="pagination-item">{{ $page }}</a>
+                        @endif
+                    @endforeach
+
+                    @if ($places->hasMorePages())
+                        <a href="{{ $places->nextPageUrl() }}" class="pagination-item">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    @else
+                        <span class="pagination-item disabled">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </span>
+                    @endif
+                </div>
+            @endif
+        </form>
+    @else
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-map-location-dot"></i>
+            </div>
+            <h3>Aucun résultat</h3>
+            <p>Commencez par effectuer une recherche Google Maps</p>
+        </div>
+    @endif
 </div>
-
-
-{{-- SCRIPT --}}
-<script>
-const selectAll = document.getElementById('select-all');
-const checkboxes = document.querySelectorAll('.row-checkbox');
-const deleteBtn = document.getElementById('delete-btn');
-const selectedCount = document.getElementById('selected-count');
-
-function updateSelection() {
-    const checked = document.querySelectorAll('.row-checkbox:checked').length;
-    selectedCount.textContent = checked;
-    deleteBtn.disabled = checked === 0;
-}
-
-if(selectAll){
-    selectAll.addEventListener('change', function () {
-        checkboxes.forEach(cb => cb.checked = this.checked);
-        updateSelection();
-    });
-
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', function () {
-            updateSelection();
-            if (!this.checked) selectAll.checked = false;
-        });
-    });
-}
-</script>
-
 
 <style>
 /*=============================================================================
-  STYLE PROFESSIONNEL - NEUTRE - RESPONSIVE
+  GOOGLE MAPS - ULTRA PREMIUM STYLE AVEC COLONNES REDIMENSIONNABLES
   =============================================================================*/
 
-/*---------------------------------------
-  VARIABLES & RESET
----------------------------------------*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-    --color-primary: #2563eb;
-    --color-primary-light: #3b82f6;
-    --color-primary-soft: #dbeafe;
-    --color-success: #059669;
-    --color-success-light: #d1fae5;
-    --color-danger: #dc2626;
-    --color-danger-light: #fee2e2;
-    --color-gray-50: #f9fafb;
-    --color-gray-100: #f3f4f6;
-    --color-gray-200: #e5e7eb;
-    --color-gray-300: #d1d5db;
-    --color-gray-400: #9ca3af;
-    --color-gray-500: #6b7280;
-    --color-gray-600: #4b5563;
-    --color-gray-700: #374151;
-    --color-gray-800: #1f2937;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --primary-50: #eff6ff;
+    --primary-100: #dbeafe;
+    --primary-200: #bfdbfe;
+    --primary-300: #93c5fd;
+    --primary-400: #60a5fa;
+    --primary-500: #3b82f6;
+    --primary-600: #2563eb;
+    --primary-700: #1d4ed8;
+    --primary-800: #1e40af;
+    --primary-900: #1e3a8a;
+    
+    --success-50: #f0fdf4;
+    --success-100: #dcfce7;
+    --success-200: #bbf7d0;
+    --success-300: #86efac;
+    --success-400: #4ade80;
+    --success-500: #22c55e;
+    --success-600: #16a34a;
+    --success-700: #15803d;
+    --success-800: #166534;
+    --success-900: #14532d;
+    
+    --danger-50: #fef2f2;
+    --danger-100: #fee2e2;
+    --danger-200: #fecaca;
+    --danger-300: #fca5a5;
+    --danger-400: #f87171;
+    --danger-500: #ef4444;
+    --danger-600: #dc2626;
+    --danger-700: #b91c1c;
+    --danger-800: #991b1b;
+    --danger-900: #7f1d1d;
+    
+    --warning-50: #fffbeb;
+    --warning-100: #fef3c7;
+    --warning-200: #fde68a;
+    --warning-300: #fcd34d;
+    --warning-400: #fbbf24;
+    --warning-500: #f59e0b;
+    --warning-600: #d97706;
+    --warning-700: #b45309;
+    --warning-800: #92400e;
+    --warning-900: #78350f;
+    
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    
     --radius-sm: 0.375rem;
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
-    --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --radius-2xl: 1.5rem;
+    
+    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+    --spacing-10: 2.5rem;
+    --spacing-12: 3rem;
 }
 
-/*---------------------------------------
-  LAYOUT PRINCIPAL
----------------------------------------*/
-.google-wrapper {
-    padding: 2rem 1.5rem;
-    min-height: 100vh;
-    background-color: var(--color-gray-50);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.google-card {
-    max-width: 1440px;
+.google-maps-container {
+    max-width: 1600px;
     margin: 0 auto;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    padding: 1.75rem 1.5rem;
+    padding: var(--spacing-6);
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--gray-50) 0%, #ffffff 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
 }
 
 @media (min-width: 640px) {
-    .google-card {
-        padding: 2rem 2rem;
+    .google-maps-container {
+        padding: var(--spacing-8);
     }
 }
 
 @media (min-width: 1024px) {
-    .google-card {
-        padding: 2.5rem 2.5rem;
+    .google-maps-container {
+        padding: var(--spacing-10);
     }
 }
 
-/*---------------------------------------
-  HEADER
----------------------------------------*/
-.gs-header {
+/* Header */
+.page-header {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-8);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    padding: var(--spacing-6);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 @media (min-width: 768px) {
-    .gs-header {
+    .page-header {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
     }
 }
 
-.gs-title {
-    font-size: 1.875rem;
-    font-weight: 700;
+.header-content {
+    flex: 1;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-700) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     line-height: 1.2;
-    color: var(--color-gray-800);
-    margin: 0 0 0.25rem 0;
-    letter-spacing: -0.025em;
+    margin-bottom: var(--spacing-2);
+    letter-spacing: -0.03em;
 }
 
-@media (min-width: 640px) {
-    .gs-title {
-        font-size: 2.25rem;
-    }
-}
-
-.gs-subtitle {
+.page-subtitle {
     font-size: 1rem;
-    color: var(--color-gray-500);
+    color: var(--gray-500);
     margin: 0;
     font-weight: 400;
 }
 
-@media (min-width: 640px) {
-    .gs-subtitle {
-        font-size: 1.125rem;
-    }
-}
-
-/*---------------------------------------
-  ALERTES
----------------------------------------*/
-.gs-alert-success {
-    background-color: var(--color-success-light);
-    color: #065f46;
-    padding: 1rem 1.25rem;
-    border-radius: var(--radius-md);
-    margin-bottom: 1.5rem;
+/* Button Group */
+.btn-group {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 500;
-    border-left: 4px solid var(--color-success);
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
 }
 
-.gs-alert-success i {
-    font-size: 1.25rem;
-}
-
-/*---------------------------------------
-  FORMULAIRE DE RECHERCHE
----------------------------------------*/
-.gs-form {
-    margin-bottom: 2rem;
-}
-
-.gs-search-box {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-@media (min-width: 480px) {
-    .gs-search-box {
-        flex-direction: row;
-        align-items: stretch;
-    }
-}
-
-.gs-search-box input {
-    flex: 1 1 0%;
-    padding: 0.875rem 1.25rem;
-    border: 1px solid var(--color-gray-300);
-    border-radius: var(--radius-lg);
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    background-color: white;
-    width: 100%;
-}
-
-.gs-search-box input:focus {
-    outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.gs-search-box button {
-    background-color: var(--color-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-lg);
-    padding: 0.875rem 1.75rem;
-    font-weight: 600;
-    font-size: 1rem;
+.btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3) var(--spacing-4);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.5;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-pdf {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--danger-600);
+}
+
+.btn-pdf:hover {
+    background: var(--danger-50);
+    border-color: var(--danger-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-excel {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--success-600);
+}
+
+.btn-excel:hover {
+    background: var(--success-50);
+    border-color: var(--success-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-scraping {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--primary-600);
+}
+
+.btn-scraping:hover {
+    background: var(--primary-50);
+    border-color: var(--primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-stats {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.btn-stats:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-500);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-reset {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--gray-700);
+    padding: var(--spacing-3);
+}
+
+.btn-reset:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-500);
+    transform: translateY(-2px) rotate(90deg);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-delete {
+    background: white;
+    border-color: var(--gray-200);
+    color: var(--danger-600);
+}
+
+.btn-delete:hover:not(:disabled) {
+    background: var(--danger-50);
+    border-color: var(--danger-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-delete:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--gray-50);
+    border-color: var(--gray-200);
+    color: var(--gray-400);
+    box-shadow: none;
+    transform: none;
+}
+
+/* Alerts */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4) var(--spacing-5);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-6);
+    background: white;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-md);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert-success {
+    border-left: 4px solid var(--success-600);
+    background: linear-gradient(to right, var(--success-50), white);
+    color: var(--success-700);
+}
+
+.alert-info {
+    border-left: 4px solid var(--primary-600);
+    background: linear-gradient(to right, var(--primary-50), white);
+    color: var(--primary-700);
+}
+
+.alert-danger {
+    border-left: 4px solid var(--danger-600);
+    background: linear-gradient(to right, var(--danger-50), white);
+    color: var(--danger-700);
+}
+
+.alert i {
+    font-size: 1.25rem;
+}
+
+/* Search Form */
+.search-form {
+    margin-bottom: var(--spacing-8);
+}
+
+.search-box {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    background: white;
+    padding: var(--spacing-2);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+}
+
+@media (min-width: 480px) {
+    .search-box {
+        flex-direction: row;
+    }
+}
+
+.search-input {
+    flex: 1;
+    padding: var(--spacing-4) var(--spacing-5);
+    border: none;
+    border-radius: var(--radius-xl);
+    font-size: 1rem;
+    transition: var(--transition-base);
+    background: transparent;
+    color: var(--gray-900);
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--primary-200);
+}
+
+.search-button {
+    padding: var(--spacing-4) var(--spacing-6);
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    color: white;
+    border: none;
+    border-radius: var(--radius-xl);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
     width: 100%;
 }
 
 @media (min-width: 480px) {
-    .gs-search-box button {
+    .search-button {
         width: auto;
+        min-width: 120px;
     }
 }
 
-.gs-search-box button:hover {
-    background-color: #1d4ed8;
+.search-button:hover {
+    background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
-.gs-search-box button i {
-    font-size: 1rem;
+/* Loader */
+.loader {
+    text-align: center;
+    padding: var(--spacing-8);
+    background: white;
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--spacing-6);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.3s ease-out;
 }
 
-/*---------------------------------------
-  TOOLBAR
----------------------------------------*/
-.gs-toolbar {
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--primary-600);
+    border-right-color: var(--primary-400);
+    border-bottom-color: var(--primary-300);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    margin: 0 auto var(--spacing-4);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
+}
+
+/* Table Toolbar */
+.table-toolbar {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin: 1.5rem 0 1.25rem;
+    gap: var(--spacing-3);
+    margin: var(--spacing-6) 0 var(--spacing-4);
+    padding: var(--spacing-3) var(--spacing-4);
+    background: white;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-md);
 }
 
 @media (min-width: 640px) {
-    .gs-toolbar {
+    .table-toolbar {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
     }
 }
 
-.gs-count {
+.selection-info {
+    padding: var(--spacing-2) var(--spacing-4);
+    background: var(--gray-100);
+    border-radius: 9999px;
     font-size: 0.9375rem;
-    color: var(--color-gray-600);
-    background-color: var(--color-gray-100);
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-lg);
+    color: var(--gray-600);
     display: inline-flex;
     align-items: center;
-    font-weight: 500;
+    border: 1px solid var(--gray-200);
 }
 
-.gs-count span {
+.selection-info span {
     font-weight: 700;
-    color: var(--color-gray-800);
-    margin-right: 0.25rem;
+    color: var(--gray-900);
+    margin-right: var(--spacing-1);
 }
 
-/*---------------------------------------
-  BOUTONS
----------------------------------------*/
-.gs-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    border-radius: var(--radius-lg);
-    transition: all 0.2s ease;
-    cursor: pointer;
-    border: 1px solid transparent;
-    text-decoration: none;
-    line-height: 1.5;
+/* Table Container */
+.table-container-wrapper {
+    width: 100%;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    background: white;
+    margin-bottom: var(--spacing-4);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
 }
 
-.gs-btn-danger {
-    background-color: white;
-    border-color: var(--color-gray-300);
-    color: var(--color-danger);
-}
-
-.gs-btn-danger:hover:not(:disabled) {
-    background-color: var(--color-danger-light);
-    border-color: var(--color-danger);
-}
-
-.gs-btn-danger:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: white;
-    border-color: var(--color-gray-200);
-    color: var(--color-gray-400);
-}
-
-.gs-btn-pdf {
-    background-color: white;
-    border: 1px solid var(--color-gray-300);
-    color: var(--color-danger);
-    padding: 0.625rem 1.25rem;
-}
-
-.gs-btn-pdf:hover {
-    background-color: var(--color-danger-light);
-    border-color: var(--color-danger);
-}
-
-.gs-btn i {
-    font-size: 0.9375rem;
-}
-
-/*---------------------------------------
-  TABLEAU
----------------------------------------*/
-.gs-table-wrapper {
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--color-gray-200);
+.table-scroll-container {
+    width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    margin-bottom: 1.5rem;
-    background-color: white;
+    position: relative;
 }
 
-.gs-table {
+/* Resizable Table */
+.data-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 0.9375rem;
-    min-width: 700px;
+    table-layout: fixed;
 }
 
-.gs-table thead {
-    background-color: var(--color-gray-50);
-    border-bottom: 2px solid var(--color-gray-200);
+.data-table thead {
+    background: linear-gradient(to bottom, var(--gray-50), white);
+    border-bottom: 2px solid var(--gray-200);
 }
 
-.gs-table th {
-    padding: 1rem 1.25rem;
+.data-table th {
+    padding: var(--spacing-4) var(--spacing-3);
     text-align: left;
-    font-weight: 600;
-    color: var(--color-gray-700);
-    white-space: nowrap;
+    font-weight: 700;
     font-size: 0.875rem;
+    color: var(--gray-600);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    white-space: nowrap;
+    position: relative;
+    user-select: none;
+    background: inherit;
+    border-right: 1px solid var(--gray-200);
 }
 
-.gs-table td {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--color-gray-200);
+.data-table th:last-child {
+    border-right: none;
+}
+
+.data-table th.resizable {
+    cursor: col-resize;
+}
+
+.data-table th.resizable::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    transition: background 0.2s;
+}
+
+.data-table th.resizable:hover::after,
+.data-table th.resizable.resizing::after {
+    background: var(--primary-400);
+    cursor: col-resize;
+}
+
+.data-table td {
+    padding: var(--spacing-3) var(--spacing-3);
+    border-bottom: 1px solid var(--gray-200);
+    color: var(--gray-700);
     vertical-align: middle;
-    color: var(--color-gray-700);
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.gs-table tbody tr:last-child td {
+.data-table tbody tr {
+    transition: var(--transition-base);
+}
+
+.data-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.data-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.gs-table tbody tr:hover {
-    background-color: var(--color-gray-50);
-    transition: background-color 0.15s ease;
+/* Column Width Presets */
+.column-controls {
+    margin-bottom: var(--spacing-4);
+    display: flex;
+    justify-content: flex-end;
 }
 
-.gs-strong {
-    font-weight: 600;
-    color: var(--color-gray-800);
+.column-width-presets {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    background: white;
+    padding: var(--spacing-2);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
 }
 
-.gs-muted {
-    color: var(--color-gray-400);
+.preset-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-right: var(--spacing-2);
 }
 
-/*---------------------------------------
-  CHECKBOXES
----------------------------------------*/
-.gs-table input[type="checkbox"] {
-    width: 1.125rem;
-    height: 1.125rem;
-    border-radius: 0.25rem;
-    border: 1.5px solid var(--color-gray-400);
+.preset-btn {
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--gray-700);
     cursor: pointer;
-    accent-color: var(--color-primary);
+    transition: var(--transition-base);
 }
 
-/*---------------------------------------
-  LIENS
----------------------------------------*/
-.gs-link {
-    color: var(--color-primary);
+.preset-btn:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-300);
+}
+
+.preset-btn.active {
+    background: var(--primary-600);
+    border-color: var(--primary-600);
+    color: white;
+}
+
+/* Checkbox column */
+.checkbox-col {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+    text-align: center;
+}
+
+.checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 2px solid var(--gray-400);
+    cursor: pointer;
+    accent-color: var(--primary-600);
+    transition: var(--transition-base);
+}
+
+.checkbox:hover {
+    border-color: var(--primary-600);
+    transform: scale(1.1);
+}
+
+/* Company name */
+.company-name {
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+/* Links */
+.website-link, .phone-link {
+    color: var(--primary-600);
     text-decoration: none;
     font-weight: 500;
-    word-break: break-all;
-    transition: color 0.2s ease;
+    transition: var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
 }
 
-.gs-link:hover {
-    color: #1d4ed8;
+.website-link:hover, .phone-link:hover {
+    color: var(--primary-700);
     text-decoration: underline;
 }
 
-/*---------------------------------------
-  PAGINATION
----------------------------------------*/
-.gs-pagination {
+/* Badges */
+.email-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    color: var(--primary-700);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid var(--primary-200);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
+    background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
+    color: var(--warning-700);
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    border: 1px solid var(--warning-200);
+}
+
+.reviews-count {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid var(--gray-200);
+    font-weight: 600;
+}
+
+/* Social links */
+.social-links {
+    display: flex;
+    gap: var(--spacing-1);
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    color: white;
+    transition: var(--transition-smooth);
+    text-decoration: none;
+    font-size: 1rem;
+}
+
+.social-link.facebook {
+    background: #1877f2;
+}
+
+.social-link.instagram {
+    background: linear-gradient(45deg, #f09433, #d62976, #962fbf, #4f5bd5);
+}
+
+.social-link.linkedin {
+    background: #0077b5;
+}
+
+.social-link:hover {
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-xs);
+}
+
+.status-success {
+    background: linear-gradient(135deg, var(--success-50), var(--success-100));
+    color: var(--success-700);
+    border-color: var(--success-200);
+}
+
+.status-warning {
+    background: linear-gradient(135deg, var(--warning-50), var(--warning-100));
+    color: var(--warning-700);
+    border-color: var(--warning-200);
+}
+
+.status-pending {
+    background: linear-gradient(135deg, var(--gray-50), var(--gray-100));
+    color: var(--gray-700);
+    border-color: var(--gray-200);
+}
+
+.text-muted {
+    color: var(--gray-400);
+    font-style: italic;
+}
+
+/* Pagination */
+.pagination-wrapper {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-8);
 }
 
-.pg {
+.pagination-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 2.5rem;
-    height: 2.5rem;
-    padding: 0 0.5rem;
-    border-radius: var(--radius-md);
-    background-color: white;
-    border: 1px solid var(--color-gray-300);
-    color: var(--color-gray-700);
-    font-weight: 500;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    padding: 0 var(--spacing-2);
+    border-radius: var(--radius-lg);
+    background: white;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-700);
+    font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: var(--transition-base);
     font-size: 0.9375rem;
+    box-shadow: var(--shadow-xs);
 }
 
-.pg:hover:not(.active):not(.disabled) {
-    background-color: var(--color-gray-50);
-    border-color: var(--color-gray-400);
+.pagination-item:hover:not(.active):not(.disabled) {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-.pg.active {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
+.pagination-item.active {
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    border-color: var(--primary-600);
     color: white;
+    box-shadow: var(--shadow-md);
 }
 
-.pg.disabled {
-    opacity: 0.5;
+.pagination-item.disabled {
+    opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
-    background-color: var(--color-gray-100);
+    background: var(--gray-100);
 }
 
-/*---------------------------------------
-  ÉTAT VIDE
----------------------------------------*/
-.gs-empty {
+/* Empty State */
+.empty-state {
     text-align: center;
-    padding: 3rem 1.5rem;
-    background-color: var(--color-gray-50);
+    padding: var(--spacing-12) var(--spacing-6);
+    background: white;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-lg);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--spacing-4);
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--primary-600);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-2);
+}
+
+.empty-state p {
+    color: var(--gray-500);
+    font-size: 1rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-6);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-2xl);
+    animation: slideUp 0.3s ease;
+    border: 1px solid var(--gray-200);
+}
+
+.modal-content h3 {
+    margin-bottom: var(--spacing-4);
+    color: var(--gray-900);
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+}
+
+.modal-content h3 i {
+    color: var(--primary-600);
+}
+
+.modal-content p {
+    margin-bottom: var(--spacing-6);
+    color: var(--gray-600);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
+    margin-top: var(--spacing-6);
+}
+
+/* Stats Modal */
+.stats-modal {
+    max-width: 600px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-6);
+}
+
+.stat-card {
+    background: var(--gray-50);
+    padding: var(--spacing-4);
     border-radius: var(--radius-lg);
-    border: 1px solid var(--color-gray-200);
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    transition: var(--transition-base);
 }
 
-.gs-empty i {
-    font-size: 3rem;
-    color: var(--color-gray-400);
-    margin-bottom: 1rem;
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
-.gs-empty h3 {
-    font-size: 1.25rem;
+.stat-card.highlight {
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-color: var(--primary-200);
+}
+
+.stat-card.highlight .stat-value {
+    color: var(--primary-700);
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, var(--success-50), var(--success-100));
+    border-color: var(--success-200);
+}
+
+.stat-card.success .stat-value {
+    color: var(--success-700);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--gray-900);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-1);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.progress-section {
+    margin-bottom: var(--spacing-6);
+    background: var(--gray-50);
+    padding: var(--spacing-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--gray-200);
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-2);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
+    border-radius: 9999px;
+    transition: width 0.3s ease;
+}
+
+/* Button Primary/Secondary */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    color: white;
+    border: none;
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-lg);
     font-weight: 600;
-    color: var(--color-gray-700);
-    margin: 0.5rem 0 0;
+    cursor: pointer;
+    transition: var(--transition-base);
 }
 
-/*---------------------------------------
-  UTILITAIRES
----------------------------------------*/
-.gs-form {
-    width: 100%;
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-700), var(--primary-800));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
+.btn-secondary {
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    color: var(--gray-700);
+    padding: var(--spacing-2) var(--spacing-4);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.btn-secondary:hover {
+    background: var(--gray-200);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    border-left: 4px solid var(--primary-600);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    z-index: 9999;
+    min-width: 300px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-left-color: var(--success-600);
+    background: linear-gradient(to right, var(--success-50), white);
+}
+
+.notification-error {
+    border-left-color: var(--danger-600);
+    background: linear-gradient(to right, var(--danger-50), white);
+}
+
+.notification i {
+    font-size: 1.25rem;
+}
+
+/* Animations */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ripple Effect */
+.btn .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-100);
+    border-radius: var(--radius-lg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-400);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-base);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-500);
+}
+
+/* Focus States */
+:focus-visible {
+    outline: 2px solid var(--primary-500);
+    outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .page-header {
+        padding: var(--spacing-4);
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .btn-group {
+        width: 100%;
+    }
+    
+    .table-toolbar .btn {
+        width: 100%;
+    }
+    
+    .checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .column-controls {
+        justify-content: center;
+    }
+    
+    .column-width-presets {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .notification {
+        min-width: auto;
+        width: 90%;
+        left: 5%;
+        right: 5%;
+    }
+}
 </style>
 
+<script>
+(function() {
+    'use strict';
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTableSelection();
+        initializeFormLoader();
+        initializeButtonEffects();
+        initializeScrapingButtons();
+        initializeResizableColumns();
+        initializeColumnPresets();
+    });
+
+    // Table selection management
+    function initializeTableSelection() {
+        const selectAll = document.getElementById('select-all');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        const deleteBtn = document.getElementById('delete-btn');
+        const selectedCount = document.getElementById('selected-count');
+
+        if (!selectAll || !checkboxes.length || !deleteBtn || !selectedCount) return;
+
+        function updateSelection() {
+            const checked = document.querySelectorAll('.row-checkbox:checked').length;
+            selectedCount.textContent = checked;
+            deleteBtn.disabled = checked === 0;
+            
+            if (selectAll) {
+                selectAll.checked = checked === checkboxes.length && checkboxes.length > 0;
+                selectAll.indeterminate = checked > 0 && checked < checkboxes.length;
+            }
+        }
+
+        selectAll.addEventListener('change', function() {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateSelection();
+        });
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelection);
+        });
+
+        updateSelection();
+    }
+
+    // Form loader
+    function initializeFormLoader() {
+        const searchForm = document.getElementById('searchForm');
+        const loader = document.getElementById('loader');
+
+        if (searchForm && loader) {
+            searchForm.addEventListener('submit', function(e) {
+                const queryInput = this.querySelector('input[name="query"]');
+                if (queryInput && queryInput.value.trim() === '') {
+                    e.preventDefault();
+                    showNotification('Veuillez saisir un terme de recherche', 'error');
+                    return;
+                }
+                
+                loader.classList.remove('hidden');
+            });
+        }
+    }
+
+    // Button ripple effects
+    function initializeButtonEffects() {
+        const buttons = document.querySelectorAll('.btn');
+        
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+                
+                const x = e.clientX - e.target.offsetLeft;
+                const y = e.clientY - e.target.offsetTop;
+                
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+    }
+
+    // Resizable Columns
+    function initializeResizableColumns() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const cols = table.querySelectorAll('th.resizable');
+        let isResizing = false;
+        let currentCol = null;
+        let startX = 0;
+        let startWidth = 0;
+
+        cols.forEach(col => {
+            col.addEventListener('mousedown', function(e) {
+                // Only if clicking near the right edge
+                const rect = this.getBoundingClientRect();
+                const threshold = 10;
+                
+                if (e.clientX > rect.right - threshold) {
+                    isResizing = true;
+                    currentCol = this;
+                    startX = e.clientX;
+                    startWidth = this.offsetWidth;
+                    
+                    this.classList.add('resizing');
+                    
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                    
+                    e.preventDefault();
+                }
+            });
+        });
+
+        function onMouseMove(e) {
+            if (!isResizing || !currentCol) return;
+            
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(50, startWidth + diff); // Minimum 50px
+            
+            currentCol.style.width = newWidth + 'px';
+            
+            // Save to localStorage
+            saveColumnWidths();
+        }
+
+        function onMouseUp() {
+            if (isResizing) {
+                isResizing = false;
+                if (currentCol) {
+                    currentCol.classList.remove('resizing');
+                }
+                
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+        }
+
+        // Load saved widths
+        loadColumnWidths();
+    }
+
+    function saveColumnWidths() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const widths = {};
+        const cols = table.querySelectorAll('th.resizable');
+        
+        cols.forEach(col => {
+            const index = col.dataset.index;
+            widths[index] = col.style.width;
+        });
+
+        localStorage.setItem('googleMapsColumnWidths', JSON.stringify(widths));
+    }
+
+    function loadColumnWidths() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const saved = localStorage.getItem('googleMapsColumnWidths');
+        if (!saved) return;
+
+        try {
+            const widths = JSON.parse(saved);
+            const cols = table.querySelectorAll('th.resizable');
+            
+            cols.forEach(col => {
+                const index = col.dataset.index;
+                if (widths[index]) {
+                    col.style.width = widths[index];
+                }
+            });
+        } catch (e) {
+            console.error('Error loading column widths:', e);
+        }
+    }
+
+    // Column Presets
+    function initializeColumnPresets() {
+        const presetBtns = document.querySelectorAll('.preset-btn');
+        const resetBtn = document.getElementById('resetColumnsBtn');
+
+        presetBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const width = this.dataset.width;
+                setColumnPreset(width);
+                
+                presetBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                resetColumnWidths();
+            });
+        }
+    }
+
+    function setColumnPreset(preset) {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const cols = table.querySelectorAll('th.resizable');
+        const widths = {
+            compact: {
+                '1': '150px',   // Entreprise
+                '2': '120px',   // Catégorie
+                '3': '150px',   // Adresse
+                '4': '120px',   // Téléphone
+                '5': '150px',   // Site web
+                '6': '150px',   // Email
+                '7': '100px',   // Réseaux
+                '8': '80px',    // Note
+                '9': '80px',    // Avis
+                '10': '120px'   // Statut
+            },
+            normal: {
+                '1': '200px',
+                '2': '150px',
+                '3': '200px',
+                '4': '150px',
+                '5': '200px',
+                '6': '200px',
+                '7': '120px',
+                '8': '80px',
+                '9': '80px',
+                '10': '120px'
+            },
+            wide: {
+                '1': '250px',
+                '2': '200px',
+                '3': '250px',
+                '4': '200px',
+                '5': '250px',
+                '6': '250px',
+                '7': '150px',
+                '8': '100px',
+                '9': '100px',
+                '10': '150px'
+            }
+        };
+
+        cols.forEach(col => {
+            const index = col.dataset.index;
+            if (widths[preset][index]) {
+                col.style.width = widths[preset][index];
+            }
+        });
+
+        saveColumnWidths();
+    }
+
+    function resetColumnWidths() {
+        const table = document.getElementById('resizableTable');
+        if (!table) return;
+
+        const cols = table.querySelectorAll('th.resizable');
+        cols.forEach(col => {
+            col.style.width = '';
+        });
+
+        localStorage.removeItem('googleMapsColumnWidths');
+        
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        showNotification('Colonnes réinitialisées', 'success');
+    }
+
+    // Notification system
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 100);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Confirmation modal
+    function showConfirmation(title, message, onConfirm) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3><i class="fa-solid fa-question-circle"></i> ${title}</h3>
+                <p>${message}</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelBtn">Annuler</button>
+                    <button class="btn btn-primary" id="confirmBtn">Confirmer</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            modal.remove();
+        });
+        
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            modal.remove();
+            onConfirm();
+        });
+    }
+
+    // Stats modal
+    function showStatsModal(stats) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content stats-modal">
+                <h3><i class="fa-solid fa-chart-simple"></i> Statistiques de scraping</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total || 0}</div>
+                        <div class="stat-label">Total entreprises</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.with_website || 0}</div>
+                        <div class="stat-label">Avec site web</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.scraped || 0}</div>
+                        <div class="stat-label">Sites scrappés</div>
+                    </div>
+                    
+                    <div class="stat-card highlight">
+                        <div class="stat-value">${stats.pending || 0}</div>
+                        <div class="stat-label">En attente</div>
+                    </div>
+                    
+                    <div class="stat-card success">
+                        <div class="stat-value">${stats.with_email || 0}</div>
+                        <div class="stat-label">Emails trouvés</div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span>Progression</span>
+                        <span>${Math.round((stats.scraped / stats.with_website) * 100 || 0)}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(stats.scraped / stats.with_website) * 100 || 0}%"></div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="closeStatsBtn">Fermer</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('closeStatsBtn').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    // Scraping buttons
+    function initializeScrapingButtons() {
+        const retryBtn = document.getElementById('retryScrapingBtn');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', function() {
+                showConfirmation(
+                    'Relancer le scraping',
+                    'Voulez-vous relancer le scraping pour tous les sites web non traités ?',
+                    function() {
+                        retryBtn.disabled = true;
+                        retryBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scraping en cours...';
+                        
+                        fetch('{{ route("client.google.retry-scraping") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    throw new Error(`HTTP ${response.status}`);
+                                });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                showNotification(data.message, 'success');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                showNotification(data.message, 'error');
+                                retryBtn.disabled = false;
+                                retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur:', error);
+                            showNotification('Erreur lors du lancement du scraping', 'error');
+                            retryBtn.disabled = false;
+                            retryBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Relancer scraping';
+                        });
+                    }
+                );
+            });
+        }
+
+        const statsBtn = document.getElementById('scrapingStatsBtn');
+        if (statsBtn) {
+            statsBtn.addEventListener('click', function() {
+                statsBtn.disabled = true;
+                statsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Chargement...';
+                
+                fetch('{{ route("client.google.scraping-stats") }}', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erreur réseau');
+                    }
+                    return response.json();
+                })
+                .then(stats => {
+                    showStatsModal(stats);
+                    statsBtn.disabled = false;
+                    statsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> Statistiques';
+                })
+                .catch(error => {
+                    console.error('Erreur stats:', error);
+                    showNotification('Erreur lors du chargement des statistiques', 'error');
+                    statsBtn.disabled = false;
+                    statsBtn.innerHTML = '<i class="fa-solid fa-chart-simple"></i> Statistiques';
+                });
+            });
+        }
+    }
+})();
+</script>
 @endsection

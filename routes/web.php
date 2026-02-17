@@ -56,6 +56,13 @@ Route::post('/google/scrape', [GoogleScraperController::class, 'scrape'])
     Route::delete('/google/delete-selected', [GoogleScraperController::class, 'deleteSelected'])
     ->name('client.google.delete.selected');
 
+    Route::get('/google/export/excel', [GoogleScraperController::class, 'exportExcel'])
+    ->name('client.google.export.excel');
+Route::post('/google/retry-scraping', [GoogleScraperController::class, 'retryScraping'])
+    ->name('client.google.retry-scraping');
+
+Route::get('/google/scraping-stats', [GoogleScraperController::class, 'getScrapingStats'])
+    ->name('client.google.scraping-stats');
     Route::get('/web', [WebScraperController::class, 'index'])
     ->name('client.web');
 
@@ -64,6 +71,9 @@ Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
 
     Route::get('/web/export/pdf', [WebScraperController::class, 'exportPdf'])
     ->name('client.web.export.pdf');
+
+    Route::get('/web/export/excel', [WebScraperController::class, 'exportExcel'])
+    ->name('client.web.export.excel');
 
     Route::delete('/web/delete-selected', [WebScraperController::class, 'deleteSelected'])
     ->name('client.web.delete.selected');
@@ -154,3 +164,15 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 
 
 });
+
+// CRM
+Route::get('/crm/dashboard', fn () => view('client.crm.dashboard'))->name('client.crm.dashboard');
+Route::get('/crm/leads', fn () => view('client.crm.leads'))->name('client.crm.leads');
+
+// MAILS
+Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
+Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');
+Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
+
+// routes/web.php
+

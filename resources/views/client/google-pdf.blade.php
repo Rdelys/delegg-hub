@@ -7,18 +7,13 @@
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             color: #111827;
         }
 
         h1 {
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 10px;
-        }
-
-        p {
-            margin-bottom: 20px;
-            color: #6b7280;
         }
 
         table {
@@ -29,13 +24,13 @@
         th {
             background: #f3f4f6;
             text-align: left;
-            padding: 8px;
+            padding: 6px;
             font-weight: bold;
             border: 1px solid #d1d5db;
         }
 
         td {
-            padding: 8px;
+            padding: 6px;
             border: 1px solid #d1d5db;
         }
 
@@ -46,31 +41,42 @@
 </head>
 <body>
 
-    <h1>Entreprises – Google Maps</h1>
-    <p>Export généré automatiquement</p>
+<h1>Entreprises – Google Maps</h1>
 
-    <table>
-        <thead>
+<table>
+    <thead>
+        <tr>
+            <th>Entreprise</th>
+            <th>Catégorie</th>
+            <th>Adresse</th>
+            <th>Téléphone</th>
+            <th>Site</th>
+            <th>Note</th>
+            <th>Avis</th>
+            <th>Statut Web</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($places as $p)
             <tr>
-                <th>Entreprise</th>
-                <th>Catégorie</th>
-                <th>Adresse</th>
-                <th>Téléphone</th>
-                <th>Site</th>
+                <td>{{ $p->name }}</td>
+                <td>{{ $p->category }}</td>
+                <td>{{ $p->address }}</td>
+                <td>{{ $p->phone }}</td>
+                <td>{{ $p->website }}</td>
+                <td>{{ $p->rating }}</td>
+                <td>{{ $p->reviews_count }}</td>
+                <td>
+                    @if($p->website_scraped)
+                        Scrappé
+                    @else
+                        —
+                    @endif
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach($places as $p)
-                <tr>
-                    <td>{{ $p->name ?? '—' }}</td>
-                    <td>{{ $p->category ?? '—' }}</td>
-                    <td>{{ $p->address ?? '—' }}</td>
-                    <td>{{ $p->phone ?? '—' }}</td>
-                    <td>{{ $p->website ?? '—' }}</td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+        @endforeach
+    </tbody>
+</table>
 
 </body>
 </html>

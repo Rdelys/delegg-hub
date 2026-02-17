@@ -1,4 +1,6 @@
 <?php
+// app/Models/GooglePlace.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,5 +15,27 @@ class GooglePlace extends Model
         'phone',
         'website',
         'email',
+        'facebook',
+        'instagram',
+        'linkedin',
+        'source_url',
+        'rating',
+        'reviews_count',
+        'website_scraped',
+        'website_scraped_at',
+        'contact_scraped_at',
     ];
+
+    protected $casts = [
+        'rating' => 'float',
+        'reviews_count' => 'integer',
+        'website_scraped' => 'boolean',
+        'website_scraped_at' => 'datetime',
+        'contact_scraped_at' => 'datetime',
+    ];
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class);
+    }
 }

@@ -6,24 +6,25 @@
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             color: #0f172a;
         }
         h1 {
             font-size: 18px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
         }
         th, td {
-            padding: 8px;
+            padding: 6px;
             border: 1px solid #e5e7eb;
             text-align: left;
         }
         th {
             background: #f1f5f9;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -36,6 +37,9 @@
         <tr>
             <th>Nom</th>
             <th>Email</th>
+            <th>Facebook</th>
+            <th>Instagram</th>
+            <th>LinkedIn</th>
             <th>Source</th>
         </tr>
     </thead>
@@ -44,6 +48,9 @@
             <tr>
                 <td>{{ $row->name }}</td>
                 <td>{{ $row->email }}</td>
+                <td>{{ $row->facebook }}</td>
+                <td>{{ $row->instagram }}</td>
+                <td>{{ $row->linkedin }}</td>
                 <td>{{ $row->source_url }}</td>
             </tr>
         @endforeach
