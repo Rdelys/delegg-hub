@@ -9,6 +9,8 @@ class GooglePlace extends Model
 {
     protected $fillable = [
         'client_id',
+            'nom_scrapping', // ✅ AJOUT
+
         'name',
         'category',
         'address',
