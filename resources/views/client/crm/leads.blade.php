@@ -21,6 +21,46 @@
         </div>
     </div>
 
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">156</span>
+                <span class="stat-label">Total leads</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">23</span>
+                <span class="stat-label">À relancer</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon yellow">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">12</span>
+                <span class="stat-label">RDV pris</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <span class="stat-value">8</span>
+                <span class="stat-label">Clôturés</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Filters Bar -->
     <div class="filters-bar">
         <div class="search-box">
@@ -31,9 +71,11 @@
             <select class="filter-select">
                 <option>Tous les statuts</option>
                 <option>En cours</option>
-                <option>A relancer</option>
-                <option>Vendu</option>
-                <option>Mort</option>
+                <option>À relancer</option>
+                <option>RDV proposé</option>
+                <option>RDV pris</option>
+                <option>Refus</option>
+                <option>Clôturé</option>
             </select>
             <select class="filter-select">
                 <option>Toute chaleur</option>
@@ -54,12 +96,13 @@
             <thead>
                 <tr>
                     <th>
-                        <input type="checkbox" class="select-all">
+                        <input type="checkbox" class="select-all" onclick="event.stopPropagation()">
                     </th>
                     <th>Prénom Nom</th>
                     <th>Commentaire</th>
                     <th>Chaleur</th>
                     <th>Status</th>
+                    <th>Status Relance</th>
                     <th>Enfants %</th>
                     <th>Date statut</th>
                     <th>LinkedIn</th>
@@ -86,8 +129,8 @@
             </thead>
             <tbody>
                 <!-- Ligne de test 1 -->
-                <tr>
-                    <td><input type="checkbox" class="select-row"></td>
+                <tr onclick="openEditModal(1)" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
                     <td>
                         <div class="lead-info">
                             <strong>Jean Dupont</strong>
@@ -97,6 +140,7 @@
                     <td>Client potentiel, intéressé par nos services</td>
                     <td><span class="badge chaud">Chaud</span></td>
                     <td><span class="badge encours">En cours</span></td>
+                    <td><span class="badge relance-status">J+2 – Email relance</span></td>
                     <td><span class="badge pourcent">60%</span></td>
                     <td>15/02/2025</td>
                     <td><span class="badge attente">En attente</span></td>
@@ -104,7 +148,7 @@
                     <td><span class="badge">WhatsApp 1</span></td>
                     <td><span class="badge">Message 2</span></td>
                     <td><span class="badge">MP 1</span></td>
-                    <td class="checkbox-cell"><input type="checkbox" checked disabled></td>
+                    <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" checked disabled></td>
                     <td><span class="badge">Com 1</span></td>
                     <td><span class="badge attente">Oui, attente</span></td>
                     <td><span class="badge succes">Oui, reçu</span></td>
@@ -114,17 +158,17 @@
                     <td>0145879632</td>
                     <td>0612345678</td>
                     <td class="url-cell">
-                        <a href="#" class="url-link">linkedin.com/in/jeandupont</a>
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">linkedin.com/in/jeandupont</a>
                     </td>
                     <td class="url-cell">
-                        <a href="#" class="url-link">maps.app.goo.gl/abc123</a>
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">maps.app.goo.gl/abc123</a>
                     </td>
                     <td class="url-cell">
-                        <a href="#" class="url-link">techcorp.com</a>
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">techcorp.com</a>
                     </td>
                     <td>@techcorp_officiel</td>
                     <td><span class="badge envoye">Envoyé</span></td>
-                    <td class="actions">
+                    <td class="actions" onclick="event.stopPropagation()">
                         <button class="btn-icon" onclick="openEditModal(1)" title="Modifier">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -137,8 +181,8 @@
                     </td>
                 </tr>
                 <!-- Ligne de test 2 -->
-                <tr>
-                    <td><input type="checkbox" class="select-row"></td>
+                <tr onclick="openEditModal(2)" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
                     <td>
                         <div class="lead-info">
                             <strong>Marie Martin</strong>
@@ -147,7 +191,8 @@
                     </td>
                     <td>A demandé un devis, à relancer</td>
                     <td><span class="badge tiede">Tiède</span></td>
-                    <td><span class="badge relance">A relancer</span></td>
+                    <td><span class="badge relance">À relancer</span></td>
+                    <td><span class="badge relance-status">J+1 – Relance réseaux</span></td>
                     <td><span class="badge pourcent">40%</span></td>
                     <td>10/02/2025</td>
                     <td><span class="badge valide">Validé</span></td>
@@ -155,7 +200,7 @@
                     <td><span class="badge">PAS DE PORTABLE</span></td>
                     <td><span class="badge">Message 1</span></td>
                     <td><span class="badge">MP 2</span></td>
-                    <td class="checkbox-cell"><input type="checkbox" disabled></td>
+                    <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" disabled></td>
                     <td><span class="badge">Com 2</span></td>
                     <td><span class="badge succes">Oui, reçu</span></td>
                     <td><span class="badge">Non, Pas de compte</span></td>
@@ -165,17 +210,17 @@
                     <td>-</td>
                     <td>0623456789</td>
                     <td class="url-cell">
-                        <a href="#" class="url-link">linkedin.com/in/mariemartin</a>
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">linkedin.com/in/mariemartin</a>
                     </td>
                     <td class="url-cell">
-                        <a href="#" class="url-link">maps.app.goo.gl/def456</a>
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">maps.app.goo.gl/def456</a>
                     </td>
                     <td class="url-cell">
-                        <a href="#" class="url-link">designstudio.fr</a>
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">designstudio.fr</a>
                     </td>
                     <td>@design_studio_off</td>
                     <td><span class="badge">A faire</span></td>
-                    <td class="actions">
+                    <td class="actions" onclick="event.stopPropagation()">
                         <button class="btn-icon" onclick="openEditModal(2)" title="Modifier">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -187,6 +232,58 @@
                         </button>
                     </td>
                 </tr>
+                <!-- Ligne de test 3 -->
+                <tr onclick="openEditModal(3)" style="cursor: pointer;">
+                    <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
+                    <td>
+                        <div class="lead-info">
+                            <strong>Pierre Dubois</strong>
+                            <small>ID: LD-2025-003</small>
+                        </div>
+                    </td>
+                    <td>RDV confirmé pour la semaine prochaine</td>
+                    <td><span class="badge chaud">Chaud</span></td>
+                    <td><span class="badge rdv-pris">RDV pris</span></td>
+                    <td><span class="badge rdv-badge">RDV pris</span></td>
+                    <td><span class="badge pourcent">80%</span></td>
+                    <td>18/02/2025</td>
+                    <td><span class="badge valide">Validé</span></td>
+                    <td><span class="badge">Mail 4</span></td>
+                    <td><span class="badge">WhatsApp 3</span></td>
+                    <td><span class="badge">Message 3</span></td>
+                    <td><span class="badge">MP 3</span></td>
+                    <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" checked disabled></td>
+                    <td><span class="badge">Com 3</span></td>
+                    <td><span class="badge succes">Oui, reçu</span></td>
+                    <td><span class="badge succes">Oui, reçu</span></td>
+                    <td>Innovation SARL</td>
+                    <td>CEO</td>
+                    <td>pierre.d@innovation.fr</td>
+                    <td>0156789345</td>
+                    <td>0645678901</td>
+                    <td class="url-cell">
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">linkedin.com/in/pierredubois</a>
+                    </td>
+                    <td class="url-cell">
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">maps.app.goo.gl/ghi789</a>
+                    </td>
+                    <td class="url-cell">
+                        <a href="#" class="url-link" onclick="event.stopPropagation()">innovation.fr</a>
+                    </td>
+                    <td>@innovation_off</td>
+                    <td><span class="badge envoye">Validé</span></td>
+                    <td class="actions" onclick="event.stopPropagation()">
+                        <button class="btn-icon" onclick="openEditModal(3)" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon" onclick="openDeleteModal(3, 'Pierre Dubois')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        <button class="btn-icon" onclick="exportLead(3)" title="Exporter">
+                            <i class="fas fa-file-excel"></i>
+                        </button>
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -194,7 +291,7 @@
     <!-- Pagination -->
     <div class="pagination">
         <div class="pagination-info">
-            Affichage de 1 à 2 sur 156 leads
+            Affichage de 1 à 3 sur 156 leads
         </div>
         <div class="pagination-controls">
             <button class="btn-pagination" disabled>
@@ -236,22 +333,44 @@
                             <option>Froid</option>
                             <option>Tiède</option>
                             <option>Chaud</option>
-                            <option>Vendu</option>
-                            <option>Mort</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Status du lead</label>
                         <select id="status">
                             <option>En cours</option>
-                            <option>A relancer plus tard</option>
-                            <option>R1 prix</option>
-                            <option>Vendu</option>
-                            <option>Mort</option>
+                            <option>À relancer plus tard</option>
+                            <option>Répondu – à traiter</option>
+                            <option>RDV proposé</option>
+                            <option>RDV pris</option>
+                            <option>Refus</option>
+                            <option>Clôturé</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Lead a jour de ses enfants</label>
+                        <label>Status Relance</label>
+                        <select id="statusRelance">
+                            <option>J0 – Email envoyé</option>
+                            <option>J0 – Réseaux envoyé</option>
+                            <option>J+1 – Relance réseaux</option>
+                            <option>J+2 – Email relance</option>
+                            <option>J+3 – WhatsApp/SMS 1</option>
+                            <option>J+4 – Email angle problème</option>
+                            <option>J+5 – Réseaux angle problème</option>
+                            <option>J+7 – Email proposition RDV</option>
+                            <option>J+8 – WhatsApp/SMS 2</option>
+                            <option>J+10 – Email final</option>
+                            <option>J+12 – Réseaux final</option>
+                            <option>Répondu – à traiter</option>
+                            <option>RDV proposé</option>
+                            <option>RDV pris</option>
+                            <option>Refus</option>
+                            <option>À relancer plus tard</option>
+                            <option>Clôturé</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Lead à jour de ses enfants</label>
                         <select id="enfants">
                             <option>0%</option>
                             <option>40%</option>
@@ -430,6 +549,13 @@
 
     * {
         font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: #f0f4f8;
     }
 
     /* Premium Card Style */
@@ -666,7 +792,7 @@
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        min-width: 2200px;
+        min-width: 2300px;
         font-size: 13px;
     }
 
@@ -693,6 +819,7 @@
 
     .leads-table tbody tr {
         transition: all 0.2s;
+        cursor: pointer;
     }
 
     .leads-table tbody tr:hover {
@@ -768,11 +895,15 @@
     .badge.froid { background: linear-gradient(135deg, #e2e3e5, #d3d6d8); color: #383d41; border: 1px solid #d3d6d8; }
     .badge.encours { background: linear-gradient(135deg, #cfe2ff, #b6d4fe); color: #052c65; border: 1px solid #b6d4fe; }
     .badge.relance { background: linear-gradient(135deg, #fff3cd, #ffe69c); color: #856404; border: 1px solid #ffe69c; }
+    .badge.relance-status { background: linear-gradient(135deg, #e9d5ff, #d8b4fe); color: #6b21a8; border: 1px solid #d8b4fe; }
+    .badge.rdv-badge { background: linear-gradient(135deg, #d1e7dd, #badbcc); color: #0f5132; border: 1px solid #badbcc; }
     .badge.pourcent { background: linear-gradient(135deg, #d1e7dd, #badbcc); color: #0f5132; border: 1px solid #badbcc; }
     .badge.attente { background: linear-gradient(135deg, #cff4fc, #b6effb); color: #055160; border: 1px solid #b6effb; }
     .badge.valide { background: linear-gradient(135deg, #d1e7dd, #badbcc); color: #0f5132; border: 1px solid #badbcc; }
     .badge.succes { background: linear-gradient(135deg, #d1e7dd, #badbcc); color: #0f5132; border: 1px solid #badbcc; }
     .badge.envoye { background: linear-gradient(135deg, #cfe2ff, #b6d4fe); color: #052c65; border: 1px solid #b6d4fe; }
+    .badge.rdv-pris { background: linear-gradient(135deg, #d1e7dd, #badbcc); color: #0f5132; border: 1px solid #badbcc; }
+    .badge.refus { background: linear-gradient(135deg, #f8d7da, #f5c2c7); color: #842029; border: 1px solid #f5c2c7; }
 
     /* Actions */
     .actions {
@@ -1139,6 +1270,7 @@
             document.getElementById('commentaire').value = 'Client potentiel, intéressé par nos services';
             document.getElementById('chaleur').value = 'Chaud';
             document.getElementById('status').value = 'En cours';
+            document.getElementById('statusRelance').value = 'J+2 – Email relance';
             document.getElementById('enfants').value = '60%';
             document.getElementById('dateStatut').value = '2025-02-15';
             document.getElementById('linkedin').value = 'En attente de réponse';
@@ -1160,11 +1292,12 @@
             document.getElementById('urlSite').value = 'techcorp.com';
             document.getElementById('compteInsta').value = '@techcorp_officiel';
             document.getElementById('devis').value = 'Envoyé';
-        } else {
+        } else if (leadId === 2) {
             document.getElementById('prenomNom').value = 'Marie Martin';
             document.getElementById('commentaire').value = 'A demandé un devis, à relancer';
             document.getElementById('chaleur').value = 'Tiède';
-            document.getElementById('status').value = 'A relancer plus tard';
+            document.getElementById('status').value = 'À relancer plus tard';
+            document.getElementById('statusRelance').value = 'J+1 – Relance réseaux';
             document.getElementById('enfants').value = '40%';
             document.getElementById('dateStatut').value = '2025-02-10';
             document.getElementById('linkedin').value = 'Validé';
@@ -1186,6 +1319,33 @@
             document.getElementById('urlSite').value = 'designstudio.fr';
             document.getElementById('compteInsta').value = '@design_studio_off';
             document.getElementById('devis').value = 'A faire';
+        } else {
+            document.getElementById('prenomNom').value = 'Pierre Dubois';
+            document.getElementById('commentaire').value = 'RDV confirmé pour la semaine prochaine';
+            document.getElementById('chaleur').value = 'Chaud';
+            document.getElementById('status').value = 'RDV pris';
+            document.getElementById('statusRelance').value = 'RDV pris';
+            document.getElementById('enfants').value = '80%';
+            document.getElementById('dateStatut').value = '2025-02-18';
+            document.getElementById('linkedin').value = 'Validé';
+            document.getElementById('mail').value = 'Mail 4';
+            document.getElementById('whatsapp').value = 'WhatsApp 3';
+            document.getElementById('appel').value = 'Message 3';
+            document.getElementById('mp').value = 'MP 3';
+            document.getElementById('followInsta').checked = true;
+            document.getElementById('com').value = 'Com 3';
+            document.getElementById('formulaire').value = 'Oui, avec réponse reçu';
+            document.getElementById('messenger').value = 'Oui, avec réponse reçu';
+            document.getElementById('entreprise').value = 'Innovation SARL';
+            document.getElementById('fonction').value = 'CEO';
+            document.getElementById('email').value = 'pierre.d@innovation.fr';
+            document.getElementById('telFixe').value = '0156789345';
+            document.getElementById('portable').value = '0645678901';
+            document.getElementById('urlLinkedin').value = 'linkedin.com/in/pierredubois';
+            document.getElementById('urlMaps').value = 'maps.app.goo.gl/ghi789';
+            document.getElementById('urlSite').value = 'innovation.fr';
+            document.getElementById('compteInsta').value = '@innovation_off';
+            document.getElementById('devis').value = 'Validé';
         }
         
         document.getElementById('leadModal').style.display = 'block';
@@ -1205,6 +1365,7 @@
 
     // Ouvrir modal de suppression
     function openDeleteModal(leadId, leadName) {
+        event.stopPropagation(); // Empêche le déclenchement de l'événement click sur la ligne
         deleteLeadId = leadId;
         document.getElementById('deleteLeadName').textContent = leadName;
         document.getElementById('deleteModal').style.display = 'block';
@@ -1231,8 +1392,13 @@
     }
 
     // Select all checkbox
-    document.querySelector('.select-all')?.addEventListener('change', function(e) {
-        document.querySelectorAll('.select-row').forEach(cb => cb.checked = e.target.checked);
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.querySelector('.select-all');
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function(e) {
+                document.querySelectorAll('.select-row').forEach(cb => cb.checked = e.target.checked);
+            });
+        }
     });
 </script>
 @endsection
