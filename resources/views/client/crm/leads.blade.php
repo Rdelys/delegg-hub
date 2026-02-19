@@ -22,73 +22,97 @@
     </div>
 
     <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon blue">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">156</span>
-                <span class="stat-label">Total leads</span>
-            </div>
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i class="fas fa-users"></i>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon green">
-                <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">23</span>
-                <span class="stat-label">À relancer</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon yellow">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">12</span>
-                <span class="stat-label">RDV pris</span>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon purple">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="stat-info">
-                <span class="stat-value">8</span>
-                <span class="stat-label">Clôturés</span>
-            </div>
+        <div class="stat-info">
+            <span class="stat-value">{{ $totalLeads }}</span>
+            <span class="stat-label">Total leads</span>
         </div>
     </div>
 
-    <!-- Filters Bar -->
-    <div class="filters-bar">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="Rechercher un lead...">
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i class="fas fa-clock"></i>
         </div>
-        <div class="filter-actions">
-            <select class="filter-select">
-                <option>Tous les statuts</option>
-                <option>En cours</option>
-                <option>À relancer</option>
-                <option>RDV proposé</option>
-                <option>RDV pris</option>
-                <option>Refus</option>
-                <option>Clôturé</option>
-            </select>
-            <select class="filter-select">
-                <option>Toute chaleur</option>
-                <option>Froid</option>
-                <option>Tiède</option>
-                <option>Chaud</option>
-            </select>
-            <button class="btn-filter">
-                <i class="fas fa-sliders-h"></i>
-                Filtres
-            </button>
+        <div class="stat-info">
+            <span class="stat-value">{{ $relanceCount }}</span>
+            <span class="stat-label">À relancer</span>
         </div>
     </div>
+
+    <div class="stat-card">
+        <div class="stat-icon yellow">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value">{{ $rdvPrisCount }}</span>
+            <span class="stat-label">RDV pris</span>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <span class="stat-value">{{ $clotureCount }}</span>
+            <span class="stat-label">Clôturés</span>
+        </div>
+    </div>
+
+</div>
+
+
+   <form method="GET" action="{{ route('client.crm.leads') }}" id="filterForm">
+    <div class="filters-bar">
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text"
+                   name="search"
+                   id="searchInput"
+                   value="{{ request('search') }}"
+                   placeholder="Rechercher un lead...">
+        </div>
+
+        <div class="filter-actions">
+
+            <select name="status" class="filter-select auto-submit">
+                <option value="">Tous les statuts</option>
+                <option value="En cours" {{ request('status') == 'En cours' ? 'selected' : '' }}>En cours</option>
+                <option value="À relancer plus tard" {{ request('status') == 'À relancer plus tard' ? 'selected' : '' }}>À relancer</option>
+                <option value="RDV proposé" {{ request('status') == 'RDV proposé' ? 'selected' : '' }}>RDV proposé</option>
+                <option value="RDV pris" {{ request('status') == 'RDV pris' ? 'selected' : '' }}>RDV pris</option>
+                <option value="Refus" {{ request('status') == 'Refus' ? 'selected' : '' }}>Refus</option>
+                <option value="Clôturé" {{ request('status') == 'Clôturé' ? 'selected' : '' }}>Clôturé</option>
+            </select>
+
+            <select name="chaleur" class="filter-select auto-submit">
+                <option value="">Toute chaleur</option>
+                <option value="Froid" {{ request('chaleur') == 'Froid' ? 'selected' : '' }}>Froid</option>
+                <option value="Tiède" {{ request('chaleur') == 'Tiède' ? 'selected' : '' }}>Tiède</option>
+                <option value="Chaud" {{ request('chaleur') == 'Chaud' ? 'selected' : '' }}>Chaud</option>
+            </select>
+
+            {{-- 🔥 Filtre Date --}}
+            <input type="date"
+                   name="date_from"
+                   class="filter-select auto-submit"
+                   value="{{ request('date_from') }}">
+
+            <input type="date"
+                   name="date_to"
+                   class="filter-select auto-submit"
+                   value="{{ request('date_to') }}">
+
+        </div>
+    </div>
+</form>
+
 
     <!-- Table responsive -->
     <div class="table-responsive">
@@ -374,10 +398,22 @@
                     <div class="form-group">
                         <label>Status Relance</label>
                         <select name="status_relance">
-                            <option>J0 – Email envoyé</option>
-                            <option>J+1 – Relance réseaux</option>
-                            <option>J+2 – Email relance</option>
-                            <option>RDV pris</option>
+                            <option>J0 – Email envoyé</option> 
+                            <option>J0 – Réseaux envoyé</option> 
+                            <option>J+1 – Relance réseaux</option> 
+                            <option>J+2 – Email relance</option> 
+                            <option>J+3 – WhatsApp/SMS 1</option> 
+                            <option>J+4 – Email angle problème</option> 
+                            <option>J+5 – Réseaux angle problème</option> 
+                            <option>J+7 – Email proposition RDV</option> 
+                            <option>J+8 – WhatsApp/SMS 2</option> 
+                            <option>J+10 – Email final</option> 
+                            <option>J+12 – Réseaux final</option> 
+                            <option>Répondu – à traiter</option> 
+                            <option>RDV proposé</option> 
+                            <option>RDV pris</option> 
+                            <option>Refus</option> 
+                            <option>À relancer plus tard</option> 
                             <option>Clôturé</option>
                         </select>
                     </div>
@@ -411,18 +447,23 @@
                     <div class="form-group">
                         <label>Suivi Mail</label>
                         <select name="suivi_mail">
-                            <option>Mail 1</option>
-                            <option>Mail 2</option>
-                            <option>Mail 3</option>
-                            <option>Mail 4</option>
+                            <option>Mail 1</option> 
+                            <option>Mail 2</option> 
+                            <option>Mail 3</option> 
+                            <option>Mail 4</option> 
+                            <option>Mail 5</option> 
+                            <option>Mail arrive en SPAM</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Suivi WhatsApp</label>
                         <select name="suivi_whatsapp">
-                            <option>WhatsApp 1</option>
-                            <option>WhatsApp 2</option>
+                            <option>WhatsApp 1</option> 
+                            <option>WhatsApp 2</option> 
+                            <option>WhatsApp 3</option> 
+                            <option>WhatsApp 4</option> 
+                            <option>WhatsApp 5</option> 
                             <option>PAS DE PORTABLE</option>
                         </select>
                     </div>
@@ -430,8 +471,11 @@
                     <div class="form-group">
                         <label>Appel Téléphonique</label>
                         <select name="appel_tel">
-                            <option>Message 1</option>
-                            <option>Message 2</option>
+                            <option>Message 1</option> 
+                            <option>Message 2</option> 
+                            <option>Message 3</option> 
+                            <option>Message 4</option> 
+                            <option>Message 5</option> 
                             <option>Mort</option>
                         </select>
                     </div>
@@ -439,8 +483,11 @@
                     <div class="form-group">
                         <label>MP Instagram</label>
                         <select name="mp_instagram">
-                            <option>MP 1</option>
-                            <option>MP 2</option>
+                            <option>MP 1</option> 
+                            <option>MP 2</option> 
+                            <option>MP 3</option> 
+                            <option>MP 4</option> 
+                            <option>MP 5</option> 
                             <option>Mort</option>
                         </select>
                     </div>
@@ -453,26 +500,32 @@
                     <div class="form-group">
                         <label>Com Insta</label>
                         <select name="com_instagram">
-                            <option>Com 1</option>
-                            <option>Com 2</option>
+                            <option>Com 1</option> 
+                            <option>Com 2</option> 
+                            <option>Com 3</option> 
+                            <option>Com 4</option> 
+                            <option>Com 5</option> 
+                            <option>Mort</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Formulaire</label>
                         <select name="formulaire_site">
-                            <option>Oui, attente réponse</option>
-                            <option>Oui, avec réponse reçu</option>
-                            <option>Non</option>
+                            <option>Oui, attente réponse</option> 
+                            <option>Oui, avec réponse reçu</option> 
+                            <option>Non, Pas de Formulaire</option> 
+                            <option>Mort</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label>Messenger</label>
                         <select name="messenger">
-                            <option>Oui, attente réponse</option>
-                            <option>Oui, avec réponse reçu</option>
-                            <option>Non</option>
+                            <option>Oui, attente réponse</option> 
+                            <option>Oui, avec réponse reçu</option> 
+                            <option>Non, Pas de compte</option> 
+                            <option>Mort</option>
                         </select>
                     </div>
 
@@ -1395,6 +1448,34 @@
 
     });
 
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const form = document.getElementById("filterForm");
+
+    // Auto submit pour selects + dates
+    document.querySelectorAll(".auto-submit").forEach(element => {
+        element.addEventListener("change", function () {
+            form.submit();
+        });
+    });
+
+    // 🔥 Recherche avec délai (anti reload à chaque lettre)
+    const searchInput = document.getElementById("searchInput");
+    let timeout = null;
+
+    searchInput.addEventListener("keyup", function () {
+
+        clearTimeout(timeout);
+
+        timeout = setTimeout(function () {
+            form.submit();
+        }, 500); // 500ms delay
+
+    });
+
+});
 </script>
 
 @endsection

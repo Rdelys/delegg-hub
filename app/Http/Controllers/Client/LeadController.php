@@ -13,16 +13,88 @@ class LeadController extends Controller
     | LISTE DES LEADS
     |--------------------------------------------------------------------------
     */
-    public function index()
-    {
-        $clientId = session('client.id');
+    public function index(Request $request)
+{
+    $clientId = session('client.id');
 
-        $leads = Lead::where('client_id', $clientId)
-            ->latest()
-            ->paginate(20);
+    $baseQuery = Lead::where('client_id', $clientId);
 
-        return view('client.crm.leads', compact('leads'));
+    /*
+    |--------------------------------------------------------------------------
+    | FILTRES
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $baseQuery->where(function ($q) use ($search) {
+            $q->where('prenom_nom', 'like', "%{$search}%")
+              ->orWhere('nom_global', 'like', "%{$search}%")
+              ->orWhere('entreprise', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhere('portable', 'like', "%{$search}%");
+        });
     }
+
+    if ($request->filled('status')) {
+        $baseQuery->where('status', $request->status);
+    }
+
+    if ($request->filled('chaleur')) {
+        $baseQuery->where('chaleur', $request->chaleur);
+    }
+
+    if ($request->filled('date_from')) {
+        $baseQuery->whereDate('date_statut', '>=', $request->date_from);
+    }
+
+    if ($request->filled('date_to')) {
+        $baseQuery->whereDate('date_statut', '<=', $request->date_to);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | 🔥 STATS (SUR LES DONNÉES FILTRÉES)
+    |--------------------------------------------------------------------------
+    */
+
+    $statsQuery = clone $baseQuery;
+
+    $totalLeads = $statsQuery->count();
+
+    $relanceCount = (clone $baseQuery)
+        ->where('status', 'À relancer plus tard')
+        ->count();
+
+    $rdvPrisCount = (clone $baseQuery)
+        ->where('status', 'RDV pris')
+        ->count();
+
+    $clotureCount = (clone $baseQuery)
+        ->where('status', 'Clôturé')
+        ->count();
+
+    /*
+    |--------------------------------------------------------------------------
+    | LISTE PAGINÉE
+    |--------------------------------------------------------------------------
+    */
+
+    $leads = $baseQuery
+        ->latest()
+        ->paginate(20)
+        ->withQueryString();
+
+    return view('client.crm.leads', compact(
+        'leads',
+        'totalLeads',
+        'relanceCount',
+        'rdvPrisCount',
+        'clotureCount'
+    ));
+}
+
 
     /*
     |--------------------------------------------------------------------------
