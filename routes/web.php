@@ -179,6 +179,13 @@ Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])
 
 Route::delete('/crm/leads/{lead}', [LeadController::class, 'destroy'])
     ->name('client.crm.leads.destroy');
+
+    Route::get('/crm/leads/export', [LeadController::class, 'exportExcel'])
+    ->name('client.crm.leads.export');
+
+Route::get('/crm/leads/{lead}/export', [LeadController::class, 'exportSingleExcel'])
+    ->name('client.crm.leads.export.single');
+
 // MAILS
 Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
 Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');

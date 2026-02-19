@@ -10,7 +10,8 @@
             <p>Liste des prospects importés depuis Google & Web.</p>
         </div>
         <div class="header-actions">
-            <button class="btn-excel" onclick="exportAllExcel()">
+            <button class="btn-excel"
+                onclick="window.location='{{ route('client.crm.leads.export', request()->query()) }}'">
                 <i class="fas fa-file-excel"></i>
                 Export Excel
             </button>
@@ -269,7 +270,11 @@
                         title="Supprimer">
                         <i class="fas fa-trash"></i>
                     </button>
-
+                    <button class="btn-icon"
+                        onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'"
+                        title="Exporter">
+                        <i class="fas fa-file-excel"></i>
+                    </button>
                 </td>
 
             </tr>
