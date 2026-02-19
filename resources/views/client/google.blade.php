@@ -106,6 +106,16 @@
         @endforeach
     </select>
 </form>
+@if(request('filter_scrapping'))
+<form method="POST" action="{{ route('client.google.export.lead.scrapping') }}">
+    @csrf
+    <input type="hidden" name="nom_scrapping" value="{{ request('filter_scrapping') }}">
+    <button class="btn btn-success">
+        Exporter tout le scrapping
+    </button>
+</form>
+@endif
+
     {{-- Results Section --}}
     @if(isset($places) && $places->count())
         <form method="POST" 
@@ -148,6 +158,9 @@
                                 <th class="resizable" data-index="8" style="width: 80px; min-width: 80px;">Note</th>
                                 <th class="resizable" data-index="9" style="width: 80px; min-width: 80px;">Avis</th>
                                 <th class="resizable" data-index="10" style="width: 120px; min-width: 120px;">Statut</th>
+                                <th class="resizable">Exporté</th>
+<th style="width:120px;">Action</th>
+
                             </tr>
                         </thead>
                         <tbody>
@@ -254,6 +267,32 @@
                                             <span class="text-muted">—</span>
                                         @endif
                                     </td>
+                                    <td>
+    @if($p->exported_to_lead)
+        <span class="status-badge status-success">
+            <i class="fa-solid fa-check"></i> Oui
+        </span>
+    @else
+        <span class="status-badge status-warning">
+            <i class="fa-solid fa-clock"></i> Non
+        </span>
+    @endif
+</td>
+
+<td>
+    @if(!$p->exported_to_lead)
+        <button 
+            type="button"
+            class="btn btn-primary btn-sm export-btn"
+            data-url="{{ route('client.google.export.lead.single', $p->id) }}">
+            Exporter
+        </button>
+    @else
+        —
+    @endif
+</td>
+
+
                                 </tr>
                             @endforeach
                         </tbody>
@@ -2011,5 +2050,34 @@
         }
     }
 })();
+
+document.addEventListener('click', function(e) {
+
+    if (e.target.classList.contains('export-btn')) {
+
+        const url = e.target.dataset.url;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Erreur');
+            return res.text();
+        })
+        .then(() => {
+            window.location.reload();
+        })
+        .catch(() => {
+            alert('Erreur export');
+        });
+    }
+
+});
+
 </script>
 @endsection
