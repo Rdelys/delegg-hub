@@ -92,261 +92,275 @@
 
     <!-- Table responsive -->
     <div class="table-responsive">
-        <table class="leads-table">
-            <thead>
-                <tr>
-                    <th>
-                        <input type="checkbox" class="select-all" onclick="event.stopPropagation()">
-                    </th>
-                    <th>Nom Global</th>
-                    <th>Prénom Nom</th>
-                    <th>Commentaire</th>
-                    <th>Chaleur</th>
-                    <th>Status</th>
-                    <th>Status Relance</th>
-                    <th>Enfants %</th>
-                    <th>Date statut</th>
-                    <th>LinkedIn</th>
-                    <th>Suivi Mail</th>
-                    <th>WhatsApp</th>
-                    <th>Téléphone</th>
-                    <th>MP Insta</th>
-                    <th>Follow Insta</th>
-                    <th>Com Insta</th>
-                    <th>Formulaire</th>
-                    <th>Messenger</th>
-                    <th>Entreprise</th>
-                    <th>Fonction</th>
-                    <th>Email</th>
-                    <th>Tel Fixe</th>
-                    <th>Portable</th>
-                    <th>URL LinkedIn</th>
-                    <th>URL Maps</th>
-                    <th>Site web</th>
-                    <th>Compte Insta</th>
-                    <th>Devis</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Ligne de test 1 -->
-                <tr onclick="openEditModal(1)" style="cursor: pointer;">
-                    <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
-                    <td>{{ $lead->nom_global ?? '-' }}</td>
-                    <td>
-                        <div class="lead-info">
-                            <strong>Jean Dupont</strong>
-                            <small>ID: LD-2025-001</small>
-                        </div>
-                    </td>
-                    <td>Client potentiel, intéressé par nos services</td>
-                    <td><span class="badge chaud">Chaud</span></td>
-                    <td><span class="badge encours">En cours</span></td>
-                    <td><span class="badge relance-status">J+2 – Email relance</span></td>
-                    <td><span class="badge pourcent">60%</span></td>
-                    <td>15/02/2025</td>
-                    <td><span class="badge attente">En attente</span></td>
-                    <td><span class="badge">Mail 2</span></td>
-                    <td><span class="badge">WhatsApp 1</span></td>
-                    <td><span class="badge">Message 2</span></td>
-                    <td><span class="badge">MP 1</span></td>
-                    <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" checked disabled></td>
-                    <td><span class="badge">Com 1</span></td>
-                    <td><span class="badge attente">Oui, attente</span></td>
-                    <td><span class="badge succes">Oui, reçu</span></td>
-                    <td>TechCorp SAS</td>
-                    <td>CTO</td>
-                    <td>jean.d@techcorp.com</td>
-                    <td>0145879632</td>
-                    <td>0612345678</td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">linkedin.com/in/jeandupont</a>
-                    </td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">maps.app.goo.gl/abc123</a>
-                    </td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">techcorp.com</a>
-                    </td>
-                    <td>@techcorp_officiel</td>
-                    <td><span class="badge envoye">Envoyé</span></td>
-                    <td class="actions" onclick="event.stopPropagation()">
-                        <button class="btn-icon" onclick="openEditModal(1)" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon" onclick="openDeleteModal(1, 'Jean Dupont')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn-icon" onclick="exportLead(1)" title="Exporter">
-                            <i class="fas fa-file-excel"></i>
-                        </button>
-                    </td>
-                </tr>
-                <!-- Ligne de test 2 -->
-                <tr onclick="openEditModal(2)" style="cursor: pointer;">
-                    <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
-                    <td>{{ $lead->nom_global ?? '-' }}</td>
-                    <td>
-                        <div class="lead-info">
-                            <strong>Marie Martin</strong>
-                            <small>ID: LD-2025-002</small>
-                        </div>
-                    </td>
-                    <td>A demandé un devis, à relancer</td>
-                    <td><span class="badge tiede">Tiède</span></td>
-                    <td><span class="badge relance">À relancer</span></td>
-                    <td><span class="badge relance-status">J+1 – Relance réseaux</span></td>
-                    <td><span class="badge pourcent">40%</span></td>
-                    <td>10/02/2025</td>
-                    <td><span class="badge valide">Validé</span></td>
-                    <td><span class="badge">Mail 1</span></td>
-                    <td><span class="badge">PAS DE PORTABLE</span></td>
-                    <td><span class="badge">Message 1</span></td>
-                    <td><span class="badge">MP 2</span></td>
-                    <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" disabled></td>
-                    <td><span class="badge">Com 2</span></td>
-                    <td><span class="badge succes">Oui, reçu</span></td>
-                    <td><span class="badge">Non, Pas de compte</span></td>
-                    <td>Design Studio</td>
-                    <td>Directrice artistique</td>
-                    <td>m.martin@designstudio.fr</td>
-                    <td>-</td>
-                    <td>0623456789</td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">linkedin.com/in/mariemartin</a>
-                    </td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">maps.app.goo.gl/def456</a>
-                    </td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">designstudio.fr</a>
-                    </td>
-                    <td>@design_studio_off</td>
-                    <td><span class="badge">A faire</span></td>
-                    <td class="actions" onclick="event.stopPropagation()">
-                        <button class="btn-icon" onclick="openEditModal(2)" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon" onclick="openDeleteModal(2, 'Marie Martin')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn-icon" onclick="exportLead(2)" title="Exporter">
-                            <i class="fas fa-file-excel"></i>
-                        </button>
-                    </td>
-                </tr>
-                <!-- Ligne de test 3 -->
-                <tr onclick="openEditModal(3)" style="cursor: pointer;">
-                    <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
-                    <td>{{ $lead->nom_global ?? '-' }}</td>
-                    <td>
-                        <div class="lead-info">
-                            <strong>Pierre Dubois</strong>
-                            <small>ID: LD-2025-003</small>
-                        </div>
-                    </td>
-                    <td>RDV confirmé pour la semaine prochaine</td>
-                    <td><span class="badge chaud">Chaud</span></td>
-                    <td><span class="badge rdv-pris">RDV pris</span></td>
-                    <td><span class="badge rdv-badge">RDV pris</span></td>
-                    <td><span class="badge pourcent">80%</span></td>
-                    <td>18/02/2025</td>
-                    <td><span class="badge valide">Validé</span></td>
-                    <td><span class="badge">Mail 4</span></td>
-                    <td><span class="badge">WhatsApp 3</span></td>
-                    <td><span class="badge">Message 3</span></td>
-                    <td><span class="badge">MP 3</span></td>
-                    <td class="checkbox-cell" onclick="event.stopPropagation()"><input type="checkbox" checked disabled></td>
-                    <td><span class="badge">Com 3</span></td>
-                    <td><span class="badge succes">Oui, reçu</span></td>
-                    <td><span class="badge succes">Oui, reçu</span></td>
-                    <td>Innovation SARL</td>
-                    <td>CEO</td>
-                    <td>pierre.d@innovation.fr</td>
-                    <td>0156789345</td>
-                    <td>0645678901</td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">linkedin.com/in/pierredubois</a>
-                    </td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">maps.app.goo.gl/ghi789</a>
-                    </td>
-                    <td class="url-cell">
-                        <a href="#" class="url-link" onclick="event.stopPropagation()">innovation.fr</a>
-                    </td>
-                    <td>@innovation_off</td>
-                    <td><span class="badge envoye">Validé</span></td>
-                    <td class="actions" onclick="event.stopPropagation()">
-                        <button class="btn-icon" onclick="openEditModal(3)" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon" onclick="openDeleteModal(3, 'Pierre Dubois')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn-icon" onclick="exportLead(3)" title="Exporter">
-                            <i class="fas fa-file-excel"></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <table class="leads-table">
+        <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" class="select-all">
+                </th>
+                <th>Nom Global</th>
+                <th>Prénom Nom</th>
+                <th>Commentaire</th>
+                <th>Chaleur</th>
+                <th>Status</th>
+                <th>Status Relance</th>
+                <th>Enfants %</th>
+                <th>Date statut</th>
+                <th>LinkedIn</th>
+                <th>Suivi Mail</th>
+                <th>WhatsApp</th>
+                <th>Téléphone</th>
+                <th>MP Insta</th>
+                <th>Follow Insta</th>
+                <th>Com Insta</th>
+                <th>Formulaire</th>
+                <th>Messenger</th>
+                <th>Entreprise</th>
+                <th>Fonction</th>
+                <th>Email</th>
+                <th>Tel Fixe</th>
+                <th>Portable</th>
+                <th>URL LinkedIn</th>
+                <th>URL Maps</th>
+                <th>Site web</th>
+                <th>Compte Insta</th>
+                <th>Devis</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        @forelse($leads as $lead)
+
+            <tr onclick='openEditModal(@json($lead))' style="cursor:pointer;">
+
+                <td onclick="event.stopPropagation()">
+                    <input type="checkbox" class="select-row">
+                </td>
+
+                <td>{{ $lead->nom_global ?? '-' }}</td>
+
+                <td>
+                    <div class="lead-info">
+                        <strong>{{ $lead->prenom_nom }}</strong>
+                        <small>ID: {{ $lead->id }}</small>
+                    </div>
+                </td>
+
+                <td>{{ $lead->commentaire ?? '-' }}</td>
+
+                <td>
+                    <span class="badge {{ strtolower($lead->chaleur) }}">
+                        {{ $lead->chaleur ?? '-' }}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="badge">
+                        {{ $lead->status ?? '-' }}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="badge relance-status">
+                        {{ $lead->status_relance ?? '-' }}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="badge pourcent">
+                        {{ $lead->enfants_percent ?? '-' }}
+                    </span>
+                </td>
+
+                <td>
+                    {{ $lead->date_statut ? \Carbon\Carbon::parse($lead->date_statut)->format('d/m/Y') : '-' }}
+                </td>
+
+                <td><span class="badge">{{ $lead->linkedin_status ?? '-' }}</span></td>
+                <td><span class="badge">{{ $lead->suivi_mail ?? '-' }}</span></td>
+                <td><span class="badge">{{ $lead->suivi_whatsapp ?? '-' }}</span></td>
+                <td><span class="badge">{{ $lead->appel_tel ?? '-' }}</span></td>
+                <td><span class="badge">{{ $lead->mp_instagram ?? '-' }}</span></td>
+
+                <td class="checkbox-cell" onclick="event.stopPropagation()">
+                    <input type="checkbox" disabled {{ $lead->follow_insta ? 'checked' : '' }}>
+                </td>
+
+                <td><span class="badge">{{ $lead->com_instagram ?? '-' }}</span></td>
+                <td><span class="badge">{{ $lead->formulaire_site ?? '-' }}</span></td>
+                <td><span class="badge">{{ $lead->messenger ?? '-' }}</span></td>
+
+                <td>{{ $lead->entreprise ?? '-' }}</td>
+                <td>{{ $lead->fonction ?? '-' }}</td>
+                <td>{{ $lead->email ?? '-' }}</td>
+                <td>{{ $lead->tel_fixe ?? '-' }}</td>
+                <td>{{ $lead->portable ?? '-' }}</td>
+
+                <td class="url-cell">
+                    @if($lead->url_linkedin)
+                        <a href="{{ $lead->url_linkedin }}" target="_blank" class="url-link" onclick="event.stopPropagation()">
+                            Voir
+                        </a>
+                    @else -
+                    @endif
+                </td>
+
+                <td class="url-cell">
+                    @if($lead->url_maps)
+                        <a href="{{ $lead->url_maps }}" target="_blank" class="url-link" onclick="event.stopPropagation()">
+                            Voir
+                        </a>
+                    @else -
+                    @endif
+                </td>
+
+                <td class="url-cell">
+                    @if($lead->url_site)
+                        <a href="{{ $lead->url_site }}" target="_blank" class="url-link" onclick="event.stopPropagation()">
+                            Voir
+                        </a>
+                    @else -
+                    @endif
+                </td>
+
+                <td>{{ $lead->compte_insta ?? '-' }}</td>
+
+                <td>
+                    <span class="badge">
+                        {{ $lead->devis ?? '-' }}
+                    </span>
+                </td>
+
+                <td class="actions" onclick="event.stopPropagation()">
+
+                    <button class="btn-icon"
+                        onclick='openEditModal(@json($lead))'
+                        title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                    <button class="btn-icon"
+                        onclick="openDeleteModal({{ $lead->id }})"
+                        title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+
+                </td>
+
+            </tr>
+
+        @empty
+
+            <tr>
+                <td colspan="29" style="text-align:center; padding:30px;">
+                    Aucun lead trouvé.
+                </td>
+            </tr>
+
+        @endforelse
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+
+    <div class="pagination-info">
+        Affichage de {{ $leads->firstItem() ?? 0 }}
+        à {{ $leads->lastItem() ?? 0 }}
+        sur {{ $leads->total() }} leads
     </div>
 
-    <!-- Pagination -->
-    <div class="pagination">
-        <div class="pagination-info">
-            Affichage de 1 à 3 sur 156 leads
-        </div>
-        <div class="pagination-controls">
-            <button class="btn-pagination" disabled>
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="btn-pagination active">1</button>
-            <button class="btn-pagination">2</button>
-            <button class="btn-pagination">3</button>
-            <span>...</span>
-            <button class="btn-pagination">13</button>
-            <button class="btn-pagination">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
+    <div class="pagination-controls">
+
+        {{-- Bouton précédent --}}
+        <button class="btn-pagination"
+            {{ $leads->onFirstPage() ? 'disabled' : '' }}
+            onclick="window.location='{{ $leads->previousPageUrl() }}'">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        {{-- Pages --}}
+        @for ($i = 1; $i <= $leads->lastPage(); $i++)
+
+            @if ($i == $leads->currentPage())
+                <button class="btn-pagination active">
+                    {{ $i }}
+                </button>
+            @elseif (
+                $i == 1 ||
+                $i == $leads->lastPage() ||
+                abs($i - $leads->currentPage()) <= 2
+            )
+                <button class="btn-pagination"
+                    onclick="window.location='{{ $leads->url($i) }}'">
+                    {{ $i }}
+                </button>
+            @elseif (
+                abs($i - $leads->currentPage()) == 3
+            )
+                <span>...</span>
+            @endif
+
+        @endfor
+
+        {{-- Bouton suivant --}}
+        <button class="btn-pagination"
+            {{ !$leads->hasMorePages() ? 'disabled' : '' }}
+            onclick="window.location='{{ $leads->nextPageUrl() }}'">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
     </div>
+
 </div>
+
 
 <!-- Modal Ajouter/Modifier -->
 <div id="leadModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2 id="modalTitle">Ajouter un lead</h2>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <button type="button" class="close-btn" onclick="closeModal()">&times;</button>
         </div>
+
         <div class="modal-body">
-            <form id="leadForm" onsubmit="saveLead(event)">
+            <form id="leadForm" method="POST" action="{{ route('client.crm.leads.store') }}">
+                @csrf
+
+                <input type="hidden" name="_method" id="formMethod" value="POST">
+                <input type="hidden" name="lead_id" id="leadId">
+
                 <div class="form-grid">
+
                     <div class="form-group">
                         <label>Nom Global</label>
-                        <input type="text" id="nomGlobal" name="nom_global">
+                        <input type="text" name="nom_global">
                     </div>
 
                     <div class="form-group">
-                        <label>Prénom Nom du Lead *</label>
-                        <input type="text" id="prenomNom" required>
+                        <label>Prénom Nom *</label>
+                        <input type="text" name="prenom_nom" required>
                     </div>
+
                     <div class="form-group">
                         <label>Commentaire</label>
-                        <textarea id="commentaire" rows="2"></textarea>
+                        <textarea name="commentaire" rows="2"></textarea>
                     </div>
+
                     <div class="form-group">
-                        <label>Chaleur du lead</label>
-                        <select id="chaleur">
-                            <option>Froid</option>
-                            <option>Tiède</option>
-                            <option>Chaud</option>
+                        <label>Chaleur</label>
+                        <select name="chaleur">
+                            <option value="Froid">Froid</option>
+                            <option value="Tiède">Tiède</option>
+                            <option value="Chaud">Chaud</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Status du lead</label>
-                        <select id="status">
+                        <label>Status</label>
+                        <select name="status">
                             <option>En cours</option>
                             <option>À relancer plus tard</option>
                             <option>Répondu – à traiter</option>
@@ -356,31 +370,21 @@
                             <option>Clôturé</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Status Relance</label>
-                        <select id="statusRelance">
+                        <select name="status_relance">
                             <option>J0 – Email envoyé</option>
-                            <option>J0 – Réseaux envoyé</option>
                             <option>J+1 – Relance réseaux</option>
                             <option>J+2 – Email relance</option>
-                            <option>J+3 – WhatsApp/SMS 1</option>
-                            <option>J+4 – Email angle problème</option>
-                            <option>J+5 – Réseaux angle problème</option>
-                            <option>J+7 – Email proposition RDV</option>
-                            <option>J+8 – WhatsApp/SMS 2</option>
-                            <option>J+10 – Email final</option>
-                            <option>J+12 – Réseaux final</option>
-                            <option>Répondu – à traiter</option>
-                            <option>RDV proposé</option>
                             <option>RDV pris</option>
-                            <option>Refus</option>
-                            <option>À relancer plus tard</option>
                             <option>Clôturé</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Lead à jour de ses enfants</label>
-                        <select id="enfants">
+                        <label>Enfants %</label>
+                        <select name="enfants_percent">
                             <option>0%</option>
                             <option>40%</option>
                             <option>60%</option>
@@ -388,135 +392,138 @@
                             <option>100%</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Date du statut</label>
-                        <input type="date" id="dateStatut">
+                        <label>Date statut</label>
+                        <input type="date" name="date_statut">
                     </div>
+
                     <div class="form-group">
-                        <label>Contacter sur LinkedIn</label>
-                        <select id="linkedin">
+                        <label>LinkedIn</label>
+                        <select name="linkedin_status">
                             <option>Validé</option>
                             <option>Non</option>
                             <option>En attente de réponse</option>
                             <option>Refusé</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Suivi Mail</label>
-                        <select id="mail">
+                        <select name="suivi_mail">
                             <option>Mail 1</option>
                             <option>Mail 2</option>
                             <option>Mail 3</option>
                             <option>Mail 4</option>
-                            <option>Mail 5</option>
-                            <option>Mail arrive en SPAM</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Suivi WhatsApp</label>
-                        <select id="whatsapp">
+                        <select name="suivi_whatsapp">
                             <option>WhatsApp 1</option>
                             <option>WhatsApp 2</option>
-                            <option>WhatsApp 3</option>
-                            <option>WhatsApp 4</option>
-                            <option>WhatsApp 5</option>
                             <option>PAS DE PORTABLE</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Appel téléphonique</label>
-                        <select id="appel">
+                        <label>Appel Téléphonique</label>
+                        <select name="appel_tel">
                             <option>Message 1</option>
                             <option>Message 2</option>
-                            <option>Message 3</option>
-                            <option>Message 4</option>
-                            <option>Message 5</option>
                             <option>Mort</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>MP instagram</label>
-                        <select id="mp">
+                        <label>MP Instagram</label>
+                        <select name="mp_instagram">
                             <option>MP 1</option>
                             <option>MP 2</option>
-                            <option>MP 3</option>
-                            <option>MP 4</option>
-                            <option>MP 5</option>
                             <option>Mort</option>
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Follow Insta</label>
-                        <input type="checkbox" id="followInsta">
+                        <input type="checkbox" name="follow_insta" value="1">
                     </div>
+
                     <div class="form-group">
                         <label>Com Insta</label>
-                        <select id="com">
+                        <select name="com_instagram">
                             <option>Com 1</option>
                             <option>Com 2</option>
-                            <option>Com 3</option>
-                            <option>Com 4</option>
-                            <option>Com 5</option>
-                            <option>Mort</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Formulaire site</label>
-                        <select id="formulaire">
+                        <label>Formulaire</label>
+                        <select name="formulaire_site">
                             <option>Oui, attente réponse</option>
                             <option>Oui, avec réponse reçu</option>
-                            <option>Non, Pas de Formulaire</option>
-                            <option>Mort</option>
+                            <option>Non</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Message Messenger</label>
-                        <select id="messenger">
+                        <label>Messenger</label>
+                        <select name="messenger">
                             <option>Oui, attente réponse</option>
                             <option>Oui, avec réponse reçu</option>
-                            <option>Non, Pas de compte</option>
-                            <option>Mort</option>
+                            <option>Non</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label>Nom entreprise</label>
-                        <input type="text" id="entreprise">
+                        <label>Entreprise</label>
+                        <input type="text" name="entreprise">
                     </div>
+
                     <div class="form-group">
-                        <label>Fonction du prospect</label>
-                        <input type="text" id="fonction">
+                        <label>Fonction</label>
+                        <input type="text" name="fonction">
                     </div>
+
                     <div class="form-group">
-                        <label>Email Scrappé</label>
-                        <input type="email" id="email">
+                        <label>Email</label>
+                        <input type="email" name="email">
                     </div>
+
                     <div class="form-group">
                         <label>Tel Fixe</label>
-                        <input type="text" id="telFixe">
+                        <input type="text" name="tel_fixe">
                     </div>
+
                     <div class="form-group">
-                        <label>Portable du Lead</label>
-                        <input type="text" id="portable">
+                        <label>Portable</label>
+                        <input type="text" name="portable">
                     </div>
+
                     <div class="form-group">
                         <label>URL LinkedIn</label>
-                        <input type="url" id="urlLinkedin">
+                        <input type="text" name="url_linkedin">
                     </div>
+
                     <div class="form-group">
-                        <label>URL Google Maps</label>
-                        <input type="url" id="urlMaps">
+                        <label>URL Maps</label>
+                        <input type="text" name="url_maps">
                     </div>
+
                     <div class="form-group">
-                        <label>URL Site internet</label>
-                        <input type="url" id="urlSite">
+                        <label>URL Site</label>
+                        <input type="text" name="url_site">
                     </div>
+
                     <div class="form-group">
                         <label>Compte Insta</label>
-                        <input type="text" id="compteInsta">
+                        <input type="text" name="compte_insta">
                     </div>
+
                     <div class="form-group">
                         <label>Devis</label>
-                        <select id="devis">
+                        <select name="devis">
                             <option>Pas encore</option>
                             <option>A faire</option>
                             <option>Envoyé</option>
@@ -524,33 +531,44 @@
                             <option>Perdu</option>
                         </select>
                     </div>
+
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary" onclick="closeModal()">Annuler</button>
                     <button type="submit" class="btn-primary">Enregistrer</button>
                 </div>
+
             </form>
         </div>
     </div>
 </div>
+
 
 <!-- Modal Suppression -->
 <div id="deleteModal" class="modal">
     <div class="modal-content" style="max-width: 400px;">
         <div class="modal-header">
             <h2>Confirmer la suppression</h2>
-            <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            <button type="button" class="close-btn" onclick="closeDeleteModal()">&times;</button>
         </div>
+
         <div class="modal-body">
-            <p>Êtes-vous sûr de vouloir supprimer le lead : <strong id="deleteLeadName"></strong> ?</p>
-            <p style="color: #ef4444; margin-top: 10px;">Cette action est irréversible.</p>
+            <p>Êtes-vous sûr de vouloir supprimer ce lead ?</p>
         </div>
+
         <div class="modal-footer">
-            <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Annuler</button>
-            <button type="button" class="btn-danger" onclick="confirmDelete()">Supprimer</button>
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+
+                <button type="button" class="btn-secondary" onclick="closeDeleteModal()">Annuler</button>
+                <button type="submit" class="btn-danger">Supprimer</button>
+            </form>
         </div>
     </div>
 </div>
+
 
 <style>
     /* Import Google Font */
@@ -1247,167 +1265,136 @@
 </style>
 
 <script>
-    // Variables globales pour les modales
+
+    /*
+    |--------------------------------------------------------------------------
+    | VARIABLES GLOBALES
+    |--------------------------------------------------------------------------
+    */
     let currentLeadId = null;
-    let deleteLeadId = null;
 
-    // Fonctions d'export Excel (statiques pour le moment)
-    function exportAllExcel() {
-        alert('Export Excel de tous les leads (fonction statique)');
-    }
+    const leadModal = document.getElementById('leadModal');
+    const deleteModal = document.getElementById('deleteModal');
+    const leadForm = document.getElementById('leadForm');
+    const deleteForm = document.getElementById('deleteForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const formMethod = document.getElementById('formMethod');
 
-    function exportLead(leadId) {
-        alert(`Export Excel du lead ID: ${leadId} (fonction statique)`);
-    }
-
-    // Ouvrir modal d'ajout
+    /*
+    |--------------------------------------------------------------------------
+    | OUVRIR MODAL AJOUT
+    |--------------------------------------------------------------------------
+    */
     function openAddModal() {
+
         currentLeadId = null;
-        document.getElementById('modalTitle').textContent = 'Ajouter un lead';
-        document.getElementById('leadForm').reset();
-        document.getElementById('leadModal').style.display = 'block';
+
+        modalTitle.textContent = "Ajouter un lead";
+
+        leadForm.action = "{{ route('client.crm.leads.store') }}";
+        formMethod.value = "POST";
+
+        leadForm.reset();
+
+        leadModal.style.display = "block";
     }
 
-    // Ouvrir modal d'édition
-    function openEditModal(leadId) {
-        currentLeadId = leadId;
-        document.getElementById('modalTitle').textContent = 'Modifier le lead';
-        
-        // Simulation de chargement des données
-        if (leadId === 1) {
-            document.getElementById('prenomNom').value = 'Jean Dupont';
-            document.getElementById('commentaire').value = 'Client potentiel, intéressé par nos services';
-            document.getElementById('chaleur').value = 'Chaud';
-            document.getElementById('status').value = 'En cours';
-            document.getElementById('statusRelance').value = 'J+2 – Email relance';
-            document.getElementById('enfants').value = '60%';
-            document.getElementById('dateStatut').value = '2025-02-15';
-            document.getElementById('linkedin').value = 'En attente de réponse';
-            document.getElementById('mail').value = 'Mail 2';
-            document.getElementById('whatsapp').value = 'WhatsApp 1';
-            document.getElementById('appel').value = 'Message 2';
-            document.getElementById('mp').value = 'MP 1';
-            document.getElementById('followInsta').checked = true;
-            document.getElementById('com').value = 'Com 1';
-            document.getElementById('formulaire').value = 'Oui, attente réponse';
-            document.getElementById('messenger').value = 'Oui, avec réponse reçu';
-            document.getElementById('entreprise').value = 'TechCorp SAS';
-            document.getElementById('fonction').value = 'CTO';
-            document.getElementById('email').value = 'jean.d@techcorp.com';
-            document.getElementById('telFixe').value = '0145879632';
-            document.getElementById('portable').value = '0612345678';
-            document.getElementById('urlLinkedin').value = 'linkedin.com/in/jeandupont';
-            document.getElementById('urlMaps').value = 'maps.app.goo.gl/abc123';
-            document.getElementById('urlSite').value = 'techcorp.com';
-            document.getElementById('compteInsta').value = '@techcorp_officiel';
-            document.getElementById('devis').value = 'Envoyé';
-        } else if (leadId === 2) {
-            document.getElementById('prenomNom').value = 'Marie Martin';
-            document.getElementById('commentaire').value = 'A demandé un devis, à relancer';
-            document.getElementById('chaleur').value = 'Tiède';
-            document.getElementById('status').value = 'À relancer plus tard';
-            document.getElementById('statusRelance').value = 'J+1 – Relance réseaux';
-            document.getElementById('enfants').value = '40%';
-            document.getElementById('dateStatut').value = '2025-02-10';
-            document.getElementById('linkedin').value = 'Validé';
-            document.getElementById('mail').value = 'Mail 1';
-            document.getElementById('whatsapp').value = 'PAS DE PORTABLE';
-            document.getElementById('appel').value = 'Message 1';
-            document.getElementById('mp').value = 'MP 2';
-            document.getElementById('followInsta').checked = false;
-            document.getElementById('com').value = 'Com 2';
-            document.getElementById('formulaire').value = 'Oui, avec réponse reçu';
-            document.getElementById('messenger').value = 'Non, Pas de compte';
-            document.getElementById('entreprise').value = 'Design Studio';
-            document.getElementById('fonction').value = 'Directrice artistique';
-            document.getElementById('email').value = 'm.martin@designstudio.fr';
-            document.getElementById('telFixe').value = '-';
-            document.getElementById('portable').value = '0623456789';
-            document.getElementById('urlLinkedin').value = 'linkedin.com/in/mariemartin';
-            document.getElementById('urlMaps').value = 'maps.app.goo.gl/def456';
-            document.getElementById('urlSite').value = 'designstudio.fr';
-            document.getElementById('compteInsta').value = '@design_studio_off';
-            document.getElementById('devis').value = 'A faire';
-        } else {
-            document.getElementById('prenomNom').value = 'Pierre Dubois';
-            document.getElementById('commentaire').value = 'RDV confirmé pour la semaine prochaine';
-            document.getElementById('chaleur').value = 'Chaud';
-            document.getElementById('status').value = 'RDV pris';
-            document.getElementById('statusRelance').value = 'RDV pris';
-            document.getElementById('enfants').value = '80%';
-            document.getElementById('dateStatut').value = '2025-02-18';
-            document.getElementById('linkedin').value = 'Validé';
-            document.getElementById('mail').value = 'Mail 4';
-            document.getElementById('whatsapp').value = 'WhatsApp 3';
-            document.getElementById('appel').value = 'Message 3';
-            document.getElementById('mp').value = 'MP 3';
-            document.getElementById('followInsta').checked = true;
-            document.getElementById('com').value = 'Com 3';
-            document.getElementById('formulaire').value = 'Oui, avec réponse reçu';
-            document.getElementById('messenger').value = 'Oui, avec réponse reçu';
-            document.getElementById('entreprise').value = 'Innovation SARL';
-            document.getElementById('fonction').value = 'CEO';
-            document.getElementById('email').value = 'pierre.d@innovation.fr';
-            document.getElementById('telFixe').value = '0156789345';
-            document.getElementById('portable').value = '0645678901';
-            document.getElementById('urlLinkedin').value = 'linkedin.com/in/pierredubois';
-            document.getElementById('urlMaps').value = 'maps.app.goo.gl/ghi789';
-            document.getElementById('urlSite').value = 'innovation.fr';
-            document.getElementById('compteInsta').value = '@innovation_off';
-            document.getElementById('devis').value = 'Validé';
-        }
-        
-        document.getElementById('leadModal').style.display = 'block';
+    /*
+    |--------------------------------------------------------------------------
+    | OUVRIR MODAL EDIT
+    |--------------------------------------------------------------------------
+    */
+    function openEditModal(lead) {
+
+        currentLeadId = lead.id;
+
+        modalTitle.textContent = "Modifier le lead";
+
+        leadForm.action = "/crm/leads/" + lead.id;
+        formMethod.value = "PUT";
+
+        // Remplissage automatique des champs
+        Object.keys(lead).forEach(function (key) {
+
+            const field = leadForm.querySelector(`[name="${key}"]`);
+
+            if (field) {
+
+                if (field.type === "checkbox") {
+                    field.checked = lead[key] ? true : false;
+                } else {
+                    field.value = lead[key] ?? '';
+                }
+
+            }
+
+        });
+
+        leadModal.style.display = "block";
     }
 
-    // Fermer modal
+    /*
+    |--------------------------------------------------------------------------
+    | FERMER MODAL
+    |--------------------------------------------------------------------------
+    */
     function closeModal() {
-        document.getElementById('leadModal').style.display = 'none';
+        leadModal.style.display = "none";
     }
 
-    // Sauvegarder lead
-    function saveLead(event) {
-        event.preventDefault();
-        alert(currentLeadId ? 'Lead modifié avec succès !' : 'Lead ajouté avec succès !');
-        closeModal();
+    /*
+    |--------------------------------------------------------------------------
+    | OUVRIR MODAL SUPPRESSION
+    |--------------------------------------------------------------------------
+    */
+    function openDeleteModal(leadId) {
+
+        deleteForm.action = "/crm/leads/" + leadId;
+
+        deleteModal.style.display = "block";
     }
 
-    // Ouvrir modal de suppression
-    function openDeleteModal(leadId, leadName) {
-        event.stopPropagation(); // Empêche le déclenchement de l'événement click sur la ligne
-        deleteLeadId = leadId;
-        document.getElementById('deleteLeadName').textContent = leadName;
-        document.getElementById('deleteModal').style.display = 'block';
-    }
-
-    // Fermer modal de suppression
+    /*
+    |--------------------------------------------------------------------------
+    | FERMER MODAL SUPPRESSION
+    |--------------------------------------------------------------------------
+    */
     function closeDeleteModal() {
-        document.getElementById('deleteModal').style.display = 'none';
-        deleteLeadId = null;
+        deleteModal.style.display = "none";
     }
 
-    // Confirmer suppression
-    function confirmDelete() {
-        alert('Lead supprimé avec succès !');
-        closeDeleteModal();
-    }
-
-    // Fermer les modales en cliquant à l'extérieur
+    /*
+    |--------------------------------------------------------------------------
+    | FERMER EN CLIQUANT A L'EXTERIEUR
+    |--------------------------------------------------------------------------
+    */
     window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
+        if (event.target.classList.contains("modal")) {
             closeModal();
             closeDeleteModal();
         }
-    }
+    };
 
-    // Select all checkbox
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectAllCheckbox = document.querySelector('.select-all');
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function(e) {
-                document.querySelectorAll('.select-row').forEach(cb => cb.checked = e.target.checked);
+    /*
+    |--------------------------------------------------------------------------
+    | SELECT ALL CHECKBOX
+    |--------------------------------------------------------------------------
+    */
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const selectAll = document.querySelector(".select-all");
+
+        if (selectAll) {
+            selectAll.addEventListener("change", function(e) {
+
+                document.querySelectorAll(".select-row")
+                    .forEach(cb => cb.checked = e.target.checked);
+
             });
         }
+
     });
+
 </script>
+
 @endsection

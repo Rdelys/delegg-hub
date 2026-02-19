@@ -10,6 +10,8 @@ class Lead extends Model
     use HasFactory;
 
     protected $fillable = [
+            'client_id',
+
 
         // Identité
         'prenom_nom',
@@ -57,4 +59,10 @@ class Lead extends Model
         'follow_insta' => 'boolean',
         'date_statut' => 'date',
     ];
+
+    public function client()
+{
+    return $this->belongsTo(Client::class);
+}
+
 }
