@@ -98,6 +98,7 @@
                     <th>
                         <input type="checkbox" class="select-all" onclick="event.stopPropagation()">
                     </th>
+                    <th>Nom Global</th>
                     <th>Prénom Nom</th>
                     <th>Commentaire</th>
                     <th>Chaleur</th>
@@ -131,6 +132,7 @@
                 <!-- Ligne de test 1 -->
                 <tr onclick="openEditModal(1)" style="cursor: pointer;">
                     <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
+                    <td>{{ $lead->nom_global ?? '-' }}</td>
                     <td>
                         <div class="lead-info">
                             <strong>Jean Dupont</strong>
@@ -183,6 +185,7 @@
                 <!-- Ligne de test 2 -->
                 <tr onclick="openEditModal(2)" style="cursor: pointer;">
                     <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
+                    <td>{{ $lead->nom_global ?? '-' }}</td>
                     <td>
                         <div class="lead-info">
                             <strong>Marie Martin</strong>
@@ -235,6 +238,7 @@
                 <!-- Ligne de test 3 -->
                 <tr onclick="openEditModal(3)" style="cursor: pointer;">
                     <td onclick="event.stopPropagation()"><input type="checkbox" class="select-row"></td>
+                    <td>{{ $lead->nom_global ?? '-' }}</td>
                     <td>
                         <div class="lead-info">
                             <strong>Pierre Dubois</strong>
@@ -319,6 +323,11 @@
         <div class="modal-body">
             <form id="leadForm" onsubmit="saveLead(event)">
                 <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nom Global</label>
+                        <input type="text" id="nomGlobal" name="nom_global">
+                    </div>
+
                     <div class="form-group">
                         <label>Prénom Nom du Lead *</label>
                         <input type="text" id="prenomNom" required>
