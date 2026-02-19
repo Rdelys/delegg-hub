@@ -424,7 +424,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Enfants %</label>
+                        <label>Lead à jour de ses infos</label>
                         <select name="enfants_percent">
                             <option>0%</option>
                             <option>40%</option>
