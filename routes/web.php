@@ -12,6 +12,7 @@ use App\Http\Controllers\Client\ClientProfileController;
 use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\WebScraperController;
 use App\Http\Controllers\GoogleScraperController;
+use App\Http\Controllers\Client\LeadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,7 +168,23 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 
 // CRM
 Route::get('/crm/dashboard', fn () => view('client.crm.dashboard'))->name('client.crm.dashboard');
-Route::get('/crm/leads', fn () => view('client.crm.leads'))->name('client.crm.leads');
+Route::get('/crm/leads', [LeadController::class, 'index'])
+    ->name('client.crm.leads');
+
+Route::post('/crm/leads', [LeadController::class, 'store'])
+    ->name('client.crm.leads.store');
+
+Route::put('/crm/leads/{lead}', [LeadController::class, 'update'])
+    ->name('client.crm.leads.update');
+
+Route::delete('/crm/leads/{lead}', [LeadController::class, 'destroy'])
+    ->name('client.crm.leads.destroy');
+
+    Route::get('/crm/leads/export', [LeadController::class, 'exportExcel'])
+    ->name('client.crm.leads.export');
+
+Route::get('/crm/leads/{lead}/export', [LeadController::class, 'exportSingleExcel'])
+    ->name('client.crm.leads.export.single');
 
 // MAILS
 Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
