@@ -13,12 +13,14 @@
         
         @if(isset($places) && $places->count())
             <div class="btn-group">
-                <a href="{{ route('client.google.export.pdf') }}" class="btn btn-pdf">
+                <a href="{{ route('client.google.export.pdf', request()->only('filter_scrapping')) }}"
+ class="btn btn-pdf">
                     <i class="fa-solid fa-file-pdf"></i>
                     <span>PDF</span>
                 </a>
 
-                <a href="{{ route('client.google.export.excel') }}" class="btn btn-excel">
+                <a href="{{ route('client.google.export.excel', request()->only('filter_scrapping')) }}"
+ class="btn btn-excel">
                     <i class="fa-solid fa-file-excel"></i>
                     <span>Excel</span>
                 </a>
@@ -64,26 +66,46 @@
 
     {{-- Search Form --}}
     <form method="POST" action="{{ route('client.google.scrape') }}" class="search-form" id="searchForm">
-        @csrf
-        <div class="search-box">
-            <input type="text" 
-                   name="query" 
-                   required 
-                   placeholder="Ex : plombier Paris" 
-                   value="{{ old('query') }}"
-                   class="search-input">
-            <button type="submit" class="search-button">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-        </div>
-    </form>
+    @csrf
+
+    <div class="search-box">
+        <input type="text"
+               name="query"
+               required
+               placeholder="Ex : plombier Paris"
+               value="{{ old('query') }}"
+               class="search-input">
+
+        <input type="text"
+               name="nom_scrapping"
+               required
+               placeholder="Nom du scrapping (ex: Plombiers Paris Janvier)"
+               value="{{ old('nom_scrapping') }}"
+               class="search-input">
+
+        <button type="submit" class="search-button">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </div>
+</form>
+
 
     {{-- Loader --}}
     <div id="loader" class="loader hidden">
         <div class="spinner"></div>
         <p>Scraping en cours... Analyse Google + Sites web</p>
     </div>
-
+<form method="GET" action="{{ route('client.google') }}" style="margin-bottom:20px;">
+    <select name="filter_scrapping" onchange="this.form.submit()" class="search-input">
+        <option value="">-- Tous les scrappings --</option>
+        @foreach($scrappings as $scrap)
+            <option value="{{ $scrap }}" 
+                {{ request('filter_scrapping') == $scrap ? 'selected' : '' }}>
+                {{ $scrap }}
+            </option>
+        @endforeach
+    </select>
+</form>
     {{-- Results Section --}}
     @if(isset($places) && $places->count())
         <form method="POST" 
@@ -104,6 +126,7 @@
                 </button>
             </div>
 
+
             {{-- Table Container with Resizable Columns --}}
             <div class="table-container-wrapper">
                 <div class="table-scroll-container">
@@ -113,6 +136,8 @@
                                 <th class="checkbox-col" style="width: 50px; min-width: 50px; max-width: 50px;">
                                     <input type="checkbox" id="select-all" class="checkbox">
                                 </th>
+                                <th class="resizable" data-index="11">Nom Scrapping</th>
+
                                 <th class="resizable" data-index="1">Entreprise</th>
                                 <th class="resizable" data-index="2">Catégorie</th>
                                 <th class="resizable" data-index="3">Adresse</th>
@@ -131,6 +156,8 @@
                                     <td class="checkbox-col">
                                         <input type="checkbox" name="selected[]" value="{{ $p->id }}" class="checkbox row-checkbox">
                                     </td>
+                                    <td>{{ $p->nom_scrapping ?? '—' }}</td>
+
                                     <td class="company-name">{{ $p->name ?? '—' }}</td>
                                     <td>{{ $p->category ?? '—' }}</td>
                                     <td>{{ $p->address ?? '—' }}</td>
@@ -252,12 +279,13 @@
                             <i class="fa-solid fa-chevron-left"></i>
                         </span>
                     @else
-                        <a href="{{ $places->previousPageUrl() }}" class="pagination-item">
+                        <a href="{{ $places->appends(request()->query())->previousPageUrl() }}"
+ class="pagination-item">
                             <i class="fa-solid fa-chevron-left"></i>
                         </a>
                     @endif
 
-                    @foreach ($places->getUrlRange(
+@foreach ($places->appends(request()->query())->getUrlRange(
                         max(1, $places->currentPage() - 2),
                         min($places->lastPage(), $places->currentPage() + 2)
                     ) as $page => $url)
@@ -269,7 +297,8 @@
                     @endforeach
 
                     @if ($places->hasMorePages())
-                        <a href="{{ $places->nextPageUrl() }}" class="pagination-item">
+                        <a href="{{ $places->appends(request()->query())->nextPageUrl() }}"
+ class="pagination-item">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                     @else
