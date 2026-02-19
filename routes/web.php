@@ -186,6 +186,14 @@ Route::delete('/crm/leads/{lead}', [LeadController::class, 'destroy'])
 Route::get('/crm/leads/{lead}/export', [LeadController::class, 'exportSingleExcel'])
     ->name('client.crm.leads.export.single');
 
+    Route::post('/google/export-to-lead/{place}', 
+    [GoogleScraperController::class, 'exportToLead'])
+    ->name('client.google.export.lead.single');
+
+Route::post('/google/export-to-lead-by-scrapping', 
+    [GoogleScraperController::class, 'exportByScrapping'])
+    ->name('client.google.export.lead.scrapping');
+
 // MAILS
 Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
 Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');

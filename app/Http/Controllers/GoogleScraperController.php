@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Models\Lead;
 
 class GoogleScraperController extends Controller
 {
@@ -324,4 +325,81 @@ class GoogleScraperController extends Controller
 
         return response()->json($stats);
     }
+
+    public function exportToLead(GooglePlace $place)
+{
+    $clientId = session('client.id');
+
+    if ($place->client_id != $clientId) {
+        abort(403);
+    }
+
+    if ($place->exported_to_lead) {
+        return back()->with('info', 'Déjà exporté');
+    }
+
+    Lead::create([
+        'client_id'     => $clientId,
+
+        // MAPPING DEMANDÉ
+        'nom_global'    => $place->nom_scrapping,
+        'prenom_nom'    => $place->name,
+        'entreprise'    => $place->name,
+        'portable'      => $place->phone,
+        'url_site'      => $place->website,
+        'email'         => $place->email,
+        'url_linkedin'  => $place->linkedin,
+        'compte_insta'  => $place->instagram,
+        'url_maps'      => $place->source_url,
+    ]);
+
+    $place->update([
+        'exported_to_lead' => true,
+        'exported_at' => now(),
+    ]);
+
+    return back()->with('success', 'Lead créé avec succès');
+}
+
+public function exportByScrapping(Request $request)
+{
+    $clientId = session('client.id');
+
+    $request->validate([
+        'nom_scrapping' => 'required|string'
+    ]);
+
+    $places = GooglePlace::where('client_id', $clientId)
+        ->where('nom_scrapping', $request->nom_scrapping)
+        ->where('exported_to_lead', false)
+        ->get();
+
+    if ($places->isEmpty()) {
+        return back()->with('info', 'Aucune nouvelle donnée à exporter');
+    }
+
+    foreach ($places as $place) {
+
+        Lead::create([
+            'client_id'     => $clientId,
+            'nom_global'    => $place->nom_scrapping,
+            'prenom_nom'    => $place->name,
+            'entreprise'    => $place->name,
+            'portable'      => $place->phone,
+            'url_site'      => $place->website,
+            'email'         => $place->email,
+            'url_linkedin'  => $place->linkedin,
+            'compte_insta'  => $place->instagram,
+            'url_maps'      => $place->source_url,
+        ]);
+
+        $place->update([
+            'exported_to_lead' => true,
+            'exported_at' => now(),
+        ]);
+    }
+
+    return back()->with('success', $places->count().' leads exportés');
+}
+
 }
