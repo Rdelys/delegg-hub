@@ -123,17 +123,15 @@
                 <th>
                     <input type="checkbox" class="select-all">
                 </th>
-                <th>Nom Global</th>
+                <th>Nom du scrapping</th>
                 <th>Prénom Nom</th>
                 <th>Commentaire</th>
                 <th>Chaleur</th>
                 <th>Status</th>
                 <th>Status Relance</th>
-                <th>Enfants %</th>
+                <th>Lead à jour de ses infos</th>
                 <th>Date statut</th>
                 <th>LinkedIn</th>
-                <th>Suivi Mail</th>
-                <th>WhatsApp</th>
                 <th>Téléphone</th>
                 <th>MP Insta</th>
                 <th>Follow Insta</th>
@@ -203,8 +201,6 @@
                 </td>
 
                 <td><span class="badge">{{ $lead->linkedin_status ?? '-' }}</span></td>
-                <td><span class="badge">{{ $lead->suivi_mail ?? '-' }}</span></td>
-                <td><span class="badge">{{ $lead->suivi_whatsapp ?? '-' }}</span></td>
                 <td><span class="badge">{{ $lead->appel_tel ?? '-' }}</span></td>
                 <td><span class="badge">{{ $lead->mp_instagram ?? '-' }}</span></td>
 
