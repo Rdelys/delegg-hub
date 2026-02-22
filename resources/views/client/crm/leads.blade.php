@@ -577,6 +577,7 @@
                             <option>RDV pris</option>
                             <option>Refus</option>
                             <option>Clôturé</option>
+                            <option>Vendu</option>
                         </select>
                     </div>
 
