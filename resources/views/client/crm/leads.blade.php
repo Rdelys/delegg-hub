@@ -123,32 +123,216 @@
                 <th>
                     <input type="checkbox" class="select-all">
                 </th>
-                <th>Nom du scrapping</th>
-                <th>Prénom Nom</th>
-                <th>Commentaire</th>
-                <th>Chaleur</th>
-                <th>Status</th>
-                <th>Status Relance</th>
-                <th>Lead à jour de ses infos</th>
-                <th>Date statut</th>
-                <th>LinkedIn</th>
-                <th>Téléphone</th>
-                <th>MP Insta</th>
-                <th>Follow Insta</th>
-                <th>Com Insta</th>
-                <th>Formulaire</th>
-                <th>Messenger</th>
-                <th>Entreprise</th>
-                <th>Fonction</th>
-                <th>Email</th>
-                <th>Tel Fixe</th>
-                <th>Portable</th>
-                <th>URL LinkedIn</th>
-                <th>URL Maps</th>
-                <th>Site web</th>
-                <th>Compte Insta</th>
-                <th>Devis</th>
-                <th>Actions</th>
+                <th>Nom du scrapping
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Nom de la campagne ou de la source d’import du lead.
+                        </span>
+                    </span>
+                </th>
+                <th>Prénom Nom
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Nom complet du prospect tel qu’importé ou renseigné manuellement.
+                        </span>
+                    </span>
+                </th>
+                <th>Commentaire
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Notes internes sur le prospect (échanges, contexte, informations utiles).
+                        </span>
+                    </span>
+                </th>
+                <th>
+                    Chaleur
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Niveau d’intérêt du prospect : Froid, Tiède ou Chaud.
+                        </span>
+                    </span>
+                </th>                
+                <th>Status 
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            État actuel du lead dans le processus commercial.
+                        </span>
+                    </span>
+                </th>
+                <th>Status Relance
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Étape actuelle dans la séquence de relance (emails, réseaux, WhatsApp…).
+                        </span>
+                    </span>
+                </th>
+                <th>Lead à jour de ses infos
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                        Chaque ligne des prospects/lead doit être complétée intégralement, en particulier tous les URL, afin d’identifier facilement le client.
+                        Indiquez 100 % lorsque toutes les informations sont correctement renseignées.                        
+                        </span>
+                    </span>
+                </th>
+                <th>Date de relance
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Date de la dernière relance effectuée.
+                        </span>
+                    </span>
+                </th>
+                <th>Devis
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Statut du devis envoyé au prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>LinkedIn
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Est ce que vous êtes connecté sur Linkedin avec le Lead ?.
+                        </span>
+                    </span>
+                </th>
+                <th>Téléphone
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Numero du Lead ?.
+                        </span>
+                    </span>
+                </th>
+                <th>MP Insta
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Nombre de messages privés envoyés au prospect sur Instagram.
+                        </span>
+                    </span>
+                </th>
+                <th>Follow Insta
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Indique si le compte Instagram du prospect a été suivi.
+                        </span>
+                    </span>
+                </th>
+                <th>Com Insta
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Nombre de commentaires laissés sur les publications Instagram du prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>Formulaire
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Indique si un message a été envoyé via le formulaire du site et son statut.
+                        </span>
+                    </span>
+                </th>
+                <th>Messenger 
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Statut du contact effectué via Messenger (envoyé, réponse reçue ou indisponible).
+                        </span>
+                    </span>
+                </th>
+                <th>Nom entreprise
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Nom de l’entreprise ou de la société associée au prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>Fonction du prospect
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Intitulé du poste du lead (nous recherchons le gérant : gérant, gérante, directeur, etc.).
+                        </span>
+                    </span>
+                </th>
+                <th>Email
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Adresse email professionnelle du prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>Tel Fixe
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Numéro de téléphone fixe de l’entreprise.
+                        </span>
+                    </span>
+                </th>
+                <th>Portable
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Numéro de téléphone mobile du prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>URL LinkedIn
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Lien vers le profil LinkedIn du prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>URL Maps
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Lien vers la fiche Google Maps de l’entreprise.
+                        </span>
+                    </span>
+                </th>
+                <th>Site web
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Site internet officiel de l’entreprise.
+                        </span>
+                    </span>
+                </th>
+                <th>Compte Insta
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Nom d’utilisateur du compte Instagram du prospect.
+                        </span>
+                    </span>
+                </th>
+                <th>Actions
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Modifier, supprimer ou exporter ce lead.
+                        </span>
+                    </span>
+                </th>
             </tr>
         </thead>
 
@@ -200,6 +384,12 @@
                     {{ $lead->date_statut ? \Carbon\Carbon::parse($lead->date_statut)->format('d/m/Y') : '-' }}
                 </td>
 
+                <td>
+                    <span class="badge">
+                        {{ $lead->devis ?? '-' }}
+                    </span>
+                </td>
+
                 <td><span class="badge">{{ $lead->linkedin_status ?? '-' }}</span></td>
                 <td><span class="badge">{{ $lead->appel_tel ?? '-' }}</span></td>
                 <td><span class="badge">{{ $lead->mp_instagram ?? '-' }}</span></td>
@@ -246,12 +436,6 @@
                 </td>
 
                 <td>{{ $lead->compte_insta ?? '-' }}</td>
-
-                <td>
-                    <span class="badge">
-                        {{ $lead->devis ?? '-' }}
-                    </span>
-                </td>
 
                 <td class="actions" onclick="event.stopPropagation()">
 
@@ -431,7 +615,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Date statut</label>
+                        <label>Date du relance</label>
                         <input type="date" name="date_statut">
                     </div>
 
@@ -442,30 +626,6 @@
                             <option>Non</option>
                             <option>En attente de réponse</option>
                             <option>Refusé</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Suivi Mail</label>
-                        <select name="suivi_mail">
-                            <option>Mail 1</option> 
-                            <option>Mail 2</option> 
-                            <option>Mail 3</option> 
-                            <option>Mail 4</option> 
-                            <option>Mail 5</option> 
-                            <option>Mail arrive en SPAM</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Suivi WhatsApp</label>
-                        <select name="suivi_whatsapp">
-                            <option>WhatsApp 1</option> 
-                            <option>WhatsApp 2</option> 
-                            <option>WhatsApp 3</option> 
-                            <option>WhatsApp 4</option> 
-                            <option>WhatsApp 5</option> 
-                            <option>PAS DE PORTABLE</option>
                         </select>
                     </div>
 
@@ -884,7 +1044,6 @@
         font-weight: 600;
         color: #1e293b;
         font-size: 12px;
-        text-transform: uppercase;
         letter-spacing: 0.5px;
         border-bottom: 2px solid #d1d5db;
         white-space: nowrap;
@@ -1316,8 +1475,216 @@
             justify-content: center;
         }
     }
-</style>
 
+    /* Tooltip colonne version simple bas */
+.info-tooltip {
+    position: relative;
+    display: inline-block;
+    margin-left: 4px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.info-tooltip i {
+    font-size: 11px;
+}
+
+/* Tooltip */
+.info-tooltip .tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    top: 125%; /* 🔥 en bas */
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+    z-index: 999;
+}
+
+/* Petite flèche vers le haut */
+.info-tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px;
+    border-style: solid;
+    border-color: transparent transparent #1e293b transparent;
+}
+
+.info-tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Container pour tableau avec colonnes fixes */
+.table-responsive {
+    position: relative;
+    overflow-x: auto;
+    margin: 0 -28px;
+    padding: 0 28px;
+    border-radius: 20px;
+    max-width: 100%;
+}
+
+/* Style pour tableau avec colonnes fixes */
+.leads-table {
+    width: 100%;
+    border-collapse: collapse; /* Changé de separate à collapse */
+    min-width: 2300px;
+    font-size: 13px;
+    table-layout: auto; /* ou fixed selon vos besoins */
+}
+
+/* ===== COLONNES FIXES ===== */
+/* Première colonne (Checkbox) */
+.leads-table th:first-child,
+.leads-table td:first-child {
+    position: sticky;
+    left: 0;
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    background: white;
+    z-index: 30;
+    box-sizing: border-box;
+}
+
+/* Deuxième colonne (Nom du scrapping) */
+.leads-table th:nth-child(2),
+.leads-table td:nth-child(2) {
+    position: sticky;
+    left: 50px;
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+    background: white;
+    z-index: 25;
+    box-sizing: border-box;
+}
+
+/* Troisième colonne (Prénom Nom) - Forcer la largeur */
+.leads-table th:nth-child(3),
+.leads-table td:nth-child(3) {
+    position: sticky;
+    left: 230px; /* 50px + 180px */
+    width: 510px !important;
+    min-width: 510px !important;
+    max-width: 510px !important;
+    background: white;
+    z-index: 20;
+    box-sizing: border-box;
+}
+
+/* Styles spécifiques pour les en-têtes des colonnes fixes */
+.leads-table th:first-child,
+.leads-table th:nth-child(2),
+.leads-table th:nth-child(3) {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    z-index: 40;
+}
+
+/* Assurer que le dégradé de fond s'applique correctement */
+.leads-table th:first-child {
+    z-index: 45;
+}
+
+.leads-table th:nth-child(2) {
+    z-index: 44;
+}
+
+.leads-table th:nth-child(3) {
+    z-index: 43;
+}
+
+/* Ombre portée subtile */
+.leads-table th:first-child::after,
+.leads-table td:first-child::after,
+.leads-table th:nth-child(2)::after,
+.leads-table td:nth-child(2)::after,
+.leads-table th:nth-child(3)::after,
+.leads-table td:nth-child(3)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -2px;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to right, rgba(0,0,0,0.02), transparent);
+    pointer-events: none;
+}
+
+/* Gestion du contenu dans la troisième colonne */
+.leads-table td:nth-child(3) .lead-info {
+    width: 100%;
+    max-width: 510px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.leads-table td:nth-child(3) .lead-info strong {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.leads-table td:nth-child(3) .lead-info small {
+    font-size: 11px;
+    color: #64748b;
+}
+
+/* Solution alternative avec une classe spécifique pour les cellules de la 3ème colonne */
+.leads-table td:nth-child(3) {
+    white-space: nowrap;
+}
+
+/* Amélioration du survol */
+.leads-table tbody tr:hover td:first-child,
+.leads-table tbody tr:hover td:nth-child(2),
+.leads-table tbody tr:hover td:nth-child(3) {
+    background: #f8fafc;
+}
+
+/* Ajustement des tooltips */
+.leads-table th:nth-child(2) .info-tooltip,
+.leads-table th:nth-child(3) .info-tooltip {
+    position: relative;
+    z-index: 50;
+}
+
+/* Optionnel : Ajustement pour mobile */
+@media (max-width: 768px) {
+    .leads-table th:nth-child(2),
+    .leads-table td:nth-child(2) {
+        width: 140px;
+        min-width: 140px;
+        max-width: 140px;
+    }
+    
+    .leads-table th:nth-child(3),
+    .leads-table td:nth-child(3) {
+        left: 190px;
+        width: 250px !important;
+        min-width: 250px !important;
+        max-width: 250px !important;
+    }
+    
+    .leads-table td:nth-child(3) .lead-info {
+        max-width: 230px;
+    }
+}
+
+</style>
 <script>
 
     /*
