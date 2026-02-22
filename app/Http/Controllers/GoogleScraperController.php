@@ -36,7 +36,7 @@ class GoogleScraperController extends Controller
 
     $places = $query
         ->orderByDesc('rating')
-        ->paginate(10)
+        ->paginate(25) // ← MODIFIÉ ICI
         ->withQueryString(); // ⚠️ IMPORTANT POUR GARDER LE FILTRE EN PAGINATION
 
     $scrappings = GooglePlace::where('client_id', $clientId)
@@ -70,7 +70,7 @@ class GoogleScraperController extends Controller
     
     $allResults = [];
     $start = 0; // Paramètre de pagination pour SerpAPI
-    $maxResults = 100; // Ou le nombre que vous voulez
+    $maxResults = 2000; // ← MODIFIÉ ICI (max 2000 résultats)
     $pageCount = 0;
 
     do {
