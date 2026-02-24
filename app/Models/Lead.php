@@ -10,12 +10,13 @@ class Lead extends Model
     use HasFactory;
 
     protected $fillable = [
-            'client_id',
 
+        // Relation
+        'client_id',
 
         // Identité
         'prenom_nom',
-        'nom_global',
+        'nom',
         'commentaire',
 
         // Pipeline
@@ -33,21 +34,31 @@ class Lead extends Model
         'com_instagram',
         'formulaire_site',
         'messenger',
+        'message_form',
 
         // Entreprise
         'entreprise',
+        'categorie',
+        'adresse_postale',
         'fonction',
 
         // Contact
         'email',
+        'email_gerant',
         'tel_fixe',
         'portable',
 
-        // URL
+        // URLs
+        'url_facebook',
+        'url_instagramm',
         'url_linkedin',
         'url_maps',
         'url_site',
         'compte_insta',
+
+        // Google / réputation
+        'note',
+        'avis',
 
         // Commercial
         'devis',
@@ -59,8 +70,7 @@ class Lead extends Model
     ];
 
     public function client()
-{
-    return $this->belongsTo(Client::class);
-}
-
+    {
+        return $this->belongsTo(Client::class);
+    }
 }

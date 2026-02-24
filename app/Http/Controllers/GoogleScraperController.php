@@ -143,8 +143,9 @@ $scrappings = GooglePlace::whereIn('client_id', $clientIds)
                 'address' => $place['address'] ?? null,
                 'phone' => $place['phone'] ?? null,
                 'rating' => $place['rating'] ?? null,
-                'reviews_count' => $place['reviews'] ?? null,
-            ]
+'reviews_count' => $place['reviews'] 
+                    ?? $place['reviews_count'] 
+                    ?? null,            ]
         );
 
         // Lancer scraping site web
@@ -380,22 +381,50 @@ if (empty($clientIds)) {
         ]);
     }
 
+    // Nettoyage téléphone
+    $phone = preg_replace('/\s+/', '', $place->phone);
+
+    $portable = null;
+    $telFixe  = null;
+
+    if ($phone) {
+        if (str_starts_with($phone, '06') || str_starts_with($phone, '07')) {
+            $portable = $phone;
+        } else {
+            $telFixe = $phone;
+        }
+    }
+
     Lead::create([
-        'client_id'     => $clientId,
-        'nom_global'    => $place->nom_scrapping,
-        'prenom_nom'    => $place->name,
-        'entreprise'    => $place->name,
-        'portable'      => $place->phone,
-        'url_site'      => $place->website,
-        'email'         => $place->email,
-        'url_linkedin'  => $place->linkedin,
-        'compte_insta'  => $place->instagram,
-        'url_maps'      => $place->source_url,
+        'client_id'      => $clientId,
+
+        // Identité
+        'nom_global'     => $place->nom_scrapping,
+
+        // Entreprise
+        'entreprise'     => $place->name,
+        'categorie'      => $place->category,
+        'adresse_postale'=> $place->address,
+
+        // Contact
+        'portable'       => $portable,
+        'tel_fixe'       => $telFixe,
+        'email'          => $place->email,
+
+        // URLs
+        'url_site'       => $place->website,
+        'url_facebook'   => $place->facebook,
+        'url_instagramm' => $place->instagram,
+        'url_linkedin'   => $place->linkedin,
+
+        // Réputation Google
+        'note'           => $place->rating,
+        'avis'           => $place->reviews_count,
     ]);
 
     $place->update([
         'exported_to_lead' => true,
-        'exported_at' => now(),
+        'exported_at'      => now(),
     ]);
 
     return response()->json([
@@ -403,6 +432,7 @@ if (empty($clientIds)) {
         'message' => 'Export réussi'
     ]);
 }
+
 
 public function exportByScrapping(Request $request)
 {
@@ -423,26 +453,47 @@ public function exportByScrapping(Request $request)
 
     foreach ($places as $place) {
 
+        $phone = preg_replace('/\s+/', '', $place->phone);
+
+        $portable = null;
+        $telFixe  = null;
+
+        if ($phone) {
+            if (str_starts_with($phone, '06') || str_starts_with($phone, '07')) {
+                $portable = $phone;
+            } else {
+                $telFixe = $phone;
+            }
+        }
+
         Lead::create([
-            'client_id'     => $clientId,
-            'nom_global'    => $place->nom_scrapping,
-            'prenom_nom'    => $place->name,
-            'entreprise'    => $place->name,
-            'portable'      => $place->phone,
-            'url_site'      => $place->website,
-            'email'         => $place->email,
-            'url_linkedin'  => $place->linkedin,
-            'compte_insta'  => $place->instagram,
-            'url_maps'      => $place->source_url,
+            'client_id'      => $clientId,
+
+            'nom_global'     => $place->nom_scrapping,
+
+            'entreprise'     => $place->name,
+            'categorie'      => $place->category,
+            'adresse_postale'=> $place->address,
+
+            'portable'       => $portable,
+            'tel_fixe'       => $telFixe,
+            'email'          => $place->email,
+
+            'url_site'       => $place->website,
+            'url_facebook'   => $place->facebook,
+            'url_instagramm' => $place->instagram,
+            'url_linkedin'   => $place->linkedin,
+
+            'note'           => $place->rating,
+            'avis'           => $place->reviews_count,
         ]);
 
         $place->update([
             'exported_to_lead' => true,
-            'exported_at' => now(),
+            'exported_at'      => now(),
         ]);
     }
 
     return back()->with('success', $places->count().' leads exportés');
 }
-
 }

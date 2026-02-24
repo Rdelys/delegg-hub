@@ -211,6 +211,15 @@
                     </span>
                 </th>
 
+                <th>Status du Lead
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            État actuel du lead dans le processus commercial.
+                        </span>
+                    </span>
+                </th>
+
                 <th>Instagram
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
@@ -238,14 +247,25 @@
                     </span>
                 </th>
 
-                <th>Status du Lead
+                <th>Message Formulaire site web 
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text">
-                            État actuel du lead dans le processus commercial.
+                            Lead effectué via Messenger (envoyé, réponse reçue ou deja en relation).
                         </span>
                     </span>
                 </th>
+
+                <th>Catégorie 
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Métier de l'entreprise
+                        </span>
+                    </span>
+                </th>
+
+                
                 <th>Procédure de Prospection
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
@@ -326,10 +346,21 @@
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text">
-                            Adresse email professionnelle du prospect.
+                            Adresse email professionnelle de l'entreprise.
                         </span>
                     </span>
                 </th>
+
+                <th>Email gérant
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Adresse email professionnelle du gérant.
+                        </span>
+                    </span>
+                </th>
+
+
                 <th>Tel Fixe
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
@@ -347,19 +378,21 @@
                     </span>
                 </th>
                 
-                <th>URL Maps
-                    <span class="info-tooltip">
-                        <i class="fas fa-info-circle"></i>
-                        <span class="tooltip-text">
-                            Lien vers la fiche Google Maps de l’entreprise.
-                        </span>
-                    </span>
-                </th>
+                
                 <th>Site web
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
                         <span class="tooltip-text">
                             Site internet officiel de l’entreprise.
+                        </span>
+                    </span>
+                </th>
+
+                <th>Pas de site web
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Pas de site internet.
                         </span>
                     </span>
                 </th>
@@ -371,6 +404,25 @@
                         </span>
                     </span>
                 </th>
+                
+
+                <th>Note
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Note de l'entreprise.
+                        </span>
+                    </span>
+                </th>
+                <th>Avis
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Avis sur l'entreprise.
+                        </span>
+                    </span>
+                </th>
+
                 <th>Nom du scrapping
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
@@ -379,6 +431,16 @@
                         </span>
                     </span>
                 </th>
+
+                <th>URL Maps
+                    <span class="info-tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltip-text">
+                            Lien vers la fiche Google Maps de l’entreprise.
+                        </span>
+                    </span>
+                </th>
+
                 <th>Actions
                     <span class="info-tooltip">
                         <i class="fas fa-info-circle"></i>
@@ -391,184 +453,158 @@
         </thead>
 
         <tbody>
-        @forelse($leads as $lead)
+@forelse($leads as $lead)
 
-            <tr onclick='openEditModal(@json($lead))' style="cursor:pointer;">
+<tr onclick='openEditModal(@json($lead))' style="cursor:pointer;">
 
-                <td onclick="event.stopPropagation()">
-                    <input type="checkbox" class="select-row">
-                </td>
+<td onclick="event.stopPropagation()">
+    <input type="checkbox" class="select-row">
+</td>
 
-                <td>{{ $lead->entreprise ?? '-' }}</td>
+<td>{{ $lead->entreprise ?? '-' }}</td>
 
-                <td>
-                    <div class="lead-info">
-                        <strong>{{ $lead->prenom_nom }}</strong>
-                    </div>
-                </td>
+<td><strong>{{ $lead->prenom_nom }}</strong></td>
 
-                <td>
-                    <div class="lead-info">
-                        <strong>-</strong>
-                    </div>
-                </td>
+<td><strong>{{ $lead->nom ?? '-' }}</strong></td>
 
-                <td>
-                    <div class="lead-info">
-                        <strong>-</strong>
-                    </div>
-                </td>
+<td>{{ $lead->adresse_postale ?? '-' }}</td>
 
-                <td>{{ $lead->commentaire ?? '-' }}</td>
+<td>{{ $lead->commentaire ?? '-' }}</td>
 
-                <td>
-                    <span class="badge {{ strtolower($lead->chaleur) }}">
-                        {{ $lead->chaleur ?? '-' }}
-                    </span>
-                </td>
+<td>
+    <span class="badge {{ \Illuminate\Support\Str::slug($lead->chaleur) }}">
+        {{ $lead->chaleur ?? '-' }}
+    </span>
+</td>
 
-                <td class="url-cell">
-                    @if($lead->url_linkedin)
-                        <a href="{{ $lead->url_linkedin }}" target="_blank" class="url-link" onclick="event.stopPropagation()">
-                            Voir
-                        </a>
-                    @else -
-                    @endif
-                </td>
-                <td>
-                    <div class="lead-info">
-                        <strong>-</strong>
-                    </div>
-                </td>
-                <td>
-                    <div class="lead-info">
-                        <strong>-</strong>
-                    </div>
-                </td>
+<td class="url-cell">
+@if($lead->url_linkedin)
+    <a href="{{ $lead->url_linkedin }}" target="_blank" onclick="event.stopPropagation()">Voir</a>
+@else - @endif
+</td>
 
-                <td>
-                    <span class="badge">
-                        {{ $lead->appel_tel ?? '-' }}
-                    </span>
-                </td>
+<td class="url-cell">
+@if($lead->url_facebook)
+    <a href="{{ $lead->url_facebook }}" target="_blank" onclick="event.stopPropagation()">Voir</a>
+@else - @endif
+</td>
 
-                <td>
-                    <span class="badge">
-                        {{ $lead->status ?? '-' }}
-                    </span>
-                </td>
+<td class="url-cell">
+@if($lead->url_instagramm)
+    <a href="{{ $lead->url_instagramm }}" target="_blank" onclick="event.stopPropagation()">Voir</a>
+@else - @endif
+</td>
 
-                <td>
-                    <div class="lead-info">
-                        <strong>-</strong>
-                    </div>
-                </td>
-                
-                <td>
-                    <span class="badge">
-                        {{ $lead->linkedin_status ?? '-' }}
-                    </span>
-                </td>
+<td><span class="badge">{{ $lead->appel_tel ?? '-' }}</span></td>
 
-                <td>
-                    <span class="badge">
-                        {{ $lead->messenger ?? '-' }}
-                    </span>
-                </td>
+<td><span class="badge">{{ $lead->status ?? '-' }}</span></td>
 
-                <td>
-                    <span class="badge relance-status">
-                        {{ $lead->status_relance ?? '-' }}
-                    </span>
-                </td>
-                
-                <td>
-                    {{ $lead->date_statut ? \Carbon\Carbon::parse($lead->date_statut)->format('d/m/Y') : '-' }}
-                </td>
+<td><span class="badge">{{ $lead->mp_instagram ?? '-' }}</span></td>
 
-                <td>
-                    <span class="badge pourcent">
-                        {{ $lead->enfants_percent ?? '-' }}
-                    </span>
-                </td>
+<td><span class="badge">{{ $lead->linkedin_status ?? '-' }}</span></td>
 
-                
+<td><span class="badge">{{ $lead->messenger ?? '-' }}</span></td>
 
-                <td>
-                    <span class="badge">
-                        {{ $lead->devis ?? '-' }}
-                    </span>
-                </td>
+<td><span class="badge">{{ $lead->message_form ?? '-' }}</span></td>
 
-                <td><span class="badge">{{ $lead->mp_instagram ?? '-' }}</span></td>
+<td><span class="badge">{{ $lead->categorie ?? '-' }}</span></td>
 
-                <td class="checkbox-cell" onclick="event.stopPropagation()">
-                    <input type="checkbox" disabled {{ $lead->follow_insta ? 'checked' : '' }}>
-                </td>
+<td><span class="badge relance-status">{{ $lead->status_relance ?? '-' }}</span></td>
 
-                <td><span class="badge">{{ $lead->com_instagram ?? '-' }}</span></td>
-                <td><span class="badge">{{ $lead->formulaire_site ?? '-' }}</span></td>
+<td>
+{{ $lead->date_statut 
+    ? \Carbon\Carbon::parse($lead->date_statut)->format('d/m/Y') 
+    : '-' }}
+</td>
 
-                <td>{{ $lead->fonction ?? '-' }}</td>
-                <td>{{ $lead->email ?? '-' }}</td>
-                <td>{{ $lead->tel_fixe ?? '-' }}</td>
-                <td>{{ $lead->portable ?? '-' }}</td>
+<td><span class="badge pourcent">{{ $lead->enfants_percent ?? '-' }}</span></td>
 
-                
+<td><span class="badge">{{ $lead->devis ?? '-' }}</span></td>
 
-                <td class="url-cell">
-                    @if($lead->url_maps)
-                        <a href="{{ $lead->url_maps }}" target="_blank" class="url-link" onclick="event.stopPropagation()">
-                            Voir
-                        </a>
-                    @else -
-                    @endif
-                </td>
+<td><span class="badge">{{ $lead->mp_instagram ?? '-' }}</span></td>
 
-                <td class="url-cell">
-                    @if($lead->url_site)
-                        <a href="{{ $lead->url_site }}" target="_blank" class="url-link" onclick="event.stopPropagation()">
-                            Voir
-                        </a>
-                    @else -
-                    @endif
-                </td>
+<td class="checkbox-cell" onclick="event.stopPropagation()">
+    <input type="checkbox" disabled {{ $lead->follow_insta ? 'checked' : '' }}>
+</td>
 
-                <td>{{ $lead->compte_insta ?? '-' }}</td>
-                <td>{{ $lead->nom_global ?? '-' }}</td>
+<td><span class="badge">{{ $lead->com_instagram ?? '-' }}</span></td>
 
-                <td class="actions" onclick="event.stopPropagation()">
+<td><span class="badge">{{ $lead->formulaire_site ?? '-' }}</span></td>
 
-                    <button class="btn-icon"
-                        onclick='openEditModal(@json($lead))'
-                        title="Modifier">
-                        <i class="fas fa-edit"></i>
-                    </button>
+<td>{{ $lead->fonction ?? '-' }}</td>
 
-                    <button class="btn-icon"
-                        onclick="openDeleteModal({{ $lead->id }})"
-                        title="Supprimer">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="btn-icon"
-                        onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'"
-                        title="Exporter">
-                        <i class="fas fa-file-excel"></i>
-                    </button>
-                </td>
+<td>{{ $lead->email ?? '-' }}</td>
 
-            </tr>
+<td>{{ $lead->email_gerant ?? '-' }}</td>
 
-        @empty
+<td>{{ $lead->tel_fixe ?? '-' }}</td>
 
-            <tr>
-                <td colspan="29" style="text-align:center; padding:30px;">
-                    Aucun lead trouvé.
-                </td>
-            </tr>
+<td>{{ $lead->portable ?? '-' }}</td>
 
-        @endforelse
-        </tbody>
+<td class="url-cell">
+@if($lead->url_site)
+    <a href="{{ $lead->url_site }}" target="_blank" onclick="event.stopPropagation()">Voir</a>
+@else - @endif
+</td>
+
+<td class="checkbox-cell">
+    <input type="checkbox" disabled {{ !$lead->url_site ? 'checked' : '' }}>
+</td>
+
+<td>{{ $lead->compte_insta ?? '-' }}</td>
+
+<td>
+    <span class="badge">
+        {{ $lead->note ?? '-' }}
+    </span>
+</td>
+
+<td>
+    <span class="badge">
+        {{ $lead->avis ?? '-' }}
+    </span>
+</td>
+
+<td>{{ $lead->nom_global ?? '-' }}</td>
+
+<td class="url-cell">
+@if($lead->url_maps)
+    <a href="{{ $lead->url_maps }}" target="_blank" onclick="event.stopPropagation()">Voir</a>
+@else - @endif
+</td>
+
+<td class="actions" onclick="event.stopPropagation()">
+
+    <button class="btn-icon"
+        onclick='openEditModal(@json($lead))'
+        title="Modifier">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="btn-icon"
+        onclick="openDeleteModal({{ $lead->id }})"
+        title="Supprimer">
+        <i class="fas fa-trash"></i>
+    </button>
+
+    <button class="btn-icon"
+        onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'"
+        title="Exporter">
+        <i class="fas fa-file-excel"></i>
+    </button>
+
+</td>
+
+</tr>
+
+@empty
+<tr>
+    <td colspan="40" style="text-align:center; padding:30px;">
+        Aucun lead trouvé.
+    </td>
+</tr>
+@endforelse
+</tbody>
     </table>
 </div>
 
@@ -644,13 +680,28 @@
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label>Nom Global</label>
-                        <input type="text" name="nom_global">
+                        <label>Entreprise</label>
+                        <input type="text" name="entreprise">
                     </div>
 
                     <div class="form-group">
-                        <label>Prénom Nom *</label>
+                        <label>Catégorie </label>
+                        <input type="text" name="categorie">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Adresse postale </label>
+                        <input type="text" name="adresse_postale">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Prénom Gérant *</label>
                         <input type="text" name="prenom_nom" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nom Gérant</label>
+                        <input type="text" name="nom" >
                     </div>
 
                     <div class="form-group">
@@ -659,17 +710,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Chaleur</label>
-                        <select name="chaleur">
-                            <option value="Froid">Froid</option>
-                            <option value="Tiède">Tiède</option>
-                            <option value="Chaud">Chaud</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
+                        <label>Status du Lead</label>
                         <select name="status">
+                            <option>À Contacter</option>
                             <option>En cours</option>
                             <option>À relancer plus tard</option>
                             <option>Répondu – à traiter</option>
@@ -682,25 +725,82 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Status Relance</label>
+                        <label>Procédure de Prospection</label>
                         <select name="status_relance">
-                            <option>J0 – Email envoyé</option> 
-                            <option>J0 – Réseaux envoyé</option> 
-                            <option>J+1 – Relance réseaux</option> 
-                            <option>J+2 – Email relance</option> 
-                            <option>J+3 – WhatsApp/SMS 1</option> 
-                            <option>J+4 – Email angle problème</option> 
-                            <option>J+5 – Réseaux angle problème</option> 
-                            <option>J+7 – Email proposition RDV</option> 
-                            <option>J+8 – WhatsApp/SMS 2</option> 
-                            <option>J+10 – Email final</option> 
-                            <option>J+12 – Réseaux final</option> 
-                            <option>Répondu – à traiter</option> 
-                            <option>RDV proposé</option> 
-                            <option>RDV pris</option> 
-                            <option>Refus</option> 
-                            <option>À relancer plus tard</option> 
-                            <option>Clôturé</option>
+                            <option>Non commencé</option>
+                            
+                            <option>J0 - Mail 1</option>
+                            <option>J+1 - MP 1 Insta + Follow + Like + Commentaire</option>
+                            <option>J+3 - Mail 2</option>
+                            <option>J+4 - WhatsApp 1 + SMS 1</option>
+                            <option>J+6 - Connexion LinkedIn + MP</option>
+                            <option>J+7 - Mail 3</option>
+                            <option>J+8 - MP 2 Insta + Commentaire</option>
+                            <option>J+10 - WhatsApp 2 + SMS 2</option>
+                            <option>J+12 - Mail 4</option>
+                            <option>J+15 - Appel téléphonique</option>
+                            <option>J+17 - WhatsApp 3 + SMS 3</option>
+                            <option>J+20 - Mail 5</option>
+                            
+                            <option>RDV pris</option>
+                            <option>Vendu</option>
+                            <option>Mort</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date du relance</label>
+                        <input type="date" name="date_statut">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Devis</label>
+                        <select name="devis">
+                            <option>Pas encore</option>
+                            <option>A faire</option>
+                            <option>Envoyé</option>
+                            <option>Validé</option>
+                            <option>Perdu</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Chaleur</label>
+                        <select name="chaleur">
+                            <option value="Pas Échangé">Pas Échangé</option>
+                            <option value="Froid">Froid</option>
+                            <option value="Tiède">Tiède</option>
+                            <option value="Chaud">Chaud</option>
+                            <option value="Mort">Mort</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL Profil Facebook</label>
+                        <input type="text" name="url_facebook">
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL Profil Instagram</label>
+                        <input type="text" name="url_instagramm">
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL Profil LinkedIn</label>
+                        <input type="text" name="url_linkedin">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Appel Téléphonique</label>
+                        <select name="appel_tel">
+                            <option>Non appelé</option>
+                            <option>Message 1</option> 
+                            <option>Message 2</option> 
+                            <option>Message 3</option> 
+                            <option>Message 4</option> 
+                            <option>RDV pris</option>
+                            <option>Vendu</option>
+                            <option>Mort</option>
                         </select>
                     </div>
 
@@ -715,32 +815,20 @@
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <label>Date du relance</label>
-                        <input type="date" name="date_statut">
-                    </div>
 
                     <div class="form-group">
                         <label>LinkedIn</label>
                         <select name="linkedin_status">
+                            <option>Non contacté</option>
                             <option>Validé</option>
-                            <option>Non</option>
-                            <option>En attente de réponse</option>
-                            <option>Refusé</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Appel Téléphonique</label>
-                        <select name="appel_tel">
-                            <option>Message 1</option> 
-                            <option>Message 2</option> 
-                            <option>Message 3</option> 
-                            <option>Message 4</option> 
-                            <option>Message 5</option> 
+                            <option>En attente</option>
+                            <option>Connecté</option>
+                            <option>Non, pas de compte</option>
                             <option>Mort</option>
                         </select>
                     </div>
+
+                    
 
                     <div class="form-group">
                         <label>MP Instagram</label>
@@ -784,6 +872,7 @@
                     <div class="form-group">
                         <label>Messenger</label>
                         <select name="messenger">
+                            <option>Non contacté</option> 
                             <option>Oui, attente réponse</option> 
                             <option>Oui, avec réponse reçu</option> 
                             <option>Non, Pas de compte</option> 
@@ -792,8 +881,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Entreprise</label>
-                        <input type="text" name="entreprise">
+                        <label>Message formulaire site web</label>
+                        <select name="message_form">
+                            <option>Non envoyé</option> 
+                            <option>À ne pas faire car déjà en relation</option> 
+                        </select>
                     </div>
 
                     <div class="form-group">
@@ -802,23 +894,23 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Email</label>
+                        <label>Email Entreprise</label>
                         <input type="email" name="email">
                     </div>
 
                     <div class="form-group">
-                        <label>Tel Fixe</label>
+                        <label>Email Gérant</label>
+                        <input type="email" name="email_gerant">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Téléphone Fixe</label>
                         <input type="text" name="tel_fixe">
                     </div>
 
                     <div class="form-group">
-                        <label>Portable</label>
+                        <label>Téléphone Portable</label>
                         <input type="text" name="portable">
-                    </div>
-
-                    <div class="form-group">
-                        <label>URL LinkedIn</label>
-                        <input type="text" name="url_linkedin">
                     </div>
 
                     <div class="form-group">
@@ -836,16 +928,7 @@
                         <input type="text" name="compte_insta">
                     </div>
 
-                    <div class="form-group">
-                        <label>Devis</label>
-                        <select name="devis">
-                            <option>Pas encore</option>
-                            <option>A faire</option>
-                            <option>Envoyé</option>
-                            <option>Validé</option>
-                            <option>Perdu</option>
-                        </select>
-                    </div>
+                    
 
                 </div>
 

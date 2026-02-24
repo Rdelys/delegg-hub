@@ -33,10 +33,15 @@ class ScrapeGoogleMaps extends Command
 
     foreach ($data as $item) {
         \App\Models\GooglePlace::create([
-            'client_id' => $clientId,
-            'name'      => $item['name'] ?? null,
-            'category'  => $item['category'] ?? null,
-            'address'   => $item['address'] ?? null,
+            'client_id'      => $clientId,
+        'name'           => $item['name'] ?? null,
+        'category'       => $item['category'] ?? null,
+        'address'        => $item['address'] ?? null,
+        'phone'          => $item['phone'] ?? null,
+        'website'        => $item['website'] ?? null,
+        'email'          => $item['email'] ?? null,
+        'rating'         => $item['rating'] ?? null,
+        'reviews_count'  => $item['reviews_count'] ?? null,
         ]);
     }
 
