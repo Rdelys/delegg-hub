@@ -143,8 +143,9 @@ $scrappings = GooglePlace::whereIn('client_id', $clientIds)
                 'address' => $place['address'] ?? null,
                 'phone' => $place['phone'] ?? null,
                 'rating' => $place['rating'] ?? null,
-                'reviews_count' => $place['reviews'] ?? null,
-            ]
+'reviews_count' => $place['reviews'] 
+                    ?? $place['reviews_count'] 
+                    ?? null,            ]
         );
 
         // Lancer scraping site web
