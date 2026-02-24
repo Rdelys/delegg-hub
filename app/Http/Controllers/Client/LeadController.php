@@ -86,6 +86,16 @@ class LeadController extends Controller
         $rdvPrisCount = (clone $query)->where('status', 'RDV pris')->count();
         $clotureCount = (clone $query)->where('status', 'Clôturé')->count();
 
+                /* ================= RÉCUPÉRER LES NOMS DE SCRAPPING UNIQUES ================= */
+        $scrappingNames = Lead::whereIn('client_id', $clientIds)
+            ->whereNotNull('nom_global')
+            ->where('nom_global', '!=', '')
+            ->distinct()
+            ->orderBy('nom_global')
+            ->pluck('nom_global')
+            ->toArray();
+
+
         /* ================= PAGINATION ================= */
 
         $leads = $query->latest()->paginate(20)->withQueryString();
@@ -95,7 +105,8 @@ class LeadController extends Controller
             'totalLeads',
             'relanceCount',
             'rdvPrisCount',
-            'clotureCount'
+            'clotureCount',
+            'scrappingNames'
         ));
     }
 
