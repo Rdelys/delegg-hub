@@ -92,8 +92,26 @@ class DashboardController extends Controller
         return round(($earnedPoints / $totalPoints) * 100);
     }
 
+    /**
+     * Catégorise un pourcentage dans les tranches prédéfinies
+     */
+    private function categorizePercentage($percentage)
+    {
+        if ($percentage <= 20) return '0-20%';
+        if ($percentage <= 40) return '21-40%';
+        if ($percentage <= 60) return '41-60%';
+        if ($percentage <= 80) return '61-80%';
+        return '81-100%';
+    }
+
     public function index()
     {
+        $sessionClient = session('client');
+        
+        if (!$sessionClient) {
+            abort(403);
+        }
+
         $clientIds = $this->getAccessibleClientIds();
 
         if (empty($clientIds)) {
@@ -147,7 +165,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | STATISTIQUES DE COMPLÉTUDE
+        | STATISTIQUES DE COMPLÉTUDE GLOBALES
         |--------------------------------------------------------------------------
         */
 
@@ -155,11 +173,11 @@ class DashboardController extends Controller
         $allLeads = Lead::whereIn('client_id', $clientIds)->get();
         
         $completionStats = [
-            '0_20' => 0,
-            '21_40' => 0,
-            '41_60' => 0,
-            '61_80' => 0,
-            '81_100' => 0,
+            '0-20%' => 0,
+            '21-40%' => 0,
+            '41-60%' => 0,
+            '61-80%' => 0,
+            '81-100%' => 0,
         ];
 
         $totalCompletionPercentage = 0;
@@ -168,18 +186,8 @@ class DashboardController extends Controller
             $percentage = $this->calculateCompletionPercentage($lead);
             $totalCompletionPercentage += $percentage;
 
-            // Catégoriser par tranche
-            if ($percentage <= 20) {
-                $completionStats['0_20']++;
-            } elseif ($percentage <= 40) {
-                $completionStats['21_40']++;
-            } elseif ($percentage <= 60) {
-                $completionStats['41_60']++;
-            } elseif ($percentage <= 80) {
-                $completionStats['61_80']++;
-            } else {
-                $completionStats['81_100']++;
-            }
+            $category = $this->categorizePercentage($percentage);
+            $completionStats[$category]++;
         }
 
         $averageCompletion = $totalLeads > 0 
@@ -188,18 +196,63 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | DERNIERS LEADS AVEC POURCENTAGE DE COMPLÉTUDE
+        | PERFORMANCES PAR CLIENT AVEC RÉPARTITION DES POURCENTAGES
         |--------------------------------------------------------------------------
         */
 
-        $recentLeads = Lead::whereIn('client_id', $clientIds)
-            ->latest()
-            ->take(10)
-            ->get()
-            ->map(function ($lead) {
-                $lead->completion_percentage = $this->calculateCompletionPercentage($lead);
-                return $lead;
-            });
+        // Récupérer tous les clients de la même company sauf le superadmin
+        $clients = Client::where('company', $sessionClient['company'])
+            ->where('role', '!=', 'superadmin')
+            ->get();
+
+        $clientsPerformance = [];
+
+        foreach ($clients as $client) {
+            // Récupérer tous les leads de ce client
+            $clientLeads = Lead::where('client_id', $client->id)->get();
+            
+            // Nombre total de leads
+            $leadsCount = $clientLeads->count();
+            
+            // Nombre de scrappings (Google Places) pour ce client
+            $scrapingCount = GooglePlace::where('client_id', $client->id)->count();
+            
+            // Calcul de la répartition par pourcentage
+            $percentageBreakdown = [
+                '0-20%' => 0,
+                '21-40%' => 0,
+                '41-60%' => 0,
+                '61-80%' => 0,
+                '81-100%' => 0,
+            ];
+            
+            foreach ($clientLeads as $lead) {
+                $percentage = $this->calculateCompletionPercentage($lead);
+                $category = $this->categorizePercentage($percentage);
+                $percentageBreakdown[$category]++;
+            }
+            
+            // Nom de l'utilisateur
+            $userName = trim($client->first_name . ' ' . $client->last_name);
+            if (empty($userName)) {
+                $userName = $client->email;
+            }
+
+            $clientsPerformance[] = [
+                'id' => $client->id,
+                'name' => $userName,
+                'email' => $client->email,
+                'role' => $client->role,
+                'leads_count' => $leadsCount,
+                'scraping_count' => $scrapingCount,
+                'percentage_breakdown' => $percentageBreakdown,
+            ];
+        }
+
+        // Trier par nombre de leads décroissant
+        usort($clientsPerformance, function($a, $b) {
+            return $b['leads_count'] - $a['leads_count'];
+        });
 
         return view('client.crm.dashboard', compact(
             'totalScraped',
@@ -214,7 +267,8 @@ class DashboardController extends Controller
             'mort',
             'completionStats',
             'averageCompletion',
-            'recentLeads'
+            'clientsPerformance',
+            'sessionClient'
         ));
     }
 }

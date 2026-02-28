@@ -109,12 +109,12 @@
         </div>
     </div>
 
-    <!-- Statistiques de Complétude -->
+    <!-- Statistiques de Complétude Globales -->
     <div class="completion-section">
         <div class="completion-section__header">
             <div>
                 <h3 class="completion-section__title">Complétude des Leads</h3>
-                <p class="completion-section__subtitle">Moyenne: <strong>{{ $averageCompletion }}%</strong></p>
+                <p class="completion-section__subtitle">Moyenne globale: <strong>{{ $averageCompletion }}%</strong></p>
             </div>
             <span class="completion-section__badge">Qualité des données</span>
         </div>
@@ -124,15 +124,15 @@
             <div class="completion-card">
                 <div class="completion-card__header">
                     <span class="completion-card__label">0 - 20%</span>
-                    <span class="completion-card__value">{{ $completionStats['0_20'] }}</span>
+                    <span class="completion-card__value">{{ $completionStats['0-20%'] }}</span>
                 </div>
                 <div class="completion-bar">
                     <div class="completion-bar__fill completion-bar__fill--low" 
-                         style="width: {{ $totalLeads > 0 ? ($completionStats['0_20'] / $totalLeads * 100) : 0 }}%">
+                         style="width: {{ $totalLeads > 0 ? ($completionStats['0-20%'] / $totalLeads * 100) : 0 }}%">
                     </div>
                 </div>
                 <span class="completion-card__percentage">
-                    {{ $totalLeads > 0 ? round($completionStats['0_20'] / $totalLeads * 100) : 0 }}%
+                    {{ $totalLeads > 0 ? round($completionStats['0-20%'] / $totalLeads * 100) : 0 }}%
                 </span>
             </div>
 
@@ -140,15 +140,15 @@
             <div class="completion-card">
                 <div class="completion-card__header">
                     <span class="completion-card__label">21 - 40%</span>
-                    <span class="completion-card__value">{{ $completionStats['21_40'] }}</span>
+                    <span class="completion-card__value">{{ $completionStats['21-40%'] }}</span>
                 </div>
                 <div class="completion-bar">
                     <div class="completion-bar__fill completion-bar__fill--medium-low" 
-                         style="width: {{ $totalLeads > 0 ? ($completionStats['21_40'] / $totalLeads * 100) : 0 }}%">
+                         style="width: {{ $totalLeads > 0 ? ($completionStats['21-40%'] / $totalLeads * 100) : 0 }}%">
                     </div>
                 </div>
                 <span class="completion-card__percentage">
-                    {{ $totalLeads > 0 ? round($completionStats['21_40'] / $totalLeads * 100) : 0 }}%
+                    {{ $totalLeads > 0 ? round($completionStats['21-40%'] / $totalLeads * 100) : 0 }}%
                 </span>
             </div>
 
@@ -156,15 +156,15 @@
             <div class="completion-card">
                 <div class="completion-card__header">
                     <span class="completion-card__label">41 - 60%</span>
-                    <span class="completion-card__value">{{ $completionStats['41_60'] }}</span>
+                    <span class="completion-card__value">{{ $completionStats['41-60%'] }}</span>
                 </div>
                 <div class="completion-bar">
                     <div class="completion-bar__fill completion-bar__fill--medium" 
-                         style="width: {{ $totalLeads > 0 ? ($completionStats['41_60'] / $totalLeads * 100) : 0 }}%">
+                         style="width: {{ $totalLeads > 0 ? ($completionStats['41-60%'] / $totalLeads * 100) : 0 }}%">
                     </div>
                 </div>
                 <span class="completion-card__percentage">
-                    {{ $totalLeads > 0 ? round($completionStats['41_60'] / $totalLeads * 100) : 0 }}%
+                    {{ $totalLeads > 0 ? round($completionStats['41-60%'] / $totalLeads * 100) : 0 }}%
                 </span>
             </div>
 
@@ -172,15 +172,15 @@
             <div class="completion-card">
                 <div class="completion-card__header">
                     <span class="completion-card__label">61 - 80%</span>
-                    <span class="completion-card__value">{{ $completionStats['61_80'] }}</span>
+                    <span class="completion-card__value">{{ $completionStats['61-80%'] }}</span>
                 </div>
                 <div class="completion-bar">
                     <div class="completion-bar__fill completion-bar__fill--medium-high" 
-                         style="width: {{ $totalLeads > 0 ? ($completionStats['61_80'] / $totalLeads * 100) : 0 }}%">
+                         style="width: {{ $totalLeads > 0 ? ($completionStats['61-80%'] / $totalLeads * 100) : 0 }}%">
                     </div>
                 </div>
                 <span class="completion-card__percentage">
-                    {{ $totalLeads > 0 ? round($completionStats['61_80'] / $totalLeads * 100) : 0 }}%
+                    {{ $totalLeads > 0 ? round($completionStats['61-80%'] / $totalLeads * 100) : 0 }}%
                 </span>
             </div>
 
@@ -188,93 +188,158 @@
             <div class="completion-card">
                 <div class="completion-card__header">
                     <span class="completion-card__label">81 - 100%</span>
-                    <span class="completion-card__value">{{ $completionStats['81_100'] }}</span>
+                    <span class="completion-card__value">{{ $completionStats['81-100%'] }}</span>
                 </div>
                 <div class="completion-bar">
                     <div class="completion-bar__fill completion-bar__fill--high" 
-                         style="width: {{ $totalLeads > 0 ? ($completionStats['81_100'] / $totalLeads * 100) : 0 }}%">
+                         style="width: {{ $totalLeads > 0 ? ($completionStats['81-100%'] / $totalLeads * 100) : 0 }}%">
                     </div>
                 </div>
                 <span class="completion-card__percentage">
-                    {{ $totalLeads > 0 ? round($completionStats['81_100'] / $totalLeads * 100) : 0 }}%
+                    {{ $totalLeads > 0 ? round($completionStats['81-100%'] / $totalLeads * 100) : 0 }}%
                 </span>
             </div>
         </div>
     </div>
 
-    <!-- Tableau des leads récents avec pourcentage de complétude -->
+    <!-- Tableau des performances par client avec répartition des pourcentages -->
     <div class="table-card">
         <div class="table-card__header">
-            <h3 class="table-card__title">Derniers Leads</h3>
-            <span class="table-card__count">{{ $recentLeads->count() }} récents</span>
+            <div>
+                <h3 class="table-card__title">Performance par utilisateur</h3>
+                <p class="table-card__subtitle">Répartition des leads par niveau de complétude</p>
+            </div>
+            <span class="table-card__count">{{ count($clientsPerformance) }} utilisateurs</span>
         </div>
         
         <div class="table-responsive">
             <table class="table">
                 <thead class="table__head">
                     <tr>
-                        <th class="table__th">Nom</th>
-                        <th class="table__th">Entreprise</th>
-                        <th class="table__th">Chaleur</th>
-                        <th class="table__th">Complétude</th>
-                        <th class="table__th">Statut</th>
-                        <th class="table__th">Date</th>
+                        <th class="table__th">Utilisateur</th>
+                        <th class="table__th">Rôle</th>
+                        <th class="table__th">Total Leads</th>
+                        <th class="table__th">Scrappings</th>
+                        <th class="table__th" colspan="5">Répartition par complétude</th>
+                    </tr>
+                    <tr class="table__subhead">
+                        <th colspan="3"></th>
+                        <th></th>
+                        <th class="table__th table__th--small">0-20%</th>
+                        <th class="table__th table__th--small">21-40%</th>
+                        <th class="table__th table__th--small">41-60%</th>
+                        <th class="table__th table__th--small">61-80%</th>
+                        <th class="table__th table__th--small">81-100%</th>
                     </tr>
                 </thead>
                 <tbody class="table__body">
-                    @forelse($recentLeads as $lead)
-                    <tr class="table__row">
+                    @forelse($clientsPerformance as $client)
+                    <tr class="table__row {{ $client['email'] == $sessionClient['email'] ? 'table__row--current' : '' }}">
                         <td class="table__td">
-                            <span class="table__cell-text">{{ $lead->prenom_nom ?: 'Non renseigné' }}</span>
-                        </td>
-                        <td class="table__td">
-                            <span class="table__cell-text">{{ $lead->entreprise ?: 'Non renseigné' }}</span>
-                        </td>
-                        <td class="table__td">
-                            @if($lead->chaleur)
-                                <span class="badge badge--{{ strtolower($lead->chaleur) }}">
-                                    {{ $lead->chaleur }}
-                                </span>
-                            @else
-                                <span class="badge badge--default">Non défini</span>
-                            @endif
-                        </td>
-                        <td class="table__td">
-                            <div class="completion-mini">
-                                <div class="completion-mini__bar">
-                                    <div class="completion-mini__fill" 
-                                         style="width: {{ $lead->completion_percentage }}%;
-                                                background-color: 
-                                                    @if($lead->completion_percentage < 20) #ef4444
-                                                    @elseif($lead->completion_percentage < 40) #f59e0b
-                                                    @elseif($lead->completion_percentage < 60) #3b82f6
-                                                    @elseif($lead->completion_percentage < 80) #8b5cf6
-                                                    @else #10b981
-                                                    @endif">
-                                    </div>
-                                </div>
-                                <span class="completion-mini__value">{{ $lead->completion_percentage }}%</span>
+                            <div class="user-info">
+                                <span class="user-info__name">{{ $client['name'] }}</span>
+                                @if($client['email'] == $sessionClient['email'])
+                                    <span class="user-info__badge">Vous</span>
+                                @endif
                             </div>
                         </td>
                         <td class="table__td">
-                            <span class="status status--{{ $lead->status ? strtolower(str_replace(' ', '-', $lead->status)) : 'default' }}">
-                                {{ $lead->status ?: 'Non défini' }}
+                            <span class="role-badge role-badge--{{ $client['role'] }}">
+                                {{ ucfirst($client['role']) }}
                             </span>
                         </td>
                         <td class="table__td">
-                            <span class="table__date">{{ optional($lead->created_at)->format('d/m/Y') }}</span>
+                            <span class="stat-number stat-number--total">{{ $client['leads_count'] }}</span>
+                        </td>
+                        <td class="table__td">
+                            <span class="stat-number">{{ $client['scraping_count'] }}</span>
+                        </td>
+                        
+                        <!-- 0-20% -->
+                        <td class="table__td table__td--percentage">
+                            <div class="percentage-cell">
+                                <span class="percentage-cell__value">{{ $client['percentage_breakdown']['0-20%'] }}</span>
+                                <div class="percentage-cell__bar">
+                                    <div class="percentage-cell__fill percentage-cell__fill--low" 
+                                         style="width: {{ $client['leads_count'] > 0 ? ($client['percentage_breakdown']['0-20%'] / $client['leads_count'] * 100) : 0 }}%">
+                                    </div>
+                                </div>
+                                <span class="percentage-cell__percent">
+                                    {{ $client['leads_count'] > 0 ? round($client['percentage_breakdown']['0-20%'] / $client['leads_count'] * 100) : 0 }}%
+                                </span>
+                            </div>
+                        </td>
+                        
+                        <!-- 21-40% -->
+                        <td class="table__td table__td--percentage">
+                            <div class="percentage-cell">
+                                <span class="percentage-cell__value">{{ $client['percentage_breakdown']['21-40%'] }}</span>
+                                <div class="percentage-cell__bar">
+                                    <div class="percentage-cell__fill percentage-cell__fill--medium-low" 
+                                         style="width: {{ $client['leads_count'] > 0 ? ($client['percentage_breakdown']['21-40%'] / $client['leads_count'] * 100) : 0 }}%">
+                                    </div>
+                                </div>
+                                <span class="percentage-cell__percent">
+                                    {{ $client['leads_count'] > 0 ? round($client['percentage_breakdown']['21-40%'] / $client['leads_count'] * 100) : 0 }}%
+                                </span>
+                            </div>
+                        </td>
+                        
+                        <!-- 41-60% -->
+                        <td class="table__td table__td--percentage">
+                            <div class="percentage-cell">
+                                <span class="percentage-cell__value">{{ $client['percentage_breakdown']['41-60%'] }}</span>
+                                <div class="percentage-cell__bar">
+                                    <div class="percentage-cell__fill percentage-cell__fill--medium" 
+                                         style="width: {{ $client['leads_count'] > 0 ? ($client['percentage_breakdown']['41-60%'] / $client['leads_count'] * 100) : 0 }}%">
+                                    </div>
+                                </div>
+                                <span class="percentage-cell__percent">
+                                    {{ $client['leads_count'] > 0 ? round($client['percentage_breakdown']['41-60%'] / $client['leads_count'] * 100) : 0 }}%
+                                </span>
+                            </div>
+                        </td>
+                        
+                        <!-- 61-80% -->
+                        <td class="table__td table__td--percentage">
+                            <div class="percentage-cell">
+                                <span class="percentage-cell__value">{{ $client['percentage_breakdown']['61-80%'] }}</span>
+                                <div class="percentage-cell__bar">
+                                    <div class="percentage-cell__fill percentage-cell__fill--medium-high" 
+                                         style="width: {{ $client['leads_count'] > 0 ? ($client['percentage_breakdown']['61-80%'] / $client['leads_count'] * 100) : 0 }}%">
+                                    </div>
+                                </div>
+                                <span class="percentage-cell__percent">
+                                    {{ $client['leads_count'] > 0 ? round($client['percentage_breakdown']['61-80%'] / $client['leads_count'] * 100) : 0 }}%
+                                </span>
+                            </div>
+                        </td>
+                        
+                        <!-- 81-100% -->
+                        <td class="table__td table__td--percentage">
+                            <div class="percentage-cell">
+                                <span class="percentage-cell__value">{{ $client['percentage_breakdown']['81-100%'] }}</span>
+                                <div class="percentage-cell__bar">
+                                    <div class="percentage-cell__fill percentage-cell__fill--high" 
+                                         style="width: {{ $client['leads_count'] > 0 ? ($client['percentage_breakdown']['81-100%'] / $client['leads_count'] * 100) : 0 }}%">
+                                    </div>
+                                </div>
+                                <span class="percentage-cell__percent">
+                                    {{ $client['leads_count'] > 0 ? round($client['percentage_breakdown']['81-100%'] / $client['leads_count'] * 100) : 0 }}%
+                                </span>
+                            </div>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="table__empty">
+                        <td colspan="9" class="table__empty">
                             <div class="empty-state">
                                 <svg class="empty-state__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <line x1="12" y1="8" x2="12" y2="12"></line>
                                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                 </svg>
-                                <p class="empty-state__text">Aucun lead trouvé</p>
+                                <p class="empty-state__text">Aucun utilisateur trouvé</p>
                             </div>
                         </td>
                     </tr>
@@ -645,39 +710,12 @@ document.addEventListener('DOMContentLoaded', function() {
     color: var(--gray-500);
 }
 
-/* Mini progression pour tableau */
-.completion-mini {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100px;
-}
-
-.completion-mini__bar {
-    flex: 1;
-    height: 4px;
-    background: var(--gray-200);
-    border-radius: 9999px;
-    overflow: hidden;
-}
-
-.completion-mini__fill {
-    height: 100%;
-    border-radius: 9999px;
-}
-
-.completion-mini__value {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--gray-700);
-    min-width: 35px;
-}
-
-/* Tableau */
+/* Tableau des performances */
 .table-card {
     background: white;
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
+    margin-top: 2rem;
 }
 
 .table-card__header {
@@ -692,6 +730,12 @@ document.addEventListener('DOMContentLoaded', function() {
     font-size: 1rem;
     font-weight: 600;
     color: var(--gray-900);
+    margin-bottom: 0.25rem;
+}
+
+.table-card__subtitle {
+    font-size: 0.875rem;
+    color: var(--gray-500);
 }
 
 .table-card__count {
@@ -712,59 +756,148 @@ document.addEventListener('DOMContentLoaded', function() {
     border-collapse: collapse;
 }
 
+.table__head {
+    background: var(--gray-50);
+}
+
 .table__th {
     text-align: left;
-    padding: 1rem 1.5rem;
+    padding: 1rem 1rem;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--gray-500);
-    background: var(--gray-50);
+    white-space: nowrap;
+}
+
+.table__th--small {
+    font-size: 0.7rem;
+    text-align: center;
+    min-width: 80px;
+}
+
+.table__subhead .table__th {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    background: var(--gray-100);
 }
 
 .table__td {
-    padding: 1rem 1.5rem;
+    padding: 1rem 1rem;
     border-bottom: 1px solid var(--gray-200);
     color: var(--gray-700);
     font-size: 0.875rem;
+}
+
+.table__td--percentage {
+    padding: 0.75rem 0.5rem;
 }
 
 .table__row:hover {
     background: var(--gray-50);
 }
 
-/* Badges */
-.badge {
-    display: inline-flex;
+.table__row--current {
+    background: #e0e7ff;
+}
+
+.table__row--current:hover {
+    background: #c7d2fe;
+}
+
+/* User info */
+.user-info {
+    display: flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.user-info__name {
     font-weight: 500;
+    color: var(--gray-900);
+}
+
+.user-info__badge {
+    background: var(--primary);
     color: white;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
-.badge--froid { background: var(--danger); }
-.badge--tiède { background: var(--warning); }
-.badge--chaud { background: var(--success); }
-.badge--mort { background: var(--gray-900); }
-.badge--default { background: var(--gray-500); }
-
-.status {
+/* Role badge */
+.role-badge {
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 500;
-    background: var(--gray-100);
-    color: var(--gray-700);
+    white-space: nowrap;
 }
 
-.status--default {
-    background: var(--gray-100);
+.role-badge--admin {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.role-badge--user {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+/* Stat number */
+.stat-number {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.stat-number--total {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+/* Percentage cell */
+.percentage-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 80px;
+}
+
+.percentage-cell__value {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.875rem;
+}
+
+.percentage-cell__bar {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: 9999px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.percentage-cell__fill {
+    height: 100%;
+    border-radius: 9999px;
+}
+
+.percentage-cell__fill--low { background: var(--danger); }
+.percentage-cell__fill--medium-low { background: var(--warning); }
+.percentage-cell__fill--medium { background: #3b82f6; }
+.percentage-cell__fill--medium-high { background: #8b5cf6; }
+.percentage-cell__fill--high { background: var(--success); }
+
+.percentage-cell__percent {
+    font-size: 0.7rem;
     color: var(--gray-500);
+    font-weight: 500;
 }
 
 /* État vide */
@@ -830,11 +963,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     .table__td {
-        padding: 0.75rem 1rem;
+        padding: 0.75rem 0.5rem;
     }
 
-    .completion-mini {
-        width: 80px;
+    .percentage-cell {
+        min-width: 60px;
     }
 }
 
@@ -848,6 +981,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     .completion-section__header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .table-card__header {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;

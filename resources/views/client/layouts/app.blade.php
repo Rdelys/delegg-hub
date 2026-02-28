@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Delegg Hub')</title>
+    <title>@yield('title', 'Follup.io')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     
     <!-- Font Awesome & Google Fonts -->
@@ -818,7 +818,7 @@
 <!-- Mobile Header (visible uniquement sur mobile) -->
 <div class="mobile-header">
     <div class="mobile-brand">
-        DELEGG HUB
+        FOLLUP.IO
         <small>{{ session('client.company') }}</small>
     </div>
     <button class="menu-toggle-btn" id="mobileMenuToggle" aria-label="Menu">
@@ -832,7 +832,7 @@
 <div class="layout">
     <aside class="sidebar" id="sidebar">
         <div class="brand">
-            DELEGG HUB
+            FOLLUP.IO
             <span>{{ session('client.company') }}</span>
         </div>
 
@@ -843,7 +843,9 @@
                     <i class="fa-solid fa-chart-line"></i> CRM
                 </a>
                 <ul class="submenu" id="crm-submenu">
+                    @if(session('client.role') === 'superadmin')
                     <li><a href="{{ route('client.crm.dashboard') }}">Dashboard</a></li>
+                    @endif
                     <li><a href="{{ route('client.crm.leads') }}">Mes Leads</a></li>
                 </ul>
             </li>
