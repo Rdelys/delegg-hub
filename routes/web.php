@@ -13,6 +13,7 @@ use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\WebScraperController;
 use App\Http\Controllers\GoogleScraperController;
 use App\Http\Controllers\Client\LeadController;
+use App\Http\Controllers\Client\ClientMailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +94,18 @@ Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
         
     Route::post('/logout', [ClientAuthController::class, 'logout'])
         ->name('client.logout');
+
+    Route::get('/mails/envoyes', [ClientMailController::class,'index'])
+    ->name('client.mails.envoyes');
+
+Route::post('/mails/smtp/save', [ClientMailController::class,'saveSmtp'])
+    ->name('client.mails.smtp.save');
+
+Route::post('/mails/smtp/test', [ClientMailController::class,'testSmtp'])
+    ->name('client.mails.smtp.test');
+
+Route::post('/mails/send', [ClientMailController::class,'send'])
+    ->name('client.mails.send');
 });
 
 /*
@@ -195,8 +208,10 @@ Route::post('/google/export-to-lead-by-scrapping',
 
 // MAILS
 Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
-Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');
-Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
+Route::get('/mails/envoyes', [ClientMailController::class,'index'])
+    ->name('client.mails.envoyes');
+    
+    Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
 
 // routes/web.php
 Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])
