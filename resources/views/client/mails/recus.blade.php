@@ -875,16 +875,32 @@
 
         <!-- ÉTAT IMAP STATIQUE -->
         <div class="imap-status">
-            <i class="fas fa-check-circle status-success"></i>
-            <div>
-                <div class="status-text status-success">
-                    <i class="fas fa-circle"></i> IMAP configuré et opérationnel
-                </div>
-                <div class="status-details">
-                    Serveur: imap.gmail.com:993 | SSL/TLS activé
-                </div>
+    @if($imap && $imap->last_test_success)
+        <i class="fas fa-check-circle status-success"></i>
+        <div>
+            <div class="status-text status-success">
+                IMAP opérationnel
+            </div>
+            <div class="status-details">
+                {{ $imap->host }}:{{ $imap->port }}
             </div>
         </div>
+    @elseif($imap && $imap->last_test_success === false)
+        <i class="fas fa-times-circle status-error"></i>
+        <div>
+            <div class="status-text status-error">
+                Erreur IMAP
+            </div>
+        </div>
+    @else
+        <i class="fas fa-exclamation-circle status-warning"></i>
+        <div>
+            <div class="status-text status-warning">
+                IMAP non testé
+            </div>
+        </div>
+    @endif
+</div>
 
         <!-- LIENS RAPIDES VERS GMAIL -->
         <div class="tutorial-links">
@@ -903,100 +919,189 @@
         </div>
 
         <div class="config-grid">
-            <!-- Formulaire de configuration -->
-            <div class="config-card">
-                <h3><i class="fas fa-sliders-h"></i> Paramètres IMAP</h3>
-                
-                <form>
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-server"></i>
-                            Serveur IMAP
-                        </label>
-                        <input type="text" class="form-control" value="imap.gmail.com" placeholder="ex: imap.gmail.com">
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-plug"></i>
-                                Port
-                            </label>
-                            <input type="number" class="form-control" value="993" placeholder="993">
-                        </div>
+    <!-- ================= FORMULAIRE CONFIG IMAP ================= -->
+    <div class="config-card">
+        <h3><i class="fas fa-sliders-h"></i> Paramètres IMAP</h3>
 
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-shield-alt"></i>
-                                Sécurité
-                            </label>
-                            <select class="form-control">
-                                <option selected>SSL/TLS</option>
-                                <option>STARTTLS</option>
-                                <option>Aucune</option>
-                            </select>
-                        </div>
-                    </div>
+        <form method="POST" action="{{ route('client.mails.imap.save') }}">
+            @csrf
 
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-envelope"></i>
-                            Email
-                        </label>
-                        <input type="email" class="form-control" value="contact@monentreprise.com" placeholder="votre@email.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-lock"></i>
-                            Mot de passe
-                        </label>
-                        <input type="password" class="form-control" value="xxxxxxxx" placeholder="Mot de passe">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-folder"></i>
-                            Dossier racine
-                        </label>
-                        <input type="text" class="form-control" value="INBOX" placeholder="INBOX">
-                    </div>
-
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button type="button" class="btn-modern btn-primary-modern">
-                            <i class="fas fa-save"></i>
-                            Enregistrer
-                        </button>
-                        <button type="button" class="btn-modern btn-test">
-                            <i class="fas fa-vial"></i>
-                            Tester la connexion
-                        </button>
-                    </div>
-                </form>
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-server"></i>
+                    Serveur IMAP
+                </label>
+                <input type="text"
+                       name="host"
+                       class="form-control"
+                       value="{{ $imap->host ?? '' }}"
+                       placeholder="ex: imap.gmail.com"
+                       required>
             </div>
 
-            <!-- Informations et configuration actuelle -->
-            <div class="config-card">
-                <h3><i class="fas fa-info-circle"></i> Configuration actuelle</h3>
-                
-                <div class="config-details">
-                    <p><i class="fas fa-check-circle" style="color: var(--success);"></i> <strong>Statut:</strong> Connecté</p>
-                    <p><i class="fas fa-server"></i> <strong>Serveur:</strong> imap.gmail.com:993</p>
-                    <p><i class="fas fa-shield-alt"></i> <strong>Sécurité:</strong> SSL/TLS</p>
-                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> contact@monentreprise.com</p>
-                    <p><i class="fas fa-folder"></i> <strong>Dossier:</strong> INBOX</p>
-                    <p><i class="fas fa-clock"></i> <strong>Dernière synchro:</strong> 15:24:38</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-plug"></i>
+                        Port
+                    </label>
+                    <input type="number"
+                           name="port"
+                           class="form-control"
+                           value="{{ $imap->port ?? 993 }}"
+                           required>
                 </div>
 
-                <div class="alert alert-info" style="margin-top: 15px;">
-                    <i class="fas fa-lightbulb"></i>
-                    <div>
-                        <strong>Validation en 2 étapes requise</strong><br>
-                        Pour Gmail, utilisez un <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--primary); text-decoration: underline;">mot de passe d'application</a>.
-                    </div>
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-shield-alt"></i>
+                        Sécurité
+                    </label>
+                    <select name="encryption" class="form-control">
+                        <option value="ssl" {{ ($imap->encryption ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
+                        <option value="tls" {{ ($imap->encryption ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
+                        <option value="none" {{ ($imap->encryption ?? '') === 'none' ? 'selected' : '' }}>Aucune</option>
+                    </select>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-envelope"></i>
+                    Email
+                </label>
+                <input type="email"
+                       name="username"
+                       class="form-control"
+                       value="{{ $imap->username ?? '' }}"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-lock"></i>
+                    Mot de passe
+                </label>
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="••••••••"
+                       {{ $imap ? '' : 'required' }}>
+                <small style="color:var(--gray)">
+                    Laissez vide pour conserver le mot de passe actuel.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-folder"></i>
+                    Dossier racine
+                </label>
+                <input type="text"
+                       name="folder"
+                       class="form-control"
+                       value="{{ $imap->folder ?? 'INBOX' }}"
+                       required>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="submit" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-save"></i>
+                    Enregistrer
+                </button>
+        </form>
+
+        @if($imap)
+            <form method="POST"
+                  action="{{ route('client.mails.imap.test') }}">
+                @csrf
+                <button type="submit" class="btn-modern btn-test">
+                    <i class="fas fa-vial"></i>
+                    Tester la connexion
+                </button>
+            </form>
+        @endif
+            </div>
+    </div>
+
+
+    <!-- ================= CONFIGURATION ACTUELLE ================= -->
+    <div class="config-card">
+        <h3><i class="fas fa-info-circle"></i> Configuration actuelle</h3>
+
+        @if($imap)
+
+            <div class="config-details">
+
+                <p>
+                    @if($imap->last_test_success)
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <strong>Statut :</strong> Connecté
+                    @elseif($imap->last_test_success === false)
+                        <i class="fas fa-times-circle" style="color: var(--danger);"></i>
+                        <strong>Statut :</strong> Erreur de connexion
+                    @else
+                        <i class="fas fa-exclamation-circle" style="color:#ffb703;"></i>
+                        <strong>Statut :</strong> Non testé
+                    @endif
+                </p>
+
+                <p>
+                    <i class="fas fa-server"></i>
+                    <strong>Serveur :</strong>
+                    {{ $imap->host }}:{{ $imap->port }}
+                </p>
+
+                <p>
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Sécurité :</strong>
+                    {{ strtoupper($imap->encryption) }}
+                </p>
+
+                <p>
+                    <i class="fas fa-envelope"></i>
+                    <strong>Email :</strong>
+                    {{ $imap->username }}
+                </p>
+
+                <p>
+                    <i class="fas fa-folder"></i>
+                    <strong>Dossier :</strong>
+                    {{ $imap->folder }}
+                </p>
+
+                @if($imap->last_sync_at)
+                    <p>
+                        <i class="fas fa-clock"></i>
+                        <strong>Dernière synchro :</strong>
+                        {{ $imap->last_sync_at->format('d/m/Y H:i') }}
+                    </p>
+                @endif
+
+            </div>
+
+        @else
+            <div class="alert alert-warning">
+                Aucune configuration IMAP enregistrée.
+            </div>
+        @endif
+
+        <div class="alert alert-info" style="margin-top:15px;">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>Gmail :</strong><br>
+                Activez la validation en 2 étapes et utilisez un
+                <a href="https://myaccount.google.com/apppasswords"
+                   target="_blank"
+                   style="color:var(--primary); text-decoration:underline;">
+                   mot de passe d'application
+                </a>.
             </div>
         </div>
+
+    </div>
+</div>
 
         <!-- Options avancées -->
         <div style="margin-top: 20px;">
@@ -1024,267 +1129,138 @@
     </div>
 
     <!-- ================= BOÎTE DE RÉCEPTION ================= -->
-    <div class="mail-card">
-        <h2 class="section-title">
-            <i class="fas fa-inbox"></i>
-            Mails reçus
-        </h2>
+<div class="mail-card">
+    <h2 class="section-title">
+        <i class="fas fa-inbox"></i>
+        Mails reçus
+    </h2>
+    @if($imap && $imap->last_test_success)
+    <form method="POST"
+          action="{{ route('client.mails.imap.sync') }}"
+          style="margin-bottom:15px;">
+        @csrf
+        <button type="submit" class="btn-modern btn-outline-modern">
+            <i class="fas fa-sync-alt"></i>
+            Synchroniser
+        </button>
+    </form>
+@endif
 
-        <!-- STATISTIQUES RAPIDES -->
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-icon">
-                    <i class="fas fa-envelope"></i>
-                </div>
-                <div class="stat-content">
-                    <h4>24</h4>
-                    <p>Non lus</p>
-                </div>
+    {{-- ================= STATISTIQUES ================= --}}
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-envelope"></i>
             </div>
-            <div class="stat-item">
-                <div class="stat-icon green">
-                    <i class="fas fa-star"></i>
-                </div>
-                <div class="stat-content">
-                    <h4>156</h4>
-                    <p>Total</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon orange">
-                    <i class="fas fa-paperclip"></i>
-                </div>
-                <div class="stat-content">
-                    <h4>12</h4>
-                    <p>Avec pièces jointes</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon purple">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-content">
-                    <h4>8</h4>
-                    <p>Cette semaine</p>
-                </div>
+            <div class="stat-content">
+                <h4>{{ $stats['unread'] ?? 0 }}</h4>
+                <p>Non lus</p>
             </div>
         </div>
 
-        <!-- DOSSIERS RAPIDES -->
-        <div class="folders-section">
-            <div class="folder-list">
-                <div class="folder-item">
-                    <i class="fas fa-inbox"></i>
-                    <span>Boîte de réception</span>
-                    <span class="count">156</span>
-                </div>
-                <div class="folder-item">
-                    <i class="fas fa-paper-plane"></i>
-                    <span>Envoyés</span>
-                    <span class="count">89</span>
-                </div>
-                <div class="folder-item">
-                    <i class="fas fa-star"></i>
-                    <span>Favoris</span>
-                    <span class="count">12</span>
-                </div>
-                <div class="folder-item">
-                    <i class="fas fa-clock"></i>
-                    <span>Planifiés</span>
-                    <span class="count">5</span>
-                </div>
-                <div class="folder-item">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>Spam</span>
-                    <span class="count">3</span>
-                </div>
-                <div class="folder-item">
-                    <i class="fas fa-trash"></i>
-                    <span>Corbeille</span>
-                    <span class="count">23</span>
-                </div>
+        <div class="stat-item">
+            <div class="stat-icon green">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['total'] ?? 0 }}</h4>
+                <p>Total</p>
             </div>
         </div>
 
-        <!-- ALERTE INFO -->
+        <div class="stat-item">
+            <div class="stat-icon orange">
+                <i class="fas fa-paperclip"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['attachments'] ?? 0 }}</h4>
+                <p>Avec pièces jointes</p>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-icon purple">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['week'] ?? 0 }}</h4>
+                <p>Cette semaine</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= SYNCHRONISATION ================= --}}
+    @if($imap && $imap->last_sync_at)
         <div class="alert alert-info">
-            <i class="fas fa-sync-alt fa-spin"></i>
+            <i class="fas fa-sync-alt"></i>
             <div>
                 <strong>Synchronisation IMAP</strong><br>
-                Dernière mise à jour : il y a 5 minutes • 24 nouveaux messages
+                Dernière mise à jour : {{ $imap->last_sync_at->diffForHumans() }}
             </div>
         </div>
+    @endif
 
-        <!-- BARRE D'OUTILS -->
-        <div class="inbox-header">
-            <div class="inbox-actions">
-                <button class="btn-modern btn-outline-modern">
-                    <i class="fas fa-sync-alt"></i>
-                    <span class="hide-mobile">Synchroniser</span>
-                </button>
-                <button class="btn-modern btn-outline-modern">
-                    <i class="fas fa-archive"></i>
-                    <span class="hide-mobile">Archiver</span>
-                </button>
-                <button class="btn-modern btn-outline-modern">
-                    <i class="fas fa-trash"></i>
-                    <span class="hide-mobile">Supprimer</span>
-                </button>
-            </div>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Rechercher dans les mails...">
-                <button>Rechercher</button>
-            </div>
-        </div>
+    {{-- ================= LISTE EMAILS ================= --}}
+    <div class="email-list">
 
-        <!-- LISTE DES EMAILS -->
-        <div class="email-list">
-            <!-- Email non lu -->
-            <div class="email-item unread">
-                <div class="email-check">
-                    <input type="checkbox">
-                </div>
-                <div class="email-star">
-                    <i class="far fa-star"></i>
-                </div>
-                <div class="email-sender">
+        @forelse($messages as $message)
+<div class="email-item 
+    {{ collect($message->getFlags())->contains(function($flag){
+        return strtolower($flag) === '\\seen';
+    }) ? '' : 'unread' }}">
+     
+    <div class="email-sender">
                     <i class="fas fa-user-circle"></i>
-                    Jean Dupont
+                    {{ $message->getFrom()[0]->mail ?? 'Inconnu' }}
                 </div>
+
                 <div class="email-subject">
-                    <span class="subject-text">Proposition commerciale</span>
-                    <span class="preview-text">- Voici ma proposition pour le projet...</span>
+                    <span class="subject-text">
+                        {{ $message->getSubject() }}
+                    </span>
+                    <span class="preview-text">
+                        - {{ Str::limit(strip_tags($message->getTextBody()), 60) }}
+                    </span>
                 </div>
+
                 <div class="email-attachment">
-                    <i class="fas fa-paperclip"></i>
+                    @if($message->getAttachments()->count())
+                        <i class="fas fa-paperclip"></i>
+                    @else
+                        <i class="fas fa-paperclip" style="opacity:0.2;"></i>
+                    @endif
                 </div>
+
                 <div class="email-date">
-                    <i class="fas fa-clock"></i> 09:45
-                </div>
+                    <i class="fas fa-calendar"></i>
+@if($message->getDate() && $message->getDate()->first())
+    {{ \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') }}
+@else
+    --
+@endif  </div>
+
             </div>
-
-            <!-- Email avec pièce jointe -->
-            <div class="email-item">
-                <div class="email-check">
-                    <input type="checkbox">
-                </div>
-                <div class="email-star">
-                    <i class="fas fa-star" style="color: #ffb703;"></i>
-                </div>
-                <div class="email-sender">
-                    <i class="fas fa-building"></i>
-                    Factures.com
-                </div>
-                <div class="email-subject">
-                    <span class="subject-text">Votre facture F2026-012</span>
-                    <span class="preview-text">- Merci de trouver ci-joint...</span>
-                </div>
-                <div class="email-attachment">
-                    <i class="fas fa-paperclip"></i>
-                </div>
-                <div class="email-date">
-                    <i class="fas fa-calendar"></i> 28/02/26
-                </div>
+        @empty
+            <div class="alert alert-warning">
+                Aucun message trouvé.
             </div>
+        @endforelse
 
-            <!-- Email simple -->
-            <div class="email-item">
-                <div class="email-check">
-                    <input type="checkbox">
-                </div>
-                <div class="email-star">
-                    <i class="far fa-star"></i>
-                </div>
-                <div class="email-sender">
-                    <i class="fas fa-user-circle"></i>
-                    Marie Martin
-                </div>
-                <div class="email-subject">
-                    <span class="subject-text">Réunion équipe</span>
-                    <span class="preview-text">- Rappel réunion demain à 10h...</span>
-                </div>
-                <div class="email-attachment">
-                    <i class="fas fa-paperclip" style="opacity: 0.3;"></i>
-                </div>
-                <div class="email-date">
-                    <i class="fas fa-calendar"></i> 27/02/26
-                </div>
-            </div>
+    </div>
 
-            <!-- Email non lu -->
-            <div class="email-item unread">
-                <div class="email-check">
-                    <input type="checkbox">
-                </div>
-                <div class="email-star">
-                    <i class="far fa-star"></i>
-                </div>
-                <div class="email-sender">
-                    <i class="fas fa-user-circle"></i>
-                    Support Technique
-                </div>
-                <div class="email-subject">
-                    <span class="subject-text">Maintenance prévue</span>
-                    <span class="preview-text">- Intervention programmée...</span>
-                </div>
-                <div class="email-attachment">
-                    <i class="fas fa-paperclip" style="opacity: 0.3;"></i>
-                </div>
-                <div class="email-date">
-                    <i class="fas fa-clock"></i> 14:20
-                </div>
-            </div>
-
-            <!-- Email important -->
-            <div class="email-item">
-                <div class="email-check">
-                    <input type="checkbox">
-                </div>
-                <div class="email-star">
-                    <i class="fas fa-star" style="color: #ffb703;"></i>
-                </div>
-                <div class="email-sender">
-                    <i class="fas fa-user-circle"></i>
-                    Paul Bernard
-                </div>
-                <div class="email-subject">
-                    <span class="subject-text">URGENT: Contrat à signer</span>
-                    <span class="preview-text">- Merci de valider avant demain...</span>
-                </div>
-                <div class="email-attachment">
-                    <i class="fas fa-paperclip"></i>
-                </div>
-                <div class="email-date">
-                    <i class="fas fa-calendar"></i> 26/02/26
-                </div>
-            </div>
-        </div>
-
-        <!-- PAGINATION -->
-        <ul class="pagination">
-            <li class="page-item disabled">
-                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-            </li>
-            <li class="page-item active"><span class="page-link">1</span></li>
-            <li class="page-item"><span class="page-link">2</span></li>
-            <li class="page-item"><span class="page-link">3</span></li>
-            <li class="page-item"><span class="page-link">4</span></li>
-            <li class="page-item"><span class="page-link">5</span></li>
-            <li class="page-item">
-                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-            </li>
-        </ul>
-
-        <!-- ALERTE SUCCÈS -->
+    {{-- ================= CONFIG ACTIVE ================= --}}
+    @if($imap && $imap->last_test_success)
         <div class="alert alert-success mt-4">
             <i class="fas fa-check-circle"></i>
             <div>
                 <strong>Configuration IMAP active</strong><br>
-                Serveur : imap.gmail.com:993 (SSL) • Utilisateur : contact@monentreprise.com
+                Serveur : {{ $imap->host }}:{{ $imap->port }}
+                • Utilisateur : {{ $imap->username }}
             </div>
         </div>
-    </div>
+    @endif
+
+</div>
 </div>
 
 @endsection
