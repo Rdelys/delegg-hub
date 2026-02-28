@@ -36,16 +36,20 @@ class ClientMailController extends Controller
         $clientId = session('client.id');
 
         ClientSmtp::updateOrCreate(
-            ['client_id'=>$clientId],
-            [
-                'host'=>$request->host,
-                'port'=>$request->port,
-                'encryption'=>$request->encryption,
-                'username'=>$request->username,
-                'password'=>encrypt($request->password),
-                'from_name'=>session('client.first_name'),
-            ]
-        );
+    ['client_id'=>$clientId],
+    [
+        'host'=>$request->host,
+        'port'=>$request->port,
+        'encryption'=>$request->encryption,
+        'username'=>$request->username,
+        'password'=>encrypt($request->password),
+        'from_name'=>session('client.first_name'),
+
+        // ✅ RESET STATUS
+        'last_test_success' => null,
+        'last_tested_at' => null,
+    ]
+);
 
         return back()->with('success','SMTP enregistré');
     }
@@ -117,9 +121,21 @@ class ClientMailController extends Controller
                 '<h3>Test SMTP réussi ✅</h3><p>Votre configuration fonctionne.</p>'
             ));
 
+        // ✅ UPDATE SUCCESS
+        $smtp->update([
+            'last_test_success' => true,
+            'last_tested_at' => now(),
+        ]);
+
         return back()->with('success', 'Test SMTP réussi');
 
     } catch (\Exception $e) {
+
+        // ✅ UPDATE FAILED
+        $smtp->update([
+            'last_test_success' => false,
+            'last_tested_at' => now(),
+        ]);
 
         return back()->with('error', 'Erreur SMTP : ' . $e->getMessage());
     }
