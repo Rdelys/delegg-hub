@@ -14,6 +14,8 @@ use App\Http\Controllers\WebScraperController;
 use App\Http\Controllers\GoogleScraperController;
 use App\Http\Controllers\Client\LeadController;
 use App\Http\Controllers\Client\ClientMailController;
+use App\Http\Controllers\Client\ClientImapController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +108,18 @@ Route::post('/mails/smtp/test', [ClientMailController::class,'testSmtp'])
 
 Route::post('/mails/send', [ClientMailController::class,'send'])
     ->name('client.mails.send');
+    Route::get('/mails/recus', [ClientImapController::class,'index'])
+    ->name('client.mails.recus');
+
+Route::post('/mails/imap/save', [ClientImapController::class,'save'])
+    ->name('client.mails.imap.save');
+
+Route::post('/mails/imap/test', [ClientImapController::class,'test'])
+    ->name('client.mails.imap.test');
+
+    Route::post('/mails/imap/sync', [ClientImapController::class,'sync'])
+    ->name('client.mails.imap.sync');
+
 });
 
 /*
@@ -211,7 +225,6 @@ Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name(
 Route::get('/mails/envoyes', [ClientMailController::class,'index'])
     ->name('client.mails.envoyes');
     
-    Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
 
 // routes/web.php
 Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])
