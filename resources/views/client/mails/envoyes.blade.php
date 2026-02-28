@@ -352,6 +352,25 @@ textarea.form-control {
     box-shadow: var(--shadow-md);
 }
 
+.btn-link-modern {
+    background: transparent;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.btn-link-modern:hover {
+    background: rgba(67, 97, 238, 0.1);
+    border-color: var(--primary);
+}
+
 /* ================= ALERTES & NOTIFICATIONS ================= */
 .alert {
     padding: 18px 20px;
@@ -387,6 +406,16 @@ textarea.form-control {
 
 .alert-warning i {
     color: #ffc107;
+}
+
+.alert-success {
+    background: #d1fae5;
+    border-left-color: var(--success);
+    color: #0b5e42;
+}
+
+.alert-success i {
+    color: var(--success);
 }
 
 .alert strong {
@@ -432,6 +461,15 @@ textarea.form-control {
     color: #2d3e50;
     font-weight: 450;
     line-height: 1.5;
+}
+
+.tutorial-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
 }
 
 /* ================= TABLEAU ================= */
@@ -630,6 +668,10 @@ details[open] summary i {
     
     .form-row {
         grid-template-columns: 1fr;
+    }
+    
+    .tutorial-links {
+        flex-direction: column;
     }
 }
 
@@ -913,7 +955,7 @@ details[open] summary i {
         </div>
     </div>
 
-    <!-- ================= TUTORIEL ================= -->
+    <!-- ================= TUTORIEL AVEC LIENS ================= -->
     <div class="mail-card">
         <h2 class="section-title">
             <i class="fas fa-graduation-cap"></i>
@@ -947,10 +989,33 @@ details[open] summary i {
             </li>
         </ul>
 
-        <div class="alert alert-warning">
+        <!-- Liens directs vers Gmail -->
+        <div class="tutorial-links">
+            <a href="https://myaccount.google.com/security" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Sécurité du compte Google
+            </a>
+            <a href="https://myaccount.google.com/apppasswords" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Créer un mot de passe d'application
+            </a>
+            <a href="https://mail.google.com/" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Accéder à Gmail
+            </a>
+        </div>
+
+        <div class="alert alert-warning mt-4">
             <i class="fas fa-exclamation-triangle"></i>
             <div>
-                ⚠️ Ne jamais utiliser votre vrai mot de passe Gmail.
+                <strong>⚠️ Important :</strong> Ne jamais utiliser votre vrai mot de passe Gmail. Utilisez uniquement un mot de passe d'application généré spécialement.
+            </div>
+        </div>
+
+        <div class="alert alert-success mt-3">
+            <i class="fas fa-check-circle"></i>
+            <div>
+                <strong>📱 Mot de passe d'application :</strong> Il doit être généré depuis <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--success); text-decoration: underline;">cette page</a> après avoir activé la validation en 2 étapes.
             </div>
         </div>
     </div>
@@ -1032,6 +1097,29 @@ details[open] summary i {
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Lien vers la gestion des emails -->
+        <div class="mt-4" style="text-align: right;">
+            <a href="#" class="btn-link-modern">
+                <i class="fas fa-arrow-right"></i>
+                Voir tous les emails envoyés
+            </a>
+        </div>
+    </div>
+
+    <!-- ================= RAPPEL SECURITE ================= -->
+    <div class="mail-card" style="background: linear-gradient(145deg, #f8fafd, #ffffff);">
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <i class="fas fa-shield-alt" style="font-size: 3rem; color: var(--primary);"></i>
+            <div style="flex: 1;">
+                <h3 style="margin-bottom: 10px;">Sécurisez votre envoi</h3>
+                <p style="color: var(--gray);">Pour une configuration réussie, suivez le tutoriel et utilisez les liens directs vers Gmail. N'oubliez pas d'activer la validation en 2 étapes avant de créer votre mot de passe d'application.</p>
+            </div>
+            <a href="https://myaccount.google.com/security" target="_blank" class="btn-modern btn-primary-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Aller à la sécurité Google
+            </a>
         </div>
     </div>
 

@@ -291,6 +291,25 @@
     background: #5b4bc4;
 }
 
+.btn-link-modern {
+    background: transparent;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.btn-link-modern:hover {
+    background: rgba(67, 97, 238, 0.1);
+    border-color: var(--primary);
+}
+
 /* ================= ALERTES ================= */
 .alert {
     padding: 18px 20px;
@@ -336,6 +355,17 @@
 
 .alert-success i {
     color: var(--success);
+}
+
+/* ================= TUTORIEL LINKS ================= */
+.tutorial-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    padding: 15px 0;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
 }
 
 /* ================= STATISTIQUES EMAILS ================= */
@@ -705,6 +735,10 @@
     .form-row {
         grid-template-columns: 1fr;
     }
+    
+    .tutorial-links {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 580px) {
@@ -852,6 +886,22 @@
             </div>
         </div>
 
+        <!-- LIENS RAPIDES VERS GMAIL -->
+        <div class="tutorial-links">
+            <a href="https://myaccount.google.com/security" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Sécurité du compte Google
+            </a>
+            <a href="https://myaccount.google.com/apppasswords" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Créer un mot de passe d'application
+            </a>
+            <a href="https://mail.google.com/" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Accéder à Gmail
+            </a>
+        </div>
+
         <div class="config-grid">
             <!-- Formulaire de configuration -->
             <div class="config-card">
@@ -942,7 +992,7 @@
                     <i class="fas fa-lightbulb"></i>
                     <div>
                         <strong>Validation en 2 étapes requise</strong><br>
-                        Pour Gmail, utilisez un mot de passe d'application.
+                        Pour Gmail, utilisez un <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--primary); text-decoration: underline;">mot de passe d'application</a>.
                     </div>
                 </div>
             </div>
