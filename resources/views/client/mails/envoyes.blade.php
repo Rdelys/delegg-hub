@@ -601,6 +601,73 @@ details[open] summary i {
     accent-color: var(--primary);
 }
 
+.mail-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 24px 20px;
+    background: #f5f7fb;
+}
+.mail-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+}
+.section-title {
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin-bottom: 24px;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+}
+.stat-box {
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    color: #fff;
+}
+.bg-blue { background: linear-gradient(145deg,#4361ee,#3a0ca3); }
+.bg-green { background: linear-gradient(145deg,#06d6a0,#118ab2); }
+.bg-red { background: linear-gradient(145deg,#ef476f,#bc4e9c); }
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.table th, .table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+.badge-success {
+    background: rgba(6,214,160,0.12);
+    color:#0b8e6b;
+    padding:6px 12px;
+    border-radius:20px;
+}
+.badge-danger {
+    background: rgba(239,71,111,0.12);
+    color:#b13e5b;
+    padding:6px 12px;
+    border-radius:20px;
+}
+.btn-modern {
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-primary-modern { background:#4361ee; color:white; }
+.btn-success-modern { background:#06d6a0; color:white; }
+.form-control {
+    width:100%;
+    padding:10px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1024px) {
     .mail-container {
@@ -790,170 +857,206 @@ details[open] summary i {
 
 <div class="mail-container">
 
-    <!-- ================= STATISTIQUES ================= -->
+    @if(session('success'))
+        <div class="mail-card" style="background:#d1fae5;color:#065f46;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mail-card" style="background:#fee2e2;color:#991b1b;">
+            {{ session('error') }}
+        </div>
+    @endif
+    {{-- ================= STATISTIQUES ================= --}}
     <div class="mail-card">
-        <h2 class="section-title">
-            <i class="fas fa-chart-pie"></i>
-            Statistiques
-        </h2>
+        <h2 class="section-title"><i class="fas fa-chart-pie"></i> Statistiques</h2>
         <div class="stats-grid">
             <div class="stat-box bg-blue">
                 <i class="fas fa-envelope"></i>
-                <h3>120</h3>
+                <h3>{{ $stats['total'] }}</h3>
                 <p>Mails envoyés</p>
             </div>
             <div class="stat-box bg-green">
                 <i class="fas fa-check-circle"></i>
-                <h3>110</h3>
+                <h3>{{ $stats['success'] }}</h3>
                 <p>Succès</p>
             </div>
             <div class="stat-box bg-red">
                 <i class="fas fa-exclamation-circle"></i>
-                <h3>10</h3>
+                <h3>{{ $stats['failed'] }}</h3>
                 <p>Échecs</p>
             </div>
         </div>
     </div>
 
     <!-- ================= CONFIG SMTP ================= -->
-    <div class="mail-card">
-        <h2 class="section-title">
-            <i class="fas fa-cog"></i>
-            Configuration SMTP
-        </h2>
+<div class="mail-card">
+    <h2 class="section-title">
+        <i class="fas fa-cog"></i>
+        Configuration SMTP
+    </h2>
 
-        <!-- ÉTAT SMTP STATIQUE -->
-        <div class="smtp-status">
+    {{-- ================= ÉTAT SMTP DYNAMIQUE ================= --}}
+    <div class="smtp-status">
+        @if($smtp && $smtp->last_test_success)
             <i class="fas fa-check-circle status-success"></i>
             <div>
                 <div class="status-text status-success">
-                    <i class="fas fa-circle"></i> SMTP configuré et opérationnel
+                    <i class="fas fa-circle"></i> SMTP opérationnel
                 </div>
                 <div class="status-details">
-                    Serveur: smtp.gmail.com:587 | TLS activé
+                    Serveur: {{ $smtp->host }}:{{ $smtp->port }}
+                    | {{ strtoupper($smtp->encryption ?? 'Aucune') }}
                 </div>
             </div>
-        </div>
-
-        <div class="config-grid">
-            <!-- Formulaire de configuration -->
-            <div class="config-card">
-                <h3><i class="fas fa-sliders-h"></i> Paramètres SMTP</h3>
-                
-                <form>
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-server"></i>
-                            Serveur SMTP
-                        </label>
-                        <input type="text" class="form-control" value="smtp.gmail.com" placeholder="ex: smtp.gmail.com">
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-plug"></i>
-                                Port
-                            </label>
-                            <input type="number" class="form-control" value="587" placeholder="587">
-                        </div>
-
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-shield-alt"></i>
-                                Sécurité
-                            </label>
-                            <select class="form-control">
-                                <option selected>TLS</option>
-                                <option>SSL</option>
-                                <option>Aucune</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-envelope"></i>
-                            Email Gmail
-                        </label>
-                        <input type="email" class="form-control" value="contact@monentreprise.com" placeholder="exemple@gmail.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label>
-                            <i class="fas fa-key"></i>
-                            Mot de passe d'application
-                        </label>
-                        <input type="password" class="form-control" value="abcd efgh ijkl mnop" placeholder="xxxx xxxx xxxx xxxx">
-                    </div>
-
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button type="button" class="btn-modern btn-primary-modern">
-                            <i class="fas fa-save"></i>
-                            Enregistrer
-                        </button>
-                        <button type="button" class="btn-modern btn-test">
-                            <i class="fas fa-vial"></i>
-                            Tester
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Informations et configuration actuelle -->
-            <div class="config-card">
-                <h3><i class="fas fa-info-circle"></i> Configuration actuelle</h3>
-                
-                <div class="config-details">
-                    <p><i class="fas fa-check-circle" style="color: var(--success);"></i> <strong>Statut:</strong> Connecté</p>
-                    <p><i class="fas fa-server"></i> <strong>Serveur:</strong> smtp.gmail.com:587</p>
-                    <p><i class="fas fa-shield-alt"></i> <strong>Sécurité:</strong> TLS</p>
-                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> contact@monentreprise.com</p>
-                    <p><i class="fas fa-clock"></i> <strong>Dernier test:</strong> 15:24:38</p>
-                </div>
-
-                <div class="alert alert-info" style="margin-top: 15px;">
-                    <i class="fas fa-lightbulb"></i>
-                    <div>
-                        <strong>Validation en 2 étapes requise</strong><br>
-                        Utilisez un mot de passe d'application Gmail.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Options avancées -->
-        <details>
-            <summary>
-                <i class="fas fa-chevron-down"></i>
-                Options avancées
-            </summary>
-            <div style="margin-top: 15px; display: grid; gap: 15px;">
-                <div class="form-check">
-                    <input type="checkbox" id="auth" checked>
-                    <label for="auth">Authentification requise</label>
-                </div>
-                <div class="form-check">
-                    <input type="checkbox" id="ssl" checked>
-                    <label for="ssl">Valider le certificat SSL</label>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Timeout de connexion (secondes)</label>
-                    <input type="number" class="form-control" value="30" style="max-width: 200px;">
-                </div>
-            </div>
-        </details>
-
-        <div class="alert alert-info mt-4">
-            <i class="fas fa-info-circle"></i>
+        @elseif($smtp && $smtp->last_test_success === false)
+            <i class="fas fa-times-circle status-error"></i>
             <div>
-                <strong>Configuration automatique Gmail :</strong><br>
-                <i class="fas fa-server"></i> Serveur : smtp.gmail.com<br>
-                <i class="fas fa-plug"></i> Port : 587<br>
-                <i class="fas fa-shield-alt"></i> Sécurité : TLS
+                <div class="status-text status-error">
+                    <i class="fas fa-circle"></i> Erreur SMTP
+                </div>
+                <div class="status-details">
+                    Dernier test échoué
+                </div>
+            </div>
+        @else
+            <i class="fas fa-exclamation-circle status-warning"></i>
+            <div>
+                <div class="status-text status-warning">
+                    <i class="fas fa-circle"></i> SMTP non testé
+                </div>
+                <div class="status-details">
+                    Configurez puis testez votre SMTP
+                </div>
+            </div>
+        @endif
+    </div>
+
+
+    <div class="config-grid">
+
+        {{-- ================= FORMULAIRE ================= --}}
+        <div class="config-card">
+            <h3><i class="fas fa-sliders-h"></i> Paramètres SMTP</h3>
+
+            <form method="POST" action="{{ route('client.mails.smtp.save') }}">
+                @csrf
+
+                <div class="form-group">
+                    <label><i class="fas fa-server"></i> Serveur SMTP</label>
+                    <input type="text" name="host"
+                           class="form-control"
+                           value="{{ $smtp->host ?? 'smtp.gmail.com' }}"
+                           required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-plug"></i> Port</label>
+                        <input type="number" name="port"
+                               class="form-control"
+                               value="{{ $smtp->port ?? 587 }}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-shield-alt"></i> Sécurité</label>
+                        <select name="encryption" class="form-control">
+                            <option value="tls" {{ ($smtp->encryption ?? '')=='tls'?'selected':'' }}>TLS</option>
+                            <option value="ssl" {{ ($smtp->encryption ?? '')=='ssl'?'selected':'' }}>SSL</option>
+                            <option value="">Aucune</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email expéditeur</label>
+                    <input type="email" name="username"
+                           class="form-control"
+                           value="{{ $smtp->username ?? '' }}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> Mot de passe d'application</label>
+                    <input type="password"
+                           name="password"
+                           class="form-control"
+                           placeholder="Laisser vide pour conserver l'ancien">
+                </div>
+
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button type="submit" class="btn-modern btn-primary-modern">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+
+            {{-- Bouton TEST SMTP --}}
+            @if($smtp)
+                <form method="POST" action="{{ route('client.mails.smtp.test') }}" style="margin-top:10px;">
+                    @csrf
+                    <button type="submit" class="btn-modern btn-test">
+                        <i class="fas fa-vial"></i> Tester SMTP
+                    </button>
+                </form>
+            @endif
+        </div>
+
+
+        {{-- ================= CONFIG ACTUELLE ================= --}}
+        <div class="config-card">
+            <h3><i class="fas fa-info-circle"></i> Configuration actuelle</h3>
+
+            @if($smtp)
+                <div class="config-details">
+                    <p>
+                        <i class="fas fa-server"></i>
+                        <strong>Serveur:</strong>
+                        {{ $smtp->host }}:{{ $smtp->port }}
+                    </p>
+
+                    <p>
+                        <i class="fas fa-shield-alt"></i>
+                        <strong>Sécurité:</strong>
+                        {{ strtoupper($smtp->encryption ?? 'Aucune') }}
+                    </p>
+
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        <strong>Email:</strong>
+                        {{ $smtp->username }}
+                    </p>
+
+                    @if($smtp->last_tested_at)
+                        <p>
+                            <i class="fas fa-clock"></i>
+                            <strong>Dernier test:</strong>
+                            {{ $smtp->last_tested_at->format('d/m/Y H:i') }}
+                        </p>
+                    @endif
+                </div>
+            @else
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Aucune configuration SMTP enregistrée.
+                </div>
+            @endif
+
+            <div class="alert alert-info" style="margin-top:15px;">
+                <i class="fas fa-lightbulb"></i>
+                <div>
+                    <strong>Gmail :</strong><br>
+                    Serveur : smtp.gmail.com<br>
+                    Port : 587<br>
+                    Sécurité : TLS
+                </div>
             </div>
         </div>
+
     </div>
+</div>
 
     <!-- ================= TUTORIEL AVEC LIENS ================= -->
     <div class="mail-card">
@@ -1020,20 +1123,35 @@ details[open] summary i {
         </div>
     </div>
 
-    <!-- ================= ENVOI MAIL ================= -->
-    <div class="mail-card">
-        <h2 class="section-title">
-            <i class="fas fa-paper-plane"></i>
-            Envoyer un mail
-        </h2>
+   <!-- ================= ENVOI MAIL ================= -->
+<div class="mail-card">
+    <h2 class="section-title">
+        <i class="fas fa-paper-plane"></i>
+        Envoyer un mail
+    </h2>
 
-        <form>
+    @if(!$smtp)
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Configurez votre SMTP avant d’envoyer un mail.
+        </div>
+    @else
+        <form method="POST" action="{{ route('client.mails.send') }}">
+            @csrf
+
             <div class="form-group">
                 <label>
                     <i class="fas fa-user"></i>
                     Destinataire
                 </label>
-                <input type="email" class="form-control" placeholder="client@email.com">
+                <input type="email"
+                       name="to"
+                       class="form-control"
+                       value="{{ old('to') }}"
+                       required>
+                @error('to')
+                    <small style="color:red;">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class="form-group">
@@ -1041,72 +1159,105 @@ details[open] summary i {
                     <i class="fas fa-heading"></i>
                     Sujet
                 </label>
-                <input type="text" class="form-control" placeholder="Sujet du mail">
+                <input type="text"
+                       name="subject"
+                       class="form-control"
+                       value="{{ old('subject') }}"
+                       required>
+                @error('subject')
+                    <small style="color:red;">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class="form-group">
                 <label>
                     <i class="fas fa-comment"></i>
-                    Message
+                    Message (HTML autorisé)
                 </label>
-                <textarea class="form-control" rows="5" placeholder="Votre message..."></textarea>
+                <textarea name="message"
+                          class="form-control"
+                          rows="5"
+                          required>{{ old('message') }}</textarea>
+                @error('message')
+                    <small style="color:red;">{{ $message }}</small>
+                @enderror
             </div>
 
-            <button type="button" class="btn-modern btn-success-modern">
+            <button type="submit" class="btn-modern btn-success-modern">
                 <i class="fas fa-paper-plane"></i>
                 Envoyer
             </button>
         </form>
+    @endif
+</div>
+
+
+
+<!-- ================= LISTE MAILS ================= -->
+<div class="mail-card">
+    <h2 class="section-title">
+        <i class="fas fa-inbox"></i>
+        Historique des mails envoyés
+    </h2>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-user"></i> Destinataire</th>
+                    <th><i class="fas fa-tag"></i> Sujet</th>
+                    <th><i class="fas fa-calendar"></i> Date</th>
+                    <th><i class="fas fa-flag"></i> Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($logs as $log)
+                    <tr>
+                        <td>
+                            <i class="fas fa-envelope-open-text"></i>
+                            {{ $log->to }}
+                        </td>
+                        <td>{{ $log->subject }}</td>
+                        <td>
+                            <i class="fas fa-clock"></i>
+                            {{ $log->created_at->format('d/m/Y H:i') }}
+                        </td>
+                        <td>
+                            @if($log->status === 'success')
+                                <span class="badge-success">
+                                    <i class="fas fa-check-circle"></i> Succès
+                                </span>
+                            @else
+                                <span class="badge-danger">
+                                    <i class="fas fa-times-circle"></i> Échec
+                                </span>
+
+                                @if($log->error_message)
+                                    <div style="font-size:12px;color:#b13e5b;margin-top:4px;">
+                                        {{ Str::limit($log->error_message, 80) }}
+                                    </div>
+                                @endif
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align:center;padding:20px;">
+                            Aucun mail envoyé pour le moment.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 
-    <!-- ================= LISTE MAILS ================= -->
-    <div class="mail-card">
-        <h2 class="section-title">
-            <i class="fas fa-inbox"></i>
-            Liste des mails envoyés
-        </h2>
-
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-user"></i> Destinataire</th>
-                        <th><i class="fas fa-tag"></i> Sujet</th>
-                        <th><i class="fas fa-calendar"></i> Date</th>
-                        <th><i class="fas fa-flag"></i> Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><i class="fas fa-envelope-open-text"></i> client1@email.com</td>
-                        <td>Bienvenue</td>
-                        <td><i class="fas fa-clock"></i> 01/02/2026</td>
-                        <td><span class="badge-success"><i class="fas fa-check-circle"></i> Succès</span></td>
-                    </tr>
-                    <tr>
-                        <td><i class="fas fa-envelope-open-text"></i> client2@email.com</td>
-                        <td>Offre spéciale</td>
-                        <td><i class="fas fa-clock"></i> 02/02/2026</td>
-                        <td><span class="badge-success"><i class="fas fa-check-circle"></i> Succès</span></td>
-                    </tr>
-                    <tr>
-                        <td><i class="fas fa-envelope-open-text"></i> client3@email.com</td>
-                        <td>Relance</td>
-                        <td><i class="fas fa-clock"></i> 03/02/2026</td>
-                        <td><span class="badge-danger"><i class="fas fa-times-circle"></i> Échec</span></td>
-                    </tr>
-                </tbody>
-            </table>
+    {{-- Pagination si activée --}}
+    @if(method_exists($logs, 'links'))
+        <div class="mt-4">
+            {{ $logs->links() }}
         </div>
-
-        <!-- Lien vers la gestion des emails -->
-        <div class="mt-4" style="text-align: right;">
-            <a href="#" class="btn-link-modern">
-                <i class="fas fa-arrow-right"></i>
-                Voir tous les emails envoyés
-            </a>
-        </div>
-    </div>
+    @endif
+</div>
 
     <!-- ================= RAPPEL SECURITE ================= -->
     <div class="mail-card" style="background: linear-gradient(145deg, #f8fafd, #ffffff);">
