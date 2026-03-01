@@ -16,6 +16,7 @@ use App\Http\Controllers\Client\LeadController;
 use App\Http\Controllers\Client\ClientMailController;
 use App\Http\Controllers\Client\ClientImapController;
 use App\Http\Controllers\Client\ClientScheduledMailController;
+use App\Http\Controllers\Client\MailMassController;
 
 
 /*
@@ -138,6 +139,16 @@ Route::prefix('mails')
         Route::delete('/programmes/{id}', [ClientScheduledMailController::class,'destroy'])
             ->name('programmes.delete');
 });
+
+Route::get('/client/mails/plus', function () {
+    return view('client.mails.plus');
+})->name('client.mails.plus');
+
+Route::get('/client/mails/plus', [MailMassController::class, 'index'])
+    ->name('client.mails.plus');
+
+Route::post('/client/mails/plus', [MailMassController::class, 'send'])
+    ->name('client.mails.plus.send');
 });
 
 /*
