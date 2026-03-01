@@ -16,7 +16,11 @@ class ClientScheduledMailController extends Controller
             ->latest()
             ->get();
 
-        return view('client.mails.programmes', compact('mails'));
+    return view('client.mails.programmes', [
+        'mails' => $mails,
+        'serverTimezone' => config('app.timezone'),
+        'serverNow' => now(),
+    ]);
     }
 
     public function store(Request $request)

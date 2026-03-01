@@ -563,7 +563,12 @@
             <i class="fas fa-clock"></i>
             Programmer un email
         </h2>
-
+        <p class="text-muted-premium" style="margin-bottom:1.5rem;">
+            <i class="fas fa-globe"></i>
+            Heure actuel : 
+            <strong>{{ $serverTimezone }}</strong>
+            (actuellement {{ $serverNow->format('d/m/Y H:i') }})
+        </p>
         <form method="POST" action="{{ route('client.mails.programmes.store') }}">
             @csrf
 
