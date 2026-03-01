@@ -15,6 +15,7 @@ use App\Http\Controllers\GoogleScraperController;
 use App\Http\Controllers\Client\LeadController;
 use App\Http\Controllers\Client\ClientMailController;
 use App\Http\Controllers\Client\ClientImapController;
+use App\Http\Controllers\Client\ClientScheduledMailController;
 
 
 /*
@@ -123,6 +124,20 @@ Route::post('/mails/imap/test', [ClientImapController::class,'test'])
     Route::post('/crm/leads/{lead}/generate-mails', 
     [\App\Http\Controllers\Client\LeadController::class, 'generateMails']
 )->name('client.crm.leads.generate-mails');
+
+Route::prefix('mails')
+    ->name('client.mails.')
+    ->group(function () {
+
+        Route::get('/programmes', [ClientScheduledMailController::class,'index'])
+            ->name('programmes');
+
+        Route::post('/programmes', [ClientScheduledMailController::class,'store'])
+            ->name('programmes.store');
+
+        Route::delete('/programmes/{id}', [ClientScheduledMailController::class,'destroy'])
+            ->name('programmes.delete');
+});
 });
 
 /*
@@ -224,7 +239,6 @@ Route::post('/google/export-to-lead-by-scrapping',
     ->name('client.google.export.lead.scrapping');
 
 // MAILS
-Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
 Route::get('/mails/envoyes', [ClientMailController::class,'index'])
     ->name('client.mails.envoyes');
     
