@@ -858,6 +858,12 @@
                 <ul class="submenu" id="mails-submenu">
                     <li><a href="{{ route('client.mails.programmes') }}">Mes mails programmés</a></li>
                     <li>
+                        <a href="{{ route('client.mails.plus') }}">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            Envoi mail en masse
+                        </a>
+                    </li>
+                    <li>
                         <a href="#" class="menu-toggle" data-target="inbox-submenu">
                             Boite de réception
                         </a>

@@ -138,6 +138,10 @@ Route::prefix('mails')
         Route::delete('/programmes/{id}', [ClientScheduledMailController::class,'destroy'])
             ->name('programmes.delete');
 });
+
+Route::get('/client/mails/plus', function () {
+    return view('client.mails.plus');
+})->name('client.mails.plus');
 });
 
 /*
