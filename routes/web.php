@@ -120,6 +120,9 @@ Route::post('/mails/imap/test', [ClientImapController::class,'test'])
     Route::post('/mails/imap/sync', [ClientImapController::class,'sync'])
     ->name('client.mails.imap.sync');
 
+    Route::post('/crm/leads/{lead}/generate-mails', 
+    [\App\Http\Controllers\Client\LeadController::class, 'generateMails']
+)->name('client.crm.leads.generate-mails');
 });
 
 /*

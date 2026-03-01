@@ -134,18 +134,18 @@
         <table class="leads-table" id="resizableTable">
             <thead>
                 <tr>
-                    <th class="resizable" data-index="0">
+                    <th class="resizable sticky-col-0" data-index="0">
                         <input type="checkbox" class="select-all">
                     </th>
                     
-                    <th class="resizable" data-index="1">Entreprise
+                    <th class="resizable sticky-col-1" data-index="1">Entreprise
                         <span class="info-tooltip">
                             <i class="fas fa-info-circle"></i>
                             <span class="tooltip-text">Nom de l'entreprise ou de la société associée au prospect.</span>
                         </span>
                     </th>
                     
-                    <th class="resizable" data-index="2">Prénom
+                    <th class="resizable sticky-col-2" data-index="2">Prénom
                         <span class="info-tooltip">
                             <i class="fas fa-info-circle"></i>
                             <span class="tooltip-text">Prénom du prospect tel qu'importé ou renseigné manuellement.</span>
@@ -402,11 +402,11 @@
             <tbody>
                 @forelse($leads as $lead)
                     <tr onclick='openEditModal(@json($lead))' style="cursor:pointer;">
-                        <td onclick="event.stopPropagation()">
+                        <td class="sticky-col-0" onclick="event.stopPropagation()">
                             <input type="checkbox" class="select-row">
                         </td>
-                        <td>{{ $lead->entreprise ?? '-' }}</td>
-                        <td><strong>{{ $lead->prenom_nom ?? '-' }}</strong></td>
+                        <td class="sticky-col-1">{{ $lead->entreprise ?? '-' }}</td>
+                        <td class="sticky-col-2"><strong>{{ $lead->prenom_nom ?? '-' }}</strong></td>
                         <td><strong>{{ $lead->nom ?? '-' }}</strong></td>
                         <td>{{ $lead->adresse_postale ?? '-' }}</td>
                         <td>{{ $lead->commentaire ?? '-' }}</td>
@@ -472,16 +472,33 @@
                             @else - @endif
                         </td>
                         <td class="actions" onclick="event.stopPropagation()">
-                            <button class="btn-icon" onclick='openEditModal(@json($lead))' title="Modifier">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon" onclick="openDeleteModal({{ $lead->id }})" title="Supprimer">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="btn-icon" onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'" title="Exporter">
-                                <i class="fas fa-file-excel"></i>
-                            </button>
-                        </td>
+
+    <button class="btn-icon"
+        onclick='openEditModal(@json($lead))'
+        title="Modifier">
+        <i class="fas fa-edit"></i>
+    </button>
+
+    <button class="btn-icon"
+        onclick="openDeleteModal({{ $lead->id }})"
+        title="Supprimer">
+        <i class="fas fa-trash"></i>
+    </button>
+
+    <button class="btn-icon"
+        onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'"
+        title="Exporter">
+        <i class="fas fa-file-excel"></i>
+    </button>
+
+    <!-- ✅ BOUTON IA CORRECT -->
+    <button class="btn-icon"
+        onclick="openMailModal({{ $lead->id }})"
+        title="Générer email IA">
+        <i class="fas fa-robot"></i>
+    </button>
+
+</td>
                     </tr>
                 @empty
                     <tr>
@@ -1213,15 +1230,20 @@
     }
 
     .btn-icon {
-        background: white;
-        border: 1px solid #e2e8f0;
-        cursor: pointer;
-        padding: 8px;
-        border-radius: 10px;
-        color: #5f6b7a;
-        transition: all 0.2s;
-        font-size: 14px;
-    }
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    border-radius: 10px;
+    color: #5f6b7a;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    flex-shrink: 0;
+}
 
     .btn-icon:hover {
         background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
@@ -1644,8 +1666,96 @@
             justify-content: center;
         }
     }
-</style>
+   /* =========================================
+   STICKY COLUMNS (Checkbox + Entreprise + Prénom)
+========================================= */
 
+/* Header sticky */
+.leads-table th.sticky-col-0,
+.leads-table th.sticky-col-1,
+.leads-table th.sticky-col-2 {
+    position: sticky;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    z-index: 30;
+}
+
+/* Cells sticky */
+.leads-table td.sticky-col-0,
+.leads-table td.sticky-col-1,
+.leads-table td.sticky-col-2 {
+    position: sticky;
+    background: white;
+    z-index: 20;
+}
+
+/* Positions dynamiques fixes */
+.leads-table th.sticky-col-0,
+.leads-table td.sticky-col-0 {
+    left: 0;
+    min-width: 60px;
+    width: 60px;
+    text-align: center;
+}
+
+.leads-table th.sticky-col-1,
+.leads-table td.sticky-col-1 {
+    left: 60px;
+}
+
+.leads-table th.sticky-col-2,
+.leads-table td.sticky-col-2 {
+    left: 220px;
+}
+
+/* Hover harmonisé */
+.leads-table tbody tr:hover td.sticky-col-0,
+.leads-table tbody tr:hover td.sticky-col-1,
+.leads-table tbody tr:hover td.sticky-col-2 {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+/* Ombre séparation après prénom */
+.leads-table th.sticky-col-2,
+.leads-table td.sticky-col-2 {
+    box-shadow: 6px 0 8px -6px rgba(0,0,0,0.15);
+}
+/* =========================================
+   ACTIONS COLUMN FIX
+========================================= */
+
+.leads-table th[data-index="37"],
+.leads-table td.actions {
+    min-width: 190px;
+    width: 190px;
+    white-space: nowrap;
+}
+
+.leads-table td.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+</style>
+<div id="mailModal" class="modal">
+    <div class="modal-content" style="max-width:800px;">
+        <div class="modal-header">
+            <h2>Génération d'emails IA</h2>
+            <button class="close-btn" onclick="closeMailModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div id="mailLoader" style="display:none;text-align:center;">
+                <p>Génération en cours...</p>
+            </div>
+
+            <div id="mailResults" style="white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeMailModal()">Fermer</button>
+        </div>
+    </div>
+</div>
 <script>
     /*
     |--------------------------------------------------------------------------
@@ -1886,5 +1996,34 @@
             }, 500);
         });
     });
+
+    const mailModal = document.getElementById('mailModal');
+
+function openMailModal(leadId) {
+    mailModal.style.display = "block";
+    document.getElementById('mailLoader').style.display = "block";
+    document.getElementById('mailResults').innerHTML = "";
+
+    fetch(`/crm/leads/${leadId}/generate-mails`, {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('mailLoader').style.display = "none";
+        document.getElementById('mailResults').innerText = data.content;
+    })
+    .catch(err => {
+        document.getElementById('mailLoader').style.display = "none";
+        document.getElementById('mailResults').innerText = "Erreur lors de la génération.";
+    });
+}
+
+function closeMailModal() {
+    mailModal.style.display = "none";
+}
 </script>
 @endsection
