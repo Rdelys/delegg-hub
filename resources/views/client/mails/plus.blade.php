@@ -4,13 +4,23 @@
 
 @section('content')
 <div class="card">
+    @if(session('success'))
+    <div style="background:#dcfce7; padding:10px; border-radius:8px; margin-bottom:15px;">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div style="background:#fee2e2; padding:10px; border-radius:8px; margin-bottom:15px;">
+        {{ session('error') }}
+    </div>
+@endif
     <h2 style="margin-bottom: 20px;">
         <i class="fa-solid fa-paper-plane text-primary"></i>
         Envoi de mails en masse
     </h2>
 
-    <form method="POST" action="#">
-        @csrf
+<form method="POST" action="{{ route('client.mails.plus.send') }}">        @csrf
 
         <div style="margin-bottom: 15px;">
             <label>Sujet</label>
