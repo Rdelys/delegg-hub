@@ -8,21 +8,27 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
+/* ================= BASE & RESET ================= */
 :root {
-    --primary: #2563eb;
-    --primary-light: #3b82f6;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-500: #6b7280;
-    --gray-700: #374151;
-    --gray-900: #111827;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
-    --shadow: 0 1px 3px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-    --radius: 12px;
+    --primary: #4361ee;
+    --primary-dark: #3a56d4;
+    --secondary: #06d6a0;
+    --secondary-dark: #05b586;
+    --danger: #ef476f;
+    --danger-dark: #d43f62;
+    --warning: #ffd166;
+    --success: #06d6a0;
+    --dark: #2b2d42;
+    --gray: #6c757d;
+    --light: #f8f9fa;
+    --white: #ffffff;
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.1);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-lg: 20px;
+    --transition: all 0.2s ease;
 }
 
 * {
@@ -31,703 +37,1230 @@
     box-sizing: border-box;
 }
 
+/* ================= CONTAINER PRINCIPAL ================= */
 .mail-container {
-    max-width: 1280px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 1.5rem;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--gray-50);
+    padding: 24px 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f7fb;
     min-height: 100vh;
 }
 
-.card {
-    background: white;
+/* ================= CARTES ================= */
+.mail-card {
+    background: var(--white);
     border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    padding: 28px 30px;
+    margin-bottom: 28px;
+    transition: var(--transition);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+.mail-card:hover {
+    box-shadow: var(--shadow-md);
 }
 
 .section-title {
-    font-size: 1.25rem;
     font-weight: 600;
-    color: var(--gray-900);
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: var(--dark);
+    letter-spacing: -0.01em;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 12px;
+    border-bottom: 2px solid #eef2f6;
+    padding-bottom: 16px;
 }
 
 .section-title i {
     color: var(--primary);
+    font-size: 1.8rem;
 }
 
-/* Status */
-.status {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: var(--gray-50);
-    border-radius: var(--radius);
-    border: 1px solid var(--gray-200);
-    margin-bottom: 1.5rem;
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 28px;
+    background: var(--primary);
+    border-radius: 4px;
 }
 
-.status-success { color: var(--success); }
-.status-error { color: var(--error); }
-.status-warning { color: var(--warning); }
-
-/* Grid */
-.grid-2 {
+/* ================= CONFIG IMAP ================= */
+.config-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
-@media (max-width: 768px) {
-    .grid-2 { grid-template-columns: 1fr; }
+.config-card {
+    background: #f8fafd;
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    border: 1px solid #e9ecef;
 }
 
-/* Form elements */
+.config-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-card h3 i {
+    color: var(--primary);
+}
+
+.config-details {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 12px;
+    margin: 15px 0;
+    border: 1px dashed #d0d9e8;
+}
+
+.config-details p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.config-details p:last-child {
+    margin-bottom: 0;
+}
+
+.config-details i {
+    width: 20px;
+    color: var(--primary);
+}
+
+/* ================= ÉTAT IMAP ================= */
+.imap-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 18px 22px;
+    background: #f8fafd;
+    border-radius: var(--radius-sm);
+    border: 1px solid #e9ecef;
+}
+
+.imap-status i {
+    font-size: 2.2rem;
+}
+
+.imap-status .status-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.imap-status .status-details {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-top: 4px;
+}
+
+.status-success {
+    color: var(--success);
+}
+
+.status-error {
+    color: var(--danger);
+}
+
+.status-warning {
+    color: #ffb703;
+}
+
+/* ================= FORMULAIRES ================= */
 .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 20px;
 }
 
 .form-group label {
-    display: block;
-    font-size: 0.875rem;
     font-weight: 500;
-    color: var(--gray-700);
-    margin-bottom: 0.375rem;
+    color: var(--dark);
+    margin-bottom: 8px;
+    display: block;
+    font-size: 0.95rem;
 }
 
 .form-group label i {
+    margin-right: 8px;
     color: var(--primary);
-    margin-right: 0.375rem;
-    width: 1rem;
+    width: 18px;
 }
 
 .form-control {
     width: 100%;
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-    border: 1px solid var(--gray-200);
-    border-radius: 0.5rem;
-    background: white;
-    transition: all 0.15s;
+    padding: 12px 18px;
+    font-size: 0.95rem;
+    border: 2px solid #e9ecef;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    background: #fafbfc;
+    color: var(--dark);
 }
 
 .form-control:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 15px;
 }
 
-/* Buttons */
-.btn {
+/* ================= BOUTONS ================= */
+.btn-modern {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: white;
-    color: var(--gray-700);
-    border-color: var(--gray-200);
-}
-
-.btn:hover {
-    background: var(--gray-50);
-    border-color: var(--gray-300);
-}
-
-.btn-primary {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
-
-.btn-primary:hover {
-    background: var(--primary-light);
-    border-color: var(--primary-light);
-}
-
-.btn-success {
-    background: var(--success);
-    color: white;
-}
-
-.btn-success:hover {
-    opacity: 0.9;
-}
-
-.btn-outline {
-    background: transparent;
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.btn-outline:hover {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-link {
-    background: transparent;
-    border: none;
-    color: var(--primary);
-    padding: 0.375rem 0.75rem;
-}
-
-.btn-link:hover {
-    background: var(--gray-100);
-}
-
-/* Alerts */
-.alert {
-    padding: 0.875rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    margin-top: 1rem;
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-    background: var(--gray-50);
-    border: 1px solid var(--gray-200);
-}
-
-.alert-info {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-    color: #1e40af;
-}
-
-.alert-success {
-    background: #f0fdf4;
-    border-color: #bbf7d0;
-    color: #166534;
-}
-
-.alert-warning {
-    background: #fffbeb;
-    border-color: #fde68a;
-    color: #92400e;
-}
-
-/* Tutorial links */
-.tutorial-links {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin: 1rem 0;
-    padding: 1rem 0;
-    border-top: 1px solid var(--gray-200);
-    border-bottom: 1px solid var(--gray-200);
-}
-
-/* Stats */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-@media (max-width: 768px) {
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-.stat-item {
-    background: var(--gray-50);
-    border-radius: 0.75rem;
-    padding: 1rem;
-    border: 1px solid var(--gray-200);
-}
-
-.stat-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.5rem;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.75rem;
-    color: var(--primary);
-    border: 1px solid var(--gray-200);
-}
-
-.stat-content h4 {
-    font-size: 1.25rem;
+    padding: 12px 28px;
     font-weight: 600;
-    color: var(--gray-900);
-}
-
-.stat-content p {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-}
-
-/* Email list */
-.email-list {
-    border: 1px solid var(--gray-200);
-    border-radius: 0.75rem;
-    overflow: hidden;
-}
-
-.email-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: white;
-    border-bottom: 1px solid var(--gray-200);
+    font-size: 0.95rem;
+    border-radius: 50px;
+    border: none;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: var(--transition);
+    letter-spacing: 0.2px;
+    box-shadow: var(--shadow-sm);
+    gap: 10px;
 }
 
-.email-item:last-child {
-    border-bottom: none;
+.btn-modern i {
+    font-size: 1rem;
 }
 
-.email-item:hover {
-    background: var(--gray-50);
+.btn-modern:active {
+    transform: translateY(1px);
+    box-shadow: none;
 }
 
-.email-sender {
-    font-weight: 500;
-    color: var(--gray-900);
-    min-width: 180px;
+.btn-primary-modern {
+    background: var(--primary);
+    color: var(--white);
 }
 
-.email-subject {
-    color: var(--gray-700);
-    font-size: 0.875rem;
-}
-
-.email-subject .preview {
-    color: var(--gray-500);
-    margin-left: 0.5rem;
-}
-
-.email-date {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-    white-space: nowrap;
-}
-
-/* Modal */
-.mail-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.mail-modal-content {
-    background: white;
-    border-radius: 1rem;
-    width: 90%;
-    max-width: 700px;
-    max-height: 80vh;
-    overflow-y: auto;
-    padding: 1.5rem;
+.btn-primary-modern:hover {
+    background: var(--primary-dark);
     box-shadow: var(--shadow-md);
 }
 
-.mail-modal-header {
+.btn-success-modern {
+    background: var(--secondary);
+    color: var(--white);
+}
+
+.btn-success-modern:hover {
+    background: var(--secondary-dark);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline-modern {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    box-shadow: none;
+}
+
+.btn-outline-modern:hover {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.btn-test {
+    background: #6c5ce7;
+    color: white;
+}
+
+.btn-test:hover {
+    background: #5b4bc4;
+}
+
+.btn-link-modern {
+    background: transparent;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.btn-link-modern:hover {
+    background: rgba(67, 97, 238, 0.1);
+    border-color: var(--primary);
+}
+
+/* ================= ALERTES ================= */
+.alert {
+    padding: 18px 20px;
+    border-radius: var(--radius-sm);
+    margin-top: 22px;
+    font-size: 0.95rem;
+    border-left: 4px solid transparent;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.alert i {
+    font-size: 1.3rem;
+    margin-top: 2px;
+}
+
+.alert-info {
+    background: #e7f1ff;
+    border-left-color: var(--primary);
+    color: #1e4a6b;
+}
+
+.alert-info i {
+    color: var(--primary);
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.alert-warning i {
+    color: #ffc107;
+}
+
+.alert-success {
+    background: #d1fae5;
+    border-left-color: var(--success);
+    color: #0b5e42;
+}
+
+.alert-success i {
+    color: var(--success);
+}
+
+/* ================= TUTORIEL LINKS ================= */
+.tutorial-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    padding: 15px 0;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* ================= STATISTIQUES EMAILS ================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.stat-item {
+    background: #f8fafd;
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #e9ecef;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.4rem;
+}
+
+.stat-icon.green {
+    background: var(--success);
+}
+
+.stat-icon.orange {
+    background: #fb8b24;
+}
+
+.stat-icon.purple {
+    background: #9d4edd;
+}
+
+.stat-content h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.2;
+}
+
+.stat-content p {
+    color: var(--gray);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* ================= LISTE EMAILS ================= */
+.inbox-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
 }
 
-.mail-modal-header h3 {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--gray-900);
+.inbox-actions {
+    display: flex;
+    gap: 10px;
 }
 
-.mail-modal-header button {
-    background: none;
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #f8fafd;
+    border: 2px solid #e9ecef;
+    border-radius: 50px;
+    padding: 5px 5px 5px 18px;
+    min-width: 280px;
+}
+
+.search-box i {
+    color: var(--gray);
+}
+
+.search-box input {
     border: none;
-    font-size: 1.25rem;
+    background: transparent;
+    padding: 10px 12px;
+    flex: 1;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+.search-box button {
+    background: var(--primary);
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 500;
     cursor: pointer;
-    color: var(--gray-500);
-    padding: 0.25rem 0.5rem;
+    transition: var(--transition);
 }
 
-.mail-modal-meta {
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-    color: var(--gray-700);
+.search-box button:hover {
+    background: var(--primary-dark);
 }
 
-.mail-modal-meta p {
-    margin-bottom: 0.25rem;
+.email-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-/* Pagination */
+.email-item {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    background: var(--white);
+    border: 1px solid #edf2f7;
+    border-radius: 12px;
+    transition: var(--transition);
+    cursor: pointer;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.email-item:hover {
+    background: #f8fafd;
+    border-color: var(--primary);
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+}
+
+.email-item.unread {
+    background: #f0f4fe;
+    border-left: 4px solid var(--primary);
+}
+
+.email-check {
+    width: 30px;
+}
+
+.email-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+.email-star {
+    color: #ffb703;
+    font-size: 1.2rem;
+    width: 30px;
+}
+
+.email-star .far {
+    color: #ced4da;
+}
+
+.email-sender {
+    min-width: 200px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.email-sender i {
+    margin-right: 8px;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.email-subject {
+    flex: 1;
+    min-width: 250px;
+    color: #4a5568;
+}
+
+.email-subject .subject-text {
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.email-subject .preview-text {
+    color: var(--gray);
+    font-size: 0.9rem;
+}
+
+.email-attachment {
+    width: 30px;
+    color: var(--gray);
+}
+
+.email-date {
+    min-width: 100px;
+    text-align: right;
+    color: var(--gray);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.email-date i {
+    margin-right: 5px;
+}
+
+/* ================= PAGINATION ================= */
 .pagination {
     display: flex;
-    gap: 0.25rem;
     justify-content: center;
-    margin-top: 1.5rem;
+    align-items: center;
+    gap: 8px;
+    margin-top: 25px;
+    flex-wrap: wrap;
 }
 
-.pagination a, .pagination span {
-    padding: 0.375rem 0.75rem;
-    border: 1px solid var(--gray-200);
-    border-radius: 0.375rem;
-    color: var(--gray-700);
-    text-decoration: none;
-    font-size: 0.875rem;
+.page-item {
+    list-style: none;
 }
 
-.pagination .active {
+.page-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid #e9ecef;
+    color: var(--dark);
+    font-weight: 500;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.page-link:hover {
     background: var(--primary);
     color: white;
     border-color: var(--primary);
+}
+
+.page-item.active .page-link {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ================= FOLDERS ================= */
+.folders-section {
+    margin-top: 25px;
+}
+
+.folder-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #f8fafd;
+    border-radius: 50px;
+    border: 1px solid #e9ecef;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.folder-item:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.folder-item:hover i,
+.folder-item:hover span {
+    color: white;
+}
+
+.folder-item i {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.folder-item span {
+    color: var(--dark);
+    font-weight: 500;
+}
+
+.folder-item .count {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.folder-item:hover .count {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+    .mail-container {
+        padding: 20px 16px;
+    }
+    
+    .mail-card {
+        padding: 22px 20px;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .config-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .mail-card {
+        padding: 18px 16px;
+    }
+    
+    .email-item {
+        padding: 15px;
+    }
+    
+    .email-sender {
+        min-width: 150px;
+    }
+    
+    .email-subject {
+        min-width: 200px;
+    }
+    
+    .inbox-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .imap-status {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .tutorial-links {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 580px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .email-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .email-check,
+    .email-star {
+        display: none;
+    }
+    
+    .email-sender {
+        width: 100%;
+    }
+    
+    .email-subject {
+        width: 100%;
+    }
+    
+    .email-date {
+        width: 100%;
+        text-align: left;
+    }
+    
+    .folder-item {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .mail-container {
+        padding: 12px 10px;
+    }
+    
+    .mail-card {
+        padding: 15px 12px;
+        border-radius: 14px;
+    }
+    
+    .section-title {
+        font-size: 1.2rem;
+        padding-bottom: 12px;
+    }
+    
+    .section-title i {
+        font-size: 1.4rem;
+    }
+    
+    .btn-modern {
+        width: 100%;
+        padding: 12px 16px;
+    }
+    
+    .inbox-actions {
+        flex-direction: column;
+    }
+    
+    .search-box {
+        flex-direction: column;
+        background: transparent;
+        border: none;
+        padding: 0;
+        gap: 10px;
+    }
+    
+    .search-box input {
+        width: 100%;
+        border: 2px solid #e9ecef;
+        border-radius: 50px;
+        padding: 12px 18px;
+    }
+    
+    .search-box button {
+        width: 100%;
+    }
+    
+    .pagination {
+        gap: 4px;
+    }
+    
+    .page-link {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .section-title {
+        font-size: 1.1rem;
+    }
+    
+    .stat-item {
+        padding: 12px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    .stat-content h4 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (min-width: 1600px) {
+    .mail-container {
+        max-width: 1600px;
+    }
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
 }
 </style>
 
 <div class="mail-container">
 
-    <!-- Configuration IMAP -->
-    <div class="card">
+    <!-- ================= CONFIGURATION IMAP ================= -->
+    <div class="mail-card">
         <h2 class="section-title">
             <i class="fas fa-cog"></i>
             Configuration IMAP
         </h2>
 
-        <!-- Status IMAP -->
-        <div class="status">
-            @if($imap && $imap->last_test_success)
-                <i class="fas fa-check-circle status-success"></i>
-                <div>
-                    <strong style="color: var(--success);">IMAP opérationnel</strong>
-                    <div style="font-size: 0.875rem; color: var(--gray-500);">{{ $imap->host }}:{{ $imap->port }}</div>
-                </div>
-            @elseif($imap && $imap->last_test_success === false)
-                <i class="fas fa-times-circle status-error"></i>
-                <strong style="color: var(--error);">Erreur de connexion</strong>
-            @else
-                <i class="fas fa-exclamation-circle status-warning"></i>
-                <strong style="color: var(--warning);">Configuration non testée</strong>
-            @endif
+        <!-- ÉTAT IMAP STATIQUE -->
+        <div class="imap-status">
+    @if($imap && $imap->last_test_success)
+        <i class="fas fa-check-circle status-success"></i>
+        <div>
+            <div class="status-text status-success">
+                IMAP opérationnel
+            </div>
+            <div class="status-details">
+                {{ $imap->host }}:{{ $imap->port }}
+            </div>
         </div>
+    @elseif($imap && $imap->last_test_success === false)
+        <i class="fas fa-times-circle status-error"></i>
+        <div>
+            <div class="status-text status-error">
+                Erreur IMAP
+            </div>
+        </div>
+    @else
+        <i class="fas fa-exclamation-circle status-warning"></i>
+        <div>
+            <div class="status-text status-warning">
+                IMAP non testé
+            </div>
+        </div>
+    @endif
+</div>
 
-        <!-- Liens Gmail -->
+        <!-- LIENS RAPIDES VERS GMAIL -->
         <div class="tutorial-links">
-            <a href="https://myaccount.google.com/security" target="_blank" class="btn btn-link">
-                <i class="fas fa-external-link-alt"></i> Sécurité Google
+            <a href="https://myaccount.google.com/security" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Sécurité du compte Google
             </a>
-            <a href="https://myaccount.google.com/apppasswords" target="_blank" class="btn btn-link">
-                <i class="fas fa-external-link-alt"></i> Mots de passe application
+            <a href="https://myaccount.google.com/apppasswords" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Créer un mot de passe d'application
             </a>
-            <a href="https://mail.google.com/" target="_blank" class="btn btn-link">
-                <i class="fas fa-external-link-alt"></i> Gmail
+            <a href="https://mail.google.com/" target="_blank" class="btn-link-modern">
+                <i class="fas fa-external-link-alt"></i>
+                Accéder à Gmail
             </a>
         </div>
 
-        <div class="grid-2">
-            <!-- Formulaire configuration -->
-            <div>
-                <form method="POST" action="{{ route('client.mails.imap.save') }}">
-                    @csrf
-                    <div class="form-group">
-                        <label><i class="fas fa-server"></i> Serveur IMAP</label>
-                        <input type="text" name="host" class="form-control" value="{{ $imap->host ?? '' }}" placeholder="imap.gmail.com" required>
-                    </div>
+        <div class="config-grid">
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-plug"></i> Port</label>
-                            <input type="number" name="port" class="form-control" value="{{ $imap->port ?? 993 }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-shield-alt"></i> Sécurité</label>
-                            <select name="encryption" class="form-control">
-                                <option value="ssl" {{ ($imap->encryption ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
-                                <option value="tls" {{ ($imap->encryption ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
-                                <option value="none" {{ ($imap->encryption ?? '') === 'none' ? 'selected' : '' }}>Aucune</option>
-                            </select>
-                        </div>
-                    </div>
+    <!-- ================= FORMULAIRE CONFIG IMAP ================= -->
+    <div class="config-card">
+        <h3><i class="fas fa-sliders-h"></i> Paramètres IMAP</h3>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" name="username" class="form-control" value="{{ $imap->username ?? '' }}" required>
-                    </div>
+        <form method="POST" action="{{ route('client.mails.imap.save') }}">
+            @csrf
 
-                    <div class="form-group">
-                        <label><i class="fas fa-lock"></i> Mot de passe</label>
-                        <input type="password" name="password" class="form-control" placeholder="{{ $imap ? '••••••••' : '' }}" {{ $imap ? '' : 'required' }}>
-                        @if($imap)<small style="color: var(--gray-500);">Laissez vide pour conserver</small>@endif
-                    </div>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-folder"></i> Dossier racine</label>
-                        <input type="text" name="folder" class="form-control" value="{{ $imap->folder ?? 'INBOX' }}" required>
-                    </div>
-
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Enregistrer
-                        </button>
-                </form>
-
-                @if($imap)
-                <form method="POST" action="{{ route('client.mails.imap.test') }}" style="display: inline;">
-                    @csrf
-                    <button type="submit" class="btn btn-outline">
-                        <i class="fas fa-vial"></i> Tester
-                    </button>
-                </form>
-                @endif
-                    </div>
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-server"></i>
+                    Serveur IMAP
+                </label>
+                <input type="text"
+                       name="host"
+                       class="form-control"
+                       value="{{ $imap->host ?? '' }}"
+                       placeholder="ex: imap.gmail.com"
+                       required>
             </div>
 
-            <!-- Configuration actuelle -->
-            <div>
-                <h3 style="font-size: 1rem; margin-bottom: 1rem; display: flex; gap: 0.5rem;">
-                    <i class="fas fa-info-circle" style="color: var(--primary);"></i>
-                    Configuration actuelle
-                </h3>
-
-                @if($imap)
-                <div style="background: var(--gray-50); border-radius: 0.5rem; padding: 1rem; border: 1px solid var(--gray-200);">
-                    <div style="display: grid; gap: 0.5rem;">
-                        <div style="display: flex; gap: 0.5rem; align-items: center;">
-                            @if($imap->last_test_success)
-                                <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                                <span style="color: var(--success);">Connecté</span>
-                            @elseif($imap->last_test_success === false)
-                                <i class="fas fa-times-circle" style="color: var(--error);"></i>
-                                <span style="color: var(--error);">Erreur</span>
-                            @else
-                                <i class="fas fa-exclamation-circle" style="color: var(--warning);"></i>
-                                <span style="color: var(--warning);">Non testé</span>
-                            @endif
-                        </div>
-
-                        <div style="font-size: 0.875rem;">
-                            <p><strong>Serveur:</strong> {{ $imap->host }}:{{ $imap->port }}</p>
-                            <p><strong>Sécurité:</strong> {{ strtoupper($imap->encryption) }}</p>
-                            <p><strong>Email:</strong> {{ $imap->username }}</p>
-                            <p><strong>Dossier:</strong> {{ $imap->folder }}</p>
-                            @if($imap->last_sync_at)
-                                <p><strong>Dernière synchro:</strong> {{ $imap->last_sync_at->format('d/m/Y H:i') }}</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @else
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Aucune configuration enregistrée</span>
-                </div>
-                @endif
-
-                <div class="alert alert-info" style="margin-top: 1rem;">
-                    <i class="fas fa-lightbulb"></i>
-                    <div>
-                        <strong>Gmail :</strong> Activez la validation en 2 étapes et utilisez un <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color: var(--primary);">mot de passe d'application</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Options avancées -->
-        <details style="margin-top: 1.5rem;">
-            <summary style="cursor: pointer; color: var(--primary); font-weight: 500;">
-                <i class="fas fa-chevron-down" style="margin-right: 0.5rem;"></i>
-                Options avancées
-            </summary>
-            <div style="margin-top: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 0.5rem;">
-                <div style="display: grid; gap: 1rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" checked> Valider certificat SSL
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-plug"></i>
+                        Port
                     </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="checkbox" checked> Valider authentification
+                    <input type="number"
+                           name="port"
+                           class="form-control"
+                           value="{{ $imap->port ?? 993 }}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-shield-alt"></i>
+                        Sécurité
                     </label>
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label>Timeout connexion (sec)</label>
-                        <input type="number" class="form-control" value="30" style="max-width: 120px;">
-                    </div>
+                    <select name="encryption" class="form-control">
+                        <option value="ssl" {{ ($imap->encryption ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
+                        <option value="tls" {{ ($imap->encryption ?? '') === 'tls' ? 'selected' : '' }}>TLS</option>
+                        <option value="none" {{ ($imap->encryption ?? '') === 'none' ? 'selected' : '' }}>Aucune</option>
+                    </select>
                 </div>
             </div>
-        </details>
-    </div>
 
-    <!-- Boîte de réception -->
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-            <h2 class="section-title" style="margin-bottom: 0;">
-                <i class="fas fa-inbox"></i>
-                Mails reçus
-            </h2>
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-envelope"></i>
+                    Email
+                </label>
+                <input type="email"
+                       name="username"
+                       class="form-control"
+                       value="{{ $imap->username ?? '' }}"
+                       required>
+            </div>
 
-            @if($imap && $imap->last_test_success)
-            <form method="POST" action="{{ route('client.mails.imap.sync') }}">
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-lock"></i>
+                    Mot de passe
+                </label>
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="••••••••"
+                       {{ $imap ? '' : 'required' }}>
+                <small style="color:var(--gray)">
+                    Laissez vide pour conserver le mot de passe actuel.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-folder"></i>
+                    Dossier racine
+                </label>
+                <input type="text"
+                       name="folder"
+                       class="form-control"
+                       value="{{ $imap->folder ?? 'INBOX' }}"
+                       required>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="submit" class="btn-modern btn-primary-modern">
+                    <i class="fas fa-save"></i>
+                    Enregistrer
+                </button>
+        </form>
+
+        @if($imap)
+            <form method="POST"
+                  action="{{ route('client.mails.imap.test') }}">
                 @csrf
-                <button type="submit" class="btn btn-outline">
-                    <i class="fas fa-sync-alt"></i> Synchroniser
+                <button type="submit" class="btn-modern btn-test">
+                    <i class="fas fa-vial"></i>
+                    Tester la connexion
                 </button>
             </form>
-            @endif
-        </div>
+        @endif
+            </div>
+    </div>
 
-        <!-- Statistiques -->
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-icon"><i class="fas fa-envelope"></i></div>
-                <div class="stat-content">
-                    <h4>{{ $stats['unread'] ?? 0 }}</h4>
-                    <p>Non lus</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon"><i class="fas fa-star"></i></div>
-                <div class="stat-content">
-                    <h4>{{ $stats['total'] ?? 0 }}</h4>
-                    <p>Total</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon"><i class="fas fa-paperclip"></i></div>
-                <div class="stat-content">
-                    <h4>{{ $stats['attachments'] ?? 0 }}</h4>
-                    <p>Pièces jointes</p>
-                </div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                <div class="stat-content">
-                    <h4>{{ $stats['week'] ?? 0 }}</h4>
-                    <p>Cette semaine</p>
-                </div>
-            </div>
-        </div>
 
-        @if($imap && $imap->last_sync_at)
-        <div class="alert alert-info" style="margin-bottom: 1rem;">
-            <i class="fas fa-sync-alt"></i>
-            <span>Dernière synchronisation : {{ $imap->last_sync_at->diffForHumans() }}</span>
-        </div>
+    <!-- ================= CONFIGURATION ACTUELLE ================= -->
+    <div class="config-card">
+        <h3><i class="fas fa-info-circle"></i> Configuration actuelle</h3>
+
+        @if($imap)
+
+            <div class="config-details">
+
+                <p>
+                    @if($imap->last_test_success)
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <strong>Statut :</strong> Connecté
+                    @elseif($imap->last_test_success === false)
+                        <i class="fas fa-times-circle" style="color: var(--danger);"></i>
+                        <strong>Statut :</strong> Erreur de connexion
+                    @else
+                        <i class="fas fa-exclamation-circle" style="color:#ffb703;"></i>
+                        <strong>Statut :</strong> Non testé
+                    @endif
+                </p>
+
+                <p>
+                    <i class="fas fa-server"></i>
+                    <strong>Serveur :</strong>
+                    {{ $imap->host }}:{{ $imap->port }}
+                </p>
+
+                <p>
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Sécurité :</strong>
+                    {{ strtoupper($imap->encryption) }}
+                </p>
+
+                <p>
+                    <i class="fas fa-envelope"></i>
+                    <strong>Email :</strong>
+                    {{ $imap->username }}
+                </p>
+
+                <p>
+                    <i class="fas fa-folder"></i>
+                    <strong>Dossier :</strong>
+                    {{ $imap->folder }}
+                </p>
+
+                @if($imap->last_sync_at)
+                    <p>
+                        <i class="fas fa-clock"></i>
+                        <strong>Dernière synchro :</strong>
+                        {{ $imap->last_sync_at->format('d/m/Y H:i') }}
+                    </p>
+                @endif
+
+            </div>
+
+        @else
+            <div class="alert alert-warning">
+                Aucune configuration IMAP enregistrée.
+            </div>
         @endif
 
-        <!-- Liste emails -->
-        <div class="email-list">
-            @forelse($messages as $message)
-            <div class="email-item" 
-                 data-subject="{{ e($message->getSubject()) }}"
-                 data-from="{{ e($message->getFrom()[0]->mail ?? '') }}"
-                 data-date="{{ $message->getDate() && $message->getDate()->first() ? \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') : '' }}"
-                 data-body="{{ e(Str::limit(strip_tags($message->getTextBody()), 500)) }}"
-                 onclick="openMailModal(this)">
-                
-                <div class="email-sender">
-                    <i class="fas fa-user-circle" style="margin-right: 0.5rem; color: var(--primary);"></i>
+        <div class="alert alert-info" style="margin-top:15px;">
+            <i class="fas fa-lightbulb"></i>
+            <div>
+                <strong>Gmail :</strong><br>
+                Activez la validation en 2 étapes et utilisez un
+                <a href="https://myaccount.google.com/apppasswords"
+                   target="_blank"
+                   style="color:var(--primary); text-decoration:underline;">
+                   mot de passe d'application
+                </a>.
+            </div>
+        </div>
+
+    </div>
+</div>
+
+        <!-- Options avancées -->
+        <div style="margin-top: 20px;">
+            <details style="background: #f8fafd; border-radius: var(--radius-sm); padding: 15px;">
+                <summary style="font-weight: 600; color: var(--dark); cursor: pointer;">
+                    <i class="fas fa-chevron-down" style="margin-right: 8px;"></i>
+                    Options avancées
+                </summary>
+                <div style="margin-top: 15px; display: grid; gap: 15px;">
+                    <div class="form-check" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="ssl" checked style="width: 18px; height: 18px;">
+                        <label for="ssl" style="font-weight: 500;">Valider le certificat SSL</label>
+                    </div>
+                    <div class="form-check" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="validate" checked style="width: 18px; height: 18px;">
+                        <label for="validate" style="font-weight: 500;">Valider l'authentification</label>
+                    </div>
+                    <div class="form-group">
+                        <label>Timeout de connexion (secondes)</label>
+                        <input type="number" class="form-control" value="30" style="max-width: 200px;">
+                    </div>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- ================= BOÎTE DE RÉCEPTION ================= -->
+<div class="mail-card">
+    <h2 class="section-title">
+        <i class="fas fa-inbox"></i>
+        Mails reçus
+    </h2>
+    @if($imap && $imap->last_test_success)
+    <form method="POST"
+          action="{{ route('client.mails.imap.sync') }}"
+          style="margin-bottom:15px;">
+        @csrf
+        <button type="submit" class="btn-modern btn-outline-modern">
+            <i class="fas fa-sync-alt"></i>
+            Synchroniser
+        </button>
+    </form>
+@endif
+
+    {{-- ================= STATISTIQUES ================= --}}
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['unread'] ?? 0 }}</h4>
+                <p>Non lus</p>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-icon green">
+                <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['total'] ?? 0 }}</h4>
+                <p>Total</p>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-icon orange">
+                <i class="fas fa-paperclip"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['attachments'] ?? 0 }}</h4>
+                <p>Avec pièces jointes</p>
+            </div>
+        </div>
+
+        <div class="stat-item">
+            <div class="stat-icon purple">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h4>{{ $stats['week'] ?? 0 }}</h4>
+                <p>Cette semaine</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- ================= SYNCHRONISATION ================= --}}
+    @if($imap && $imap->last_sync_at)
+        <div class="alert alert-info">
+            <i class="fas fa-sync-alt"></i>
+            <div>
+                <strong>Synchronisation IMAP</strong><br>
+                Dernière mise à jour : {{ $imap->last_sync_at->diffForHumans() }}
+            </div>
+        </div>
+    @endif
+
+    {{-- ================= LISTE EMAILS ================= --}}
+    <div class="email-list">
+
+        @forelse($messages as $message)
+<div class="email-item 
+    {{ collect($message->getFlags())->contains(function($flag){
+        return strtolower($flag) === '\\seen';
+    }) ? '' : 'unread' }}">
+     
+    <div class="email-sender">
+                    <i class="fas fa-user-circle"></i>
                     {{ $message->getFrom()[0]->mail ?? 'Inconnu' }}
                 </div>
 
                 <div class="email-subject">
-                    <span>{{ $message->getSubject() }}</span>
-                    @if($message->getTextBody())
-                    <span class="preview">- {{ Str::limit(strip_tags($message->getTextBody()), 40) }}</span>
+                    <span class="subject-text">
+                        {{ $message->getSubject() }}
+                    </span>
+                    <span class="preview-text">
+                        - {{ Str::limit(strip_tags($message->getTextBody()), 60) }}
+                    </span>
+                </div>
+
+                <div class="email-attachment">
+                    @if($message->getAttachments()->count())
+                        <i class="fas fa-paperclip"></i>
+                    @else
+                        <i class="fas fa-paperclip" style="opacity:0.2;"></i>
                     @endif
                 </div>
 
                 <div class="email-date">
-                    @if($message->getDate() && $message->getDate()->first())
-                        {{ \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') }}
-                    @endif
-                </div>
-            </div>
-            @empty
-            <div style="padding: 2rem; text-align: center; color: var(--gray-500);">
-                Aucun message trouvé
-            </div>
-            @endforelse
-        </div>
+                    <i class="fas fa-calendar"></i>
+@if($message->getDate() && $message->getDate()->first())
+    {{ \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') }}
+@else
+    --
+@endif  </div>
 
-        @if($messages instanceof \Illuminate\Pagination\LengthAwarePaginator)
-        <div class="pagination">
-            {{ $messages->links() }}
-        </div>
-        @endif
+            </div>
+        @empty
+            <div class="alert alert-warning">
+                Aucun message trouvé.
+            </div>
+        @endforelse
 
-        @if($imap && $imap->last_test_success)
-        <div class="alert alert-success" style="margin-top: 1rem;">
+    </div>
+
+    {{-- ================= CONFIG ACTIVE ================= --}}
+    @if($imap && $imap->last_test_success)
+        <div class="alert alert-success mt-4">
             <i class="fas fa-check-circle"></i>
-            <span>Connecté à {{ $imap->host }}:{{ $imap->port }} ({{ $imap->username }})</span>
+            <div>
+                <strong>Configuration IMAP active</strong><br>
+                Serveur : {{ $imap->host }}:{{ $imap->port }}
+                • Utilisateur : {{ $imap->username }}
+            </div>
         </div>
-        @endif
-    </div>
+    @endif
+
 </div>
-
-<!-- Modal email -->
-<div id="mailModal" class="mail-modal">
-    <div class="mail-modal-content">
-        <div class="mail-modal-header">
-            <h3 id="modalSubject"></h3>
-            <button onclick="closeMailModal()">✕</button>
-        </div>
-        <div class="mail-modal-meta">
-            <p><strong>De :</strong> <span id="modalFrom"></span></p>
-            <p><strong>Date :</strong> <span id="modalDate"></span></p>
-        </div>
-        <div class="mail-modal-body" id="modalBody" style="line-height: 1.6;"></div>
-    </div>
 </div>
-
-<script>
-function openMailModal(element) {
-    document.getElementById('modalSubject').innerText = element.dataset.subject;
-    document.getElementById('modalFrom').innerText = element.dataset.from;
-    document.getElementById('modalDate').innerText = element.dataset.date;
-    document.getElementById('modalBody').innerHTML = element.dataset.body;
-    document.getElementById('mailModal').style.display = 'flex';
-}
-
-function closeMailModal() {
-    document.getElementById('mailModal').style.display = 'none';
-}
-
-// Fermer modal avec Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeMailModal();
-});
-
-// Fermer en cliquant hors modal
-document.getElementById('mailModal').addEventListener('click', function(e) {
-    if (e.target === this) closeMailModal();
-});
-</script>
 
 @endsection
