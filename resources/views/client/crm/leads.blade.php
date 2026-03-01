@@ -1667,57 +1667,47 @@
         }
     }
    /* =========================================
-   STICKY COLUMNS (Checkbox + Entreprise + Prénom)
+   STICKY COLUMNS AUTO
+   Checkbox + Entreprise + Prénom
+   (Largeur automatique - pas de left fixe)
 ========================================= */
 
-/* Header sticky */
+/* ---- Header sticky ---- */
 .leads-table th.sticky-col-0,
 .leads-table th.sticky-col-1,
 .leads-table th.sticky-col-2 {
     position: sticky;
+    top: 0;
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    z-index: 30;
+    z-index: 40;
 }
 
-/* Cells sticky */
+/* ---- Cells sticky ---- */
 .leads-table td.sticky-col-0,
 .leads-table td.sticky-col-1,
 .leads-table td.sticky-col-2 {
     position: sticky;
     background: white;
-    z-index: 20;
+    z-index: 30;
 }
 
-/* Positions dynamiques fixes */
+/* ---- Checkbox centrée ---- */
 .leads-table th.sticky-col-0,
 .leads-table td.sticky-col-0 {
-    left: 0;
-    min-width: 60px;
-    width: 60px;
     text-align: center;
 }
 
-.leads-table th.sticky-col-1,
-.leads-table td.sticky-col-1 {
-    left: 60px;
-}
-
-.leads-table th.sticky-col-2,
-.leads-table td.sticky-col-2 {
-    left: 220px;
-}
-
-/* Hover harmonisé */
+/* ---- Hover harmonisé ---- */
 .leads-table tbody tr:hover td.sticky-col-0,
 .leads-table tbody tr:hover td.sticky-col-1,
 .leads-table tbody tr:hover td.sticky-col-2 {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
 }
 
-/* Ombre séparation après prénom */
+/* ---- Ombre séparation douce après la 3e colonne ---- */
 .leads-table th.sticky-col-2,
 .leads-table td.sticky-col-2 {
-    box-shadow: 6px 0 8px -6px rgba(0,0,0,0.15);
+    box-shadow: 6px 0 12px -6px rgba(0, 0, 0, 0.15);
 }
 /* =========================================
    ACTIONS COLUMN FIX
@@ -2025,5 +2015,31 @@ function openMailModal(leadId) {
 function closeMailModal() {
     mailModal.style.display = "none";
 }
+
+function updateStickyPositions() {
+    const table = document.getElementById('resizableTable');
+
+    if (!table) return;
+
+    const th0 = table.querySelector('th.sticky-col-0');
+    const th1 = table.querySelector('th.sticky-col-1');
+
+    if (!th0 || !th1) return;
+
+    const width0 = th0.offsetWidth;
+    const width1 = th1.offsetWidth;
+
+    const col0 = table.querySelectorAll('.sticky-col-0');
+    const col1 = table.querySelectorAll('.sticky-col-1');
+    const col2 = table.querySelectorAll('.sticky-col-2');
+
+    col0.forEach(el => el.style.left = "0px");
+    col1.forEach(el => el.style.left = width0 + "px");
+    col2.forEach(el => el.style.left = (width0 + width1) + "px");
+}
+
+document.addEventListener("DOMContentLoaded", updateStickyPositions);
+window.addEventListener("resize", updateStickyPositions);
+document.addEventListener("mouseup", updateStickyPositions);
 </script>
 @endsection
