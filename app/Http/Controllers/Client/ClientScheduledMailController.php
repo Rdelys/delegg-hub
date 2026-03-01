@@ -5,19 +5,27 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ClientScheduledMail;
+use App\Models\ClientSmtp;
 
 class ClientScheduledMailController extends Controller
 {
     public function index()
-    {
-        $clientId = session('client.id');
+{
+    $clientId = session('client.id');
 
-        $mails = ClientScheduledMail::where('client_id', $clientId)
-            ->latest()
-            ->get();
+    $mails = ClientScheduledMail::where('client_id', $clientId)
+        ->latest()
+        ->get();
 
-        return view('client.mails.programmes', compact('mails'));
-    }
+    $smtp = ClientSmtp::where('client_id', $clientId)->first();
+
+    return view('client.mails.programmes', [
+        'mails' => $mails,
+        'serverTimezone' => config('app.timezone'),
+        'serverNow' => now(),
+        'smtp' => $smtp,
+    ]);
+}
 
     public function store(Request $request)
     {
