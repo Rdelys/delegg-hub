@@ -553,6 +553,18 @@
         outline: 2px solid var(--primary);
         outline-offset: 2px;
     }
+
+    .btn-disabled {
+    background: linear-gradient(135deg, #9ca3af, #6b7280) !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    opacity: 0.7;
+}
+
+.btn-disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
 </style>
 
 <div class="mail-container">
@@ -569,6 +581,33 @@
             <strong>{{ $serverTimezone }}</strong>
             (actuellement {{ $serverNow->format('d/m/Y H:i') }})
         </p>
+        @if(!$smtp)
+    <div class="status-badge" style="background:#fee2e2;color:#991b1b;border:1px solid #fecaca;margin-bottom:1.5rem;">
+        <i class="fas fa-times-circle"></i>
+        SMTP non configuré
+    </div>
+
+@elseif($smtp->last_test_success === true)
+    <div class="status-badge status-sent" style="margin-bottom:1.5rem;">
+        <i class="fas fa-check-circle"></i>
+        SMTP configuré et fonctionnel
+        @if($smtp->last_tested_at)
+            (testé le {{ $smtp->last_tested_at->format('d/m/Y H:i') }})
+        @endif
+    </div>
+
+@elseif($smtp->last_test_success === false)
+    <div class="status-badge" style="background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;margin-bottom:1.5rem;">
+        <i class="fas fa-exclamation-triangle"></i>
+        SMTP configuré mais test échoué
+    </div>
+
+@else
+    <div class="status-badge status-pending" style="margin-bottom:1.5rem;">
+        <i class="fas fa-clock"></i>
+        SMTP configuré mais non testé
+    </div>
+@endif
         <form method="POST" action="{{ route('client.mails.programmes.store') }}">
             @csrf
 
@@ -622,11 +661,21 @@
                 </div>
 
                 <div class="form-group" style="display: flex; align-items: flex-end;">
-                    <button type="submit" class="btn-premium btn-primary-premium">
-                        <i class="fas fa-calendar-check"></i>
+                <button type="submit"
+                class="btn-premium btn-primary-premium {{ (!$smtp || $smtp->last_test_success !== true) ? 'btn-disabled' : '' }}"
+                {{ (!$smtp || $smtp->last_test_success !== true) ? 'disabled' : '' }}>                        <i class="fas fa-calendar-check"></i>
                         Programmer l'envoi
                     </button>
                 </div>
+                @if(!$smtp || $smtp->last_test_success !== true)
+    <small class="text-muted-premium" style="color: var(--danger); margin-top: 0.5rem;">
+        <i class="fas fa-exclamation-circle"></i>
+        Vous devez configurer et tester votre SMTP avant de programmer un email.
+        <a href="{{ url('/mails/envoyes') }}" style="color: blue; text-decoration: underline; margin-left: 5px;">
+            Programmer SMTP
+        </a>
+    </small>
+@endif
             </div>
         </form>
     </div>
