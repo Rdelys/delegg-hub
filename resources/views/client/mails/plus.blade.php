@@ -785,14 +785,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ========================
-    // CLICK SUR LEAD
-    // ========================
-    leadItems.forEach(item => {
-        item.onclick = function () {
-            const email = this.dataset.email;
-            addEmail(email);
-        };
-    });
+// CLICK SUR LEAD (SUPPORT MULTI EMAIL)
+// ========================
+leadItems.forEach(item => {
+
+    item.onclick = function () {
+
+        let rawEmails = this.dataset.email;
+
+        if (!rawEmails) return;
+
+        // Séparer par virgule
+        let parts = rawEmails.split(",");
+
+        parts.forEach(email => {
+
+            email = email.trim();
+
+            if (email !== "") {
+                addEmail(email);
+            }
+        });
+
+        // Cacher visuellement le lead
+        this.style.display = "none";
+    };
+});
 
     // ========================
     // RECHERCHE LIVE
