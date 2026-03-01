@@ -9,7 +9,7 @@ use App\Services\ClientImapService;
 
 class ClientImapController extends Controller
 {
-   public function index()
+ public function index(Request $request)
 {
     $clientId = session('client.id');
     $imap = ClientImap::where('client_id', $clientId)->first();
@@ -18,9 +18,9 @@ class ClientImapController extends Controller
     $stats = [
         'unread' => 0,
         'total' => 0,
-        'attachments' => 0,
-        'week' => 0,
     ];
+
+    $perPage = 10;
 
     if ($imap && $imap->last_test_success) {
         try {
@@ -28,34 +28,16 @@ class ClientImapController extends Controller
             $client = ClientImapService::connect($imap);
             $folder = $client->getFolder($imap->folder);
 
+            // 🔥 On récupère uniquement les messages
             $messages = $folder->messages()
-                ->all()
-                ->limit(20)
+                ->unseen()
                 ->setFetchOrder("desc")
+                ->limit($perPage)
                 ->get();
 
-            $stats['total'] = $folder->messages()->count();
-            $stats['unread'] = $folder->messages()->unseen()->count();
-
-            $stats['attachments'] = $messages
-                ->filter(fn($m) => $m->getAttachments()->count() > 0)
-                ->count();
-
-            $stats['week'] = $messages
-                ->filter(function ($m) {
-                    if (!$m->getDate()) return false;
-
-                    $date = \Carbon\Carbon::parse(
-                        $m->getDate()->toDateTime()
-                    );
-
-                    return $date->greaterThan(now()->subWeek());
-                })
-                ->count();
-
-            $imap->update([
-                'last_sync_at' => now()
-            ]);
+            // 🔥 On calcule les stats à partir des messages chargés
+            $stats['unread'] = $messages->count();
+            $stats['total'] = $stats['unread'];
 
         } catch (\Exception $e) {
             logger()->error($e->getMessage());
@@ -64,6 +46,7 @@ class ClientImapController extends Controller
 
     return view('client.mails.recus', compact('imap','messages','stats'));
 }
+
     public function save(Request $request)
     {
         $clientId = session('client.id');

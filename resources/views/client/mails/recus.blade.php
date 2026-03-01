@@ -862,6 +862,37 @@
 .mt-4 {
     margin-top: 1.5rem;
 }
+
+.mail-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.mail-modal-content {
+    background: white;
+    width: 80%;
+    max-width: 900px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.mail-modal-header {
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom:15px;
+}
+
+.mail-modal-body {
+    margin-top:15px;
+}
 </style>
 
 <div class="mail-container">
@@ -1204,12 +1235,13 @@
     <div class="email-list">
 
         @forelse($messages as $message)
-<div class="email-item 
-    {{ collect($message->getFlags())->contains(function($flag){
-        return strtolower($flag) === '\\seen';
-    }) ? '' : 'unread' }}">
-     
-    <div class="email-sender">
+        <div class="email-item"
+     data-subject="{{ e($message->getSubject()) }}"
+     data-from="{{ e($message->getFrom()[0]->mail ?? '') }}"
+     data-date="{{ $message->getDate() && $message->getDate()->first() ? \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') : '' }}"
+data-body="{{ e(Str::limit(strip_tags($message->getTextBody()), 500)) }}"     onclick="openMailModal(this)">
+            
+        <div class="email-sender">
                     <i class="fas fa-user-circle"></i>
                     {{ $message->getFrom()[0]->mail ?? 'Inconnu' }}
                 </div>
@@ -1233,11 +1265,11 @@
 
                 <div class="email-date">
                     <i class="fas fa-calendar"></i>
-@if($message->getDate() && $message->getDate()->first())
-    {{ \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') }}
-@else
-    --
-@endif  </div>
+            @if($message->getDate() && $message->getDate()->first())
+                {{ \Carbon\Carbon::parse($message->getDate()->first())->format('d/m/Y H:i') }}
+            @else
+                --
+            @endif  </div>
 
             </div>
         @empty
@@ -1247,7 +1279,11 @@
         @endforelse
 
     </div>
-
+@if($messages instanceof \Illuminate\Pagination\LengthAwarePaginator)
+    <div class="pagination-wrapper">
+        {{ $messages->links() }}
+    </div>
+@endif
     {{-- ================= CONFIG ACTIVE ================= --}}
     @if($imap && $imap->last_test_success)
         <div class="alert alert-success mt-4">
@@ -1262,5 +1298,42 @@
 
 </div>
 </div>
+<!-- ================= MODAL MAIL ================= -->
+<div id="mailModal" class="mail-modal">
+    <div class="mail-modal-content">
+        <div class="mail-modal-header">
+            <h3 id="modalSubject"></h3>
+            <button onclick="closeMailModal()">✕</button>
+        </div>
 
+        <div class="mail-modal-meta">
+            <p><strong>De :</strong> <span id="modalFrom"></span></p>
+            <p><strong>Date :</strong> <span id="modalDate"></span></p>
+        </div>
+
+        <div class="mail-modal-body" id="modalBody"></div>
+    </div>
+</div>
+<script>
+function openMailModal(element) {
+
+    document.getElementById('modalSubject').innerText =
+        element.dataset.subject;
+
+    document.getElementById('modalFrom').innerText =
+        element.dataset.from;
+
+    document.getElementById('modalDate').innerText =
+        element.dataset.date;
+
+    document.getElementById('modalBody').innerHTML =
+        element.dataset.body;
+
+    document.getElementById('mailModal').style.display = 'flex';
+}
+
+function closeMailModal() {
+    document.getElementById('mailModal').style.display = 'none';
+}
+</script>
 @endsection
