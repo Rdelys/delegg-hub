@@ -246,10 +246,13 @@ Route::get('/crm/leads/{lead}/export', [LeadController::class, 'exportSingleExce
     [GoogleScraperController::class, 'exportToLead'])
     ->name('client.google.export.lead.single');
 
-Route::post('/google/export-to-lead-by-scrapping', 
-    [GoogleScraperController::class, 'exportByScrapping'])
-    ->name('client.google.export.lead.scrapping');
+Route::post('/google/export-to-lead-by-scrapping-with-mails',
+    [GoogleScraperController::class, 'exportByScrappingWithMails'])
+    ->name('client.google.export.lead.scrapping.with-mails');
 
+Route::post('/google/export-to-lead-by-scrapping-without-mails',
+    [GoogleScraperController::class, 'exportByScrappingWithoutMails'])
+    ->name('client.google.export.lead.scrapping.without-mails');
 // MAILS
 Route::get('/mails/envoyes', [ClientMailController::class,'index'])
     ->name('client.mails.envoyes');
