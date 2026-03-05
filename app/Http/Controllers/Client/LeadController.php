@@ -9,6 +9,7 @@ use App\Models\Client;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class LeadController extends Controller
 {
@@ -86,6 +87,16 @@ class LeadController extends Controller
         $rdvPrisCount = (clone $query)->where('status', 'RDV pris')->count();
         $clotureCount = (clone $query)->where('status', 'Clôturé')->count();
 
+                /* ================= RÉCUPÉRER LES NOMS DE SCRAPPING UNIQUES ================= */
+        $scrappingNames = Lead::whereIn('client_id', $clientIds)
+            ->whereNotNull('nom_global')
+            ->where('nom_global', '!=', '')
+            ->distinct()
+            ->orderBy('nom_global')
+            ->pluck('nom_global')
+            ->toArray();
+
+
         /* ================= PAGINATION ================= */
 
         $leads = $query->latest()->paginate(20)->withQueryString();
@@ -95,7 +106,8 @@ class LeadController extends Controller
             'totalLeads',
             'relanceCount',
             'rdvPrisCount',
-            'clotureCount'
+            'clotureCount',
+            'scrappingNames'
         ));
     }
 
@@ -505,5 +517,59 @@ public function exportSingleExcel(Lead $lead)
         $writer->save('php://output');
     }, $fileName);
 }
+public function generateMails(Lead $lead)
+{
+    $clientIds = $this->getAccessibleClientIds();
 
+    if (!in_array($lead->client_id, $clientIds)) {
+        abort(403);
+    }
+
+    $prompt = "
+Tu es un expert en prospection commerciale B2B.
+
+Voici les informations du prospect :
+
+Entreprise : {$lead->entreprise}
+Prénom : {$lead->prenom_nom}
+Nom : {$lead->nom}
+Fonction : {$lead->fonction}
+Catégorie : {$lead->categorie}
+Chaleur : {$lead->chaleur}
+Commentaire interne : {$lead->commentaire}
+
+Génère 5 emails de prospection différents.
+Chaque email doit :
+- Être professionnel
+- Être personnalisé
+- Être court (max 150 mots)
+- Avoir un objet
+- Avoir un ton persuasif
+
+Format attendu :
+
+Email 1:
+Objet:
+Contenu:
+
+Email 2:
+Objet:
+Contenu:
+
+etc.
+";
+
+    $response = OpenAI::chat()->create([
+        'model' => 'gpt-4o-mini',
+        'messages' => [
+            ['role' => 'system', 'content' => 'Tu es un expert en copywriting B2B.'],
+            ['role' => 'user', 'content' => $prompt],
+        ],
+        'temperature' => 0.9,
+    ]);
+
+    return response()->json([
+        'content' => $response->choices[0]->message->content
+    ]);
+}
 }
