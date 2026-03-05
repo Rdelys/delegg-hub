@@ -1176,7 +1176,6 @@
         padding: 16px 12px;
         border-bottom: 1px solid #e2e8f0;
         color: #334155;
-        white-space: nowrap;
         vertical-align: middle;
         transition: background 0.2s;
     }
@@ -1715,15 +1714,35 @@
 
 .leads-table th[data-index="37"],
 .leads-table td.actions {
-    min-width: 190px;
-    width: 190px;
-    white-space: nowrap;
+    min-width: 300px;
+    width: 300px;
 }
 
 .leads-table td.actions {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.leads-table td:nth-child(2),
+.leads-table td:nth-child(3) {
+    white-space: normal;
+    word-break: break-word;
+}
+/* Colonnes Entreprise + Prénom largeur fixe */
+
+.leads-table th:nth-child(2),
+.leads-table td:nth-child(2) {
+    width: 350px;
+    min-width: 350px;
+    max-width: 350px;
+}
+
+.leads-table th:nth-child(3),
+.leads-table td:nth-child(3) {
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
 }
 </style>
 <div id="mailModal" class="modal">
