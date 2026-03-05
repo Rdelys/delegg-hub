@@ -17,6 +17,7 @@ use App\Http\Controllers\Client\ClientMailController;
 use App\Http\Controllers\Client\ClientImapController;
 use App\Http\Controllers\Client\ClientScheduledMailController;
 use App\Http\Controllers\Client\MailMassController;
+use App\Http\Controllers\Client\PromptIaController;
 
 
 /*
@@ -264,10 +265,17 @@ Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::clas
 |--------------------------------------------------------------------------
 */
 
-Route::get('/prompt-ia', function () {
-    return view('client.prompt-ia');
-})->name('client.prompt-ia');
+Route::get('/prompt-ia', [PromptIaController::class,'index'])
+    ->name('client.prompt-ia');
 
+Route::post('/prompt-ia', [PromptIaController::class,'store'])
+->name('client.prompt-ia.store');
+
+Route::put('/prompt-ia/{id}', [PromptIaController::class,'update'])
+->name('client.prompt-ia.update');
+
+Route::delete('/prompt-ia/{id}', [PromptIaController::class,'destroy'])
+->name('client.prompt-ia.delete');
 
 /*
 |--------------------------------------------------------------------------
