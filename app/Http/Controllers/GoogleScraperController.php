@@ -434,7 +434,7 @@ if (empty($clientIds)) {
 }
 
 
-public function exportByScrapping(Request $request)
+public function exportByScrappingWithMails(Request $request)
 {
     $clientId = session('client.id');
 
@@ -444,11 +444,12 @@ public function exportByScrapping(Request $request)
 
     $places = GooglePlace::where('client_id', $clientId)
         ->where('nom_scrapping', $request->nom_scrapping)
+        ->whereNotNull('email')
         ->where('exported_to_lead', false)
         ->get();
 
     if ($places->isEmpty()) {
-        return back()->with('info', 'Aucune nouvelle donnée à exporter');
+        return back()->with('info', 'Aucun lead avec email');
     }
 
     foreach ($places as $place) {
@@ -468,22 +469,17 @@ public function exportByScrapping(Request $request)
 
         Lead::create([
             'client_id'      => $clientId,
-
             'nom_global'     => $place->nom_scrapping,
-
             'entreprise'     => $place->name,
             'categorie'      => $place->category,
             'adresse_postale'=> $place->address,
-
             'portable'       => $portable,
             'tel_fixe'       => $telFixe,
             'email'          => $place->email,
-
             'url_site'       => $place->website,
             'url_facebook'   => $place->facebook,
             'url_instagramm' => $place->instagram,
             'url_linkedin'   => $place->linkedin,
-
             'note'           => $place->rating,
             'avis'           => $place->reviews_count,
         ]);
@@ -494,6 +490,65 @@ public function exportByScrapping(Request $request)
         ]);
     }
 
-    return back()->with('success', $places->count().' leads exportés');
+    return back()->with('success', $places->count().' leads avec email exportés');
+}
+
+public function exportByScrappingWithoutMails(Request $request)
+{
+    $clientId = session('client.id');
+
+    $request->validate([
+        'nom_scrapping' => 'required|string'
+    ]);
+
+    $places = GooglePlace::where('client_id', $clientId)
+        ->where('nom_scrapping', $request->nom_scrapping)
+        ->whereNull('email')
+        ->where('exported_to_lead', false)
+        ->get();
+
+    if ($places->isEmpty()) {
+        return back()->with('info', 'Aucun lead sans email');
+    }
+
+    foreach ($places as $place) {
+
+        $phone = preg_replace('/\s+/', '', $place->phone);
+
+        $portable = null;
+        $telFixe  = null;
+
+        if ($phone) {
+            if (str_starts_with($phone, '06') || str_starts_with($phone, '07')) {
+                $portable = $phone;
+            } else {
+                $telFixe = $phone;
+            }
+        }
+
+        Lead::create([
+            'client_id'      => $clientId,
+            'nom_global'     => $place->nom_scrapping,
+            'entreprise'     => $place->name,
+            'categorie'      => $place->category,
+            'adresse_postale'=> $place->address,
+            'portable'       => $portable,
+            'tel_fixe'       => $telFixe,
+            'email'          => null,
+            'url_site'       => $place->website,
+            'url_facebook'   => $place->facebook,
+            'url_instagramm' => $place->instagram,
+            'url_linkedin'   => $place->linkedin,
+            'note'           => $place->rating,
+            'avis'           => $place->reviews_count,
+        ]);
+
+        $place->update([
+            'exported_to_lead' => true,
+            'exported_at'      => now(),
+        ]);
+    }
+
+    return back()->with('success', $places->count().' leads sans email exportés');
 }
 }
