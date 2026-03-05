@@ -13,6 +13,11 @@ use App\Http\Controllers\Client\ClientUserController;
 use App\Http\Controllers\WebScraperController;
 use App\Http\Controllers\GoogleScraperController;
 use App\Http\Controllers\Client\LeadController;
+use App\Http\Controllers\Client\ClientMailController;
+use App\Http\Controllers\Client\ClientImapController;
+use App\Http\Controllers\Client\ClientScheduledMailController;
+use App\Http\Controllers\Client\MailMassController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -93,6 +98,57 @@ Route::post('/web/scrape', [WebScraperController::class, 'scrape'])
         
     Route::post('/logout', [ClientAuthController::class, 'logout'])
         ->name('client.logout');
+
+    Route::get('/mails/envoyes', [ClientMailController::class,'index'])
+    ->name('client.mails.envoyes');
+
+Route::post('/mails/smtp/save', [ClientMailController::class,'saveSmtp'])
+    ->name('client.mails.smtp.save');
+
+Route::post('/mails/smtp/test', [ClientMailController::class,'testSmtp'])
+    ->name('client.mails.smtp.test');
+
+Route::post('/mails/send', [ClientMailController::class,'send'])
+    ->name('client.mails.send');
+    Route::get('/mails/recus', [ClientImapController::class,'index'])
+    ->name('client.mails.recus');
+
+Route::post('/mails/imap/save', [ClientImapController::class,'save'])
+    ->name('client.mails.imap.save');
+
+Route::post('/mails/imap/test', [ClientImapController::class,'test'])
+    ->name('client.mails.imap.test');
+
+    Route::post('/mails/imap/sync', [ClientImapController::class,'sync'])
+    ->name('client.mails.imap.sync');
+
+    Route::post('/crm/leads/{lead}/generate-mails', 
+    [\App\Http\Controllers\Client\LeadController::class, 'generateMails']
+)->name('client.crm.leads.generate-mails');
+
+Route::prefix('mails')
+    ->name('client.mails.')
+    ->group(function () {
+
+        Route::get('/programmes', [ClientScheduledMailController::class,'index'])
+            ->name('programmes');
+
+        Route::post('/programmes', [ClientScheduledMailController::class,'store'])
+            ->name('programmes.store');
+
+        Route::delete('/programmes/{id}', [ClientScheduledMailController::class,'destroy'])
+            ->name('programmes.delete');
+});
+
+Route::get('/client/mails/plus', function () {
+    return view('client.mails.plus');
+})->name('client.mails.plus');
+
+Route::get('/client/mails/plus', [MailMassController::class, 'index'])
+    ->name('client.mails.plus');
+
+Route::post('/client/mails/plus', [MailMassController::class, 'send'])
+    ->name('client.mails.plus.send');
 });
 
 /*
@@ -167,7 +223,6 @@ Route::middleware('admin')->prefix('admin')->group(function () {
 });
 
 // CRM
-Route::get('/crm/dashboard', fn () => view('client.crm.dashboard'))->name('client.crm.dashboard');
 Route::get('/crm/leads', [LeadController::class, 'index'])
     ->name('client.crm.leads');
 
@@ -195,9 +250,10 @@ Route::post('/google/export-to-lead-by-scrapping',
     ->name('client.google.export.lead.scrapping');
 
 // MAILS
-Route::get('/mails/programmes', fn () => view('client.mails.programmes'))->name('client.mails.programmes');
-Route::get('/mails/envoyes', fn () => view('client.mails.envoyes'))->name('client.mails.envoyes');
-Route::get('/mails/recus', fn () => view('client.mails.recus'))->name('client.mails.recus');
+Route::get('/mails/envoyes', [ClientMailController::class,'index'])
+    ->name('client.mails.envoyes');
+    
 
 // routes/web.php
-
+Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])
+    ->name('client.crm.dashboard');
