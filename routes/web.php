@@ -17,6 +17,7 @@ use App\Http\Controllers\Client\ClientMailController;
 use App\Http\Controllers\Client\ClientImapController;
 use App\Http\Controllers\Client\ClientScheduledMailController;
 use App\Http\Controllers\Client\MailMassController;
+use App\Http\Controllers\Client\PromptIaController;
 
 
 /*
@@ -257,3 +258,35 @@ Route::get('/mails/envoyes', [ClientMailController::class,'index'])
 // routes/web.php
 Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])
     ->name('client.crm.dashboard');
+
+    /*
+|--------------------------------------------------------------------------
+| PROMPT IA
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/prompt-ia', [PromptIaController::class,'index'])
+    ->name('client.prompt-ia');
+
+Route::post('/prompt-ia', [PromptIaController::class,'store'])
+->name('client.prompt-ia.store');
+
+Route::put('/prompt-ia/{id}', [PromptIaController::class,'update'])
+->name('client.prompt-ia.update');
+
+Route::delete('/prompt-ia/{id}', [PromptIaController::class,'destroy'])
+->name('client.prompt-ia.delete');
+
+/*
+|--------------------------------------------------------------------------
+| COMMUNICATION
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/communication/whatsapp', function () {
+    return view('client.communication.whatsapp');
+})->name('client.communication.whatsapp');
+
+Route::get('/communication/sms', function () {
+    return view('client.communication.sms');
+})->name('client.communication.sms');

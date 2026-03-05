@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use OpenAI\Laravel\Facades\OpenAI;
+use App\Models\PromptIa;
 
 class LeadController extends Controller
 {
@@ -517,6 +518,8 @@ public function exportSingleExcel(Lead $lead)
         $writer->save('php://output');
     }, $fileName);
 }
+
+
 public function generateMails(Lead $lead)
 {
     $clientIds = $this->getAccessibleClientIds();
@@ -525,10 +528,41 @@ public function generateMails(Lead $lead)
         abort(403);
     }
 
-    $prompt = "
-Tu es un expert en prospection commerciale B2B.
+    /*
+    |--------------------------------------------------------------------------
+    | RÉCUPÉRER LE PROMPT SELON LE GROUPE
+    |--------------------------------------------------------------------------
+    */
 
-Voici les informations du prospect :
+    $promptModel = PromptIa::where('nom_groupe', $lead->nom_global)->first();
+
+    if (!$promptModel) {
+        return response()->json([
+            'content' => "Aucun prompt IA configuré pour ce groupe."
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROMPT UTILISATEUR
+    |--------------------------------------------------------------------------
+    */
+
+    $basePrompt = $promptModel->prompt;
+
+    /*
+    |--------------------------------------------------------------------------
+    | INJECTER LES VARIABLES ENTREPRISE
+    |--------------------------------------------------------------------------
+    */
+
+    $prompt = $basePrompt . "
+
+L'entreprise qui envoie les emails est : DELEGG.
+
+DELEGG contacte un prospect pour proposer ses services.
+
+Informations du prospect :
 
 Entreprise : {$lead->entreprise}
 Prénom : {$lead->prenom_nom}
@@ -538,32 +572,55 @@ Catégorie : {$lead->categorie}
 Chaleur : {$lead->chaleur}
 Commentaire interne : {$lead->commentaire}
 
-Génère 5 emails de prospection différents.
+Génère 5 emails de prospection différents envoyés par DELEGG à ce prospect.
+
 Chaque email doit :
-- Être professionnel
-- Être personnalisé
-- Être court (max 150 mots)
-- Avoir un objet
-- Avoir un ton persuasif
+- être professionnel
+- être personnalisé selon l'entreprise du prospect
+- faire maximum 150 mots
+- contenir un objet
+- avoir un ton persuasif
+- proposer une prise de contact ou un rendez-vous
 
 Format attendu :
 
-Email 1:
+Email 1
 Objet:
 Contenu:
 
-Email 2:
+Email 2
 Objet:
 Contenu:
 
-etc.
+Email 3
+Objet:
+Contenu:
+
+Email 4
+Objet:
+Contenu:
+
+Email 5
+Objet:
+Contenu:
 ";
+    /*
+    |--------------------------------------------------------------------------
+    | OPENAI
+    |--------------------------------------------------------------------------
+    */
 
     $response = OpenAI::chat()->create([
         'model' => 'gpt-4o-mini',
         'messages' => [
-            ['role' => 'system', 'content' => 'Tu es un expert en copywriting B2B.'],
-            ['role' => 'user', 'content' => $prompt],
+            [
+                'role' => 'system',
+                'content' => 'Tu es un expert en copywriting B2B.'
+            ],
+            [
+                'role' => 'user',
+                'content' => $prompt
+            ],
         ],
         'temperature' => 0.9,
     ]);
