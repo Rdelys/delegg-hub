@@ -257,3 +257,28 @@ Route::get('/mails/envoyes', [ClientMailController::class,'index'])
 // routes/web.php
 Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])
     ->name('client.crm.dashboard');
+
+    /*
+|--------------------------------------------------------------------------
+| PROMPT IA
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/prompt-ia', function () {
+    return view('client.prompt-ia');
+})->name('client.prompt-ia');
+
+
+/*
+|--------------------------------------------------------------------------
+| COMMUNICATION
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/communication/whatsapp', function () {
+    return view('client.communication.whatsapp');
+})->name('client.communication.whatsapp');
+
+Route::get('/communication/sms', function () {
+    return view('client.communication.sms');
+})->name('client.communication.sms');

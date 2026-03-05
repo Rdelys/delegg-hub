@@ -1158,6 +1158,32 @@
                 </ul>
             </li>
 
+            <!-- PROMPT IA -->
+            <li>
+                <a href="{{ route('client.prompt-ia') }}">
+                    <i class="fa-solid fa-brain"></i> Prompt IA
+                </a>
+            </li>
+
+            <!-- COMMUNICATION -->
+            <li>
+                <a href="#" class="menu-toggle" data-target="communication-submenu">
+                    <i class="fa-solid fa-comments"></i> Communication
+                </a>
+                <ul class="submenu" id="communication-submenu">
+                    <li>
+                        <a href="{{ route('client.communication.whatsapp') }}">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('client.communication.sms') }}">
+                            <i class="fa-solid fa-message"></i> SMS
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
             <!-- PARAMETRES -->
             <li>
                 <a href="#" class="menu-toggle" data-target="params-submenu">
