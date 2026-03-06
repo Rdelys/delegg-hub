@@ -19,6 +19,7 @@ use App\Http\Controllers\Client\ClientScheduledMailController;
 use App\Http\Controllers\Client\MailMassController;
 use App\Http\Controllers\Client\PromptIaController;
 use App\Http\Controllers\WhatsAppController;
+use App\Http\Controllers\SmsController;
 
 
 /*
@@ -296,3 +297,4 @@ Route::get('/communication/sms', function () {
 })->name('client.communication.sms');
 
 Route::post('/send-whatsapp', [WhatsAppController::class, 'send'])->name('send.whatsapp');
+Route::post('/send-sms', [SmsController::class, 'send'])->name('send.sms');
