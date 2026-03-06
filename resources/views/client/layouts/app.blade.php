@@ -1166,23 +1166,56 @@
             </li>
 
             <!-- COMMUNICATION -->
-            <li>
-                <a href="#" class="menu-toggle" data-target="communication-submenu">
-                    <i class="fa-solid fa-comments"></i> Communication
-                </a>
-                <ul class="submenu" id="communication-submenu">
-                    <li>
-                        <a href="{{ route('client.communication.whatsapp') }}">
-                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('client.communication.sms') }}">
-                            <i class="fa-solid fa-message"></i> SMS
-                        </a>
-                    </li>
-                </ul>
-            </li>
+            <li class="disabled-communication">
+    <a href="#" class="menu-toggle" data-target="communication-submenu">
+        <i class="fa-solid fa-comments"></i> Communication
+    </a>
+
+    <ul class="submenu" id="communication-submenu">
+        <li>
+            <a href="{{ route('client.communication.whatsapp') }}">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('client.communication.sms') }}">
+                <i class="fa-solid fa-message"></i> SMS
+            </a>
+        </li>
+    </ul>
+</li>
+
+<style>
+.disabled-communication {
+    position: relative;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Bloquer tous les clics */
+.disabled-communication a {
+    pointer-events: none;
+}
+
+/* cacher le submenu */
+#communication-submenu {
+    display: none !important;
+}
+
+/* Tooltip */
+.disabled-communication:hover::after {
+    content: "En cours de développement";
+    position: absolute;
+    left: 60px;
+    top: 0;
+    background: #333;
+    color: #fff;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+</style>
 
             <!-- PARAMETRES -->
             <li>
