@@ -629,4 +629,45 @@ Contenu:
         'content' => $response->choices[0]->message->content
     ]);
 }
+
+public function inlineUpdate(Request $request, Lead $lead)
+{
+    $clientIds = $this->getAccessibleClientIds();
+
+    if (!in_array($lead->client_id, $clientIds)) {
+        return response()->json(['success' => false, 'message' => 'Non autorisé'], 403);
+    }
+
+    $field = $request->input('field');
+    $value = $request->input('value');
+
+    // Valider le champ
+    $allowedFields = [
+        'entreprise', 'prenom_nom', 'nom', 'adresse_postale', 'commentaire',
+        'chaleur', 'status', 'url_linkedin', 'url_facebook', 'url_instagramm',
+        'appel_tel', 'mp_instagram', 'linkedin_status', 'messenger', 
+        'message_form', 'categorie', 'status_relance', 'date_statut',
+        'enfants_percent', 'devis', 'follow_insta', 'com_instagram',
+        'formulaire_site', 'fonction', 'email', 'email_gerant', 'tel_fixe',
+        'portable', 'url_site', 'compte_insta', 'note', 'avis', 'nom_global',
+        'url_maps'
+    ];
+
+    if (!in_array($field, $allowedFields)) {
+        return response()->json(['success' => false, 'message' => 'Champ non autorisé'], 400);
+    }
+
+    // Traitement spécial pour les checkboxes
+    if ($value === 'Oui') $value = 1;
+    if ($value === 'Non') $value = 0;
+
+    try {
+        $lead->$field = $value;
+        $lead->save();
+
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+    }
+}
 }
