@@ -298,3 +298,4 @@ Route::get('/communication/sms', function () {
 
 Route::post('/send-whatsapp', [WhatsAppController::class, 'send'])->name('send.whatsapp');
 Route::post('/send-sms', [SmsController::class, 'send'])->name('send.sms');
+Route::post('/crm/leads/{lead}/inline-update', [LeadController::class, 'inlineUpdate'])->name('client.crm.leads.inline-update');
