@@ -421,7 +421,7 @@
                                 <span class="empty-value">-</span>
                             @endif
                         </td>
-                         <td class="url-cell" onclick="event.stopPropagation()">
+                        <td class="url-cell" onclick="event.stopPropagation()">
                             @if($lead->url_facebook)
                                 <a href="{{ $lead->url_facebook }}" target="_blank" class="url-link" data-url="{{ $lead->url_facebook }}">Voir</a>
                             @else 
@@ -443,7 +443,7 @@
                         <td><span class="badge">{{ $lead->message_form ?? '-' }}</span></td>
                         <td><span class="badge">{{ $lead->categorie ?? '-' }}</span></td>
                         <td><span class="badge status-relance">{{ $lead->status_relance ?? '-' }}</span></td>
-                        <td>
+                        <td class="date-cell">
                             {{ $lead->date_statut ? \Carbon\Carbon::parse($lead->date_statut)->format('d/m/Y') : '-' }}
                         </td>
                         <td><span class="badge badge-percent">{{ $lead->enfants_percent ?? '-' }}</span></td>
@@ -466,7 +466,7 @@
                                 <span class="empty-value">-</span>
                             @endif
                         </td>
-                        <td class="checkbox-cell">
+                        <td class="checkbox-cell" onclick="event.stopPropagation()">
                             <input type="checkbox" disabled {{ !$lead->url_site ? 'checked' : '' }}>
                         </td>
                         <td>{{ $lead->compte_insta ?? '-' }}</td>
@@ -481,21 +481,23 @@
                             @endif
                         </td>
                         <td class="actions" onclick="event.stopPropagation()">
-                            <button class="btn-icon" onclick='openEditModal(@json($lead))' title="Modifier">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon" onclick="openDeleteModal({{ $lead->id }})" title="Supprimer">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                            <button class="btn-icon" onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'" title="Exporter">
-                                <i class="fas fa-file-excel"></i>
-                            </button>
-                            <button class="btn-icon" onclick="openMailModal({{ $lead->id }})" title="Générer email IA">
-                                <i class="fas fa-robot"></i>
-                            </button>
-                            <button class="btn-icon" onclick='openEditModal(@json($lead))' title="Ouvrir dans le modal">
-                                <i class="fas fa-external-link-alt"></i>
-                            </button>
+                            <div class="actions-container">
+                                <button class="btn-icon" onclick='openEditModal(@json($lead))' title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon" onclick="openDeleteModal({{ $lead->id }})" title="Supprimer">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-icon" onclick="window.location='{{ route('client.crm.leads.export.single', $lead->id) }}'" title="Exporter">
+                                    <i class="fas fa-file-excel"></i>
+                                </button>
+                                <button class="btn-icon" onclick="openMailModal({{ $lead->id }})" title="Générer email IA">
+                                    <i class="fas fa-robot"></i>
+                                </button>
+                                <button class="btn-icon" onclick='openEditModal(@json($lead))' title="Ouvrir dans le modal">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -1257,24 +1259,30 @@ body {
 
 /* Actions */
 .actions {
+    padding: 8px !important;
+}
+
+.actions-container {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .btn-icon {
-    width: 34px;
-    height: 34px;
-    display: flex;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     background: white;
     border: 1px solid #e2e8f0;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 8px;
     color: #5f6b7a;
     transition: all 0.2s ease;
-    font-size: 14px;
+    font-size: 13px;
     flex-shrink: 0;
 }
 
@@ -1298,27 +1306,61 @@ body {
 
 .checkbox-cell {
     text-align: center;
+    vertical-align: middle;
+}
+
+.checkbox-cell input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: default;
+    accent-color: #3b82f6;
 }
 
 /* URL Links */
 .url-cell {
-    max-width: 150px;
+    max-width: 120px;
+    min-width: 80px;
+    text-align: center;
+    vertical-align: middle;
 }
 
-.url-cell a {
+.url-link {
     color: #2563eb;
     text-decoration: none;
     font-size: 12px;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-weight: 500;
+    display: inline-block;
+    padding: 4px 12px;
+    background: #eff6ff;
+    border-radius: 20px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid #bfdbfe;
     white-space: nowrap;
-    transition: color 0.2s;
 }
 
-.url-cell a:hover {
+.url-link:hover {
+    background: #dbeafe;
     color: #1d4ed8;
-    text-decoration: underline;
+    transform: translateY(-1px);
+    border-color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.empty-value {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 12px;
+    padding: 4px 8px;
+    background: #f8fafc;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Date cell */
+.date-cell {
+    text-align: center;
+    min-width: 90px;
 }
 
 /* Pagination */
@@ -1649,29 +1691,48 @@ body {
 
 .leads-table th[data-index="37"],
 .leads-table td.actions {
-    min-width: 200px;
-    width: 200px;
+    min-width: 180px;
+    width: auto;
 }
 
-.leads-table td.actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-
-/* Colonnes Entreprise + Prénom */
-.leads-table th:nth-child(2),
-.leads-table td:nth-child(2) {
-    min-width: 250px;
-    max-width: 350px;
-}
-
-.leads-table th:nth-child(3),
-.leads-table td:nth-child(3) {
-    min-width: 150px;
-    max-width: 200px;
-}
+/* Colonnes avec largeur automatique */
+.leads-table th[data-index="0"] { min-width: 40px; width: auto; }
+.leads-table th[data-index="1"] { min-width: 200px; width: auto; }
+.leads-table th[data-index="2"] { min-width: 120px; width: auto; }
+.leads-table th[data-index="3"] { min-width: 120px; width: auto; }
+.leads-table th[data-index="4"] { min-width: 150px; width: auto; }
+.leads-table th[data-index="5"] { min-width: 200px; width: auto; }
+.leads-table th[data-index="6"] { min-width: 80px; width: auto; }
+.leads-table th[data-index="7"], 
+.leads-table th[data-index="8"], 
+.leads-table th[data-index="9"],
+.leads-table th[data-index="30"],
+.leads-table th[data-index="36"] { min-width: 80px; width: auto; }
+.leads-table th[data-index="10"],
+.leads-table th[data-index="11"],
+.leads-table th[data-index="12"],
+.leads-table th[data-index="13"],
+.leads-table th[data-index="14"],
+.leads-table th[data-index="15"],
+.leads-table th[data-index="16"],
+.leads-table th[data-index="17"],
+.leads-table th[data-index="18"],
+.leads-table th[data-index="19"],
+.leads-table th[data-index="20"],
+.leads-table th[data-index="21"],
+.leads-table th[data-index="22"],
+.leads-table th[data-index="23"],
+.leads-table th[data-index="24"] { min-width: 100px; width: auto; }
+.leads-table th[data-index="25"],
+.leads-table th[data-index="26"],
+.leads-table th[data-index="27"],
+.leads-table th[data-index="28"],
+.leads-table th[data-index="29"],
+.leads-table th[data-index="31"],
+.leads-table th[data-index="32"],
+.leads-table th[data-index="33"],
+.leads-table th[data-index="34"],
+.leads-table th[data-index="35"] { min-width: 100px; width: auto; }
 
 /* =========================================
    INLINE EDIT STYLES
@@ -1718,6 +1779,50 @@ body {
 .inline-textarea {
     resize: vertical;
     min-height: 60px;
+}
+
+/* Style amélioré pour l'édition d'URL */
+.url-edit {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #3b82f6;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    background: white;
+    font-family: 'Inter', sans-serif;
+}
+
+.url-edit:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    border-color: #2563eb;
+}
+
+.url-edit::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Tooltip pour montrer l'URL complète au survol */
+.url-cell {
+    position: relative;
+}
+
+.url-cell:hover .url-link::after {
+    content: attr(data-url);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: #1e293b;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1px solid #334155;
 }
 
 /* Notification */
@@ -1899,104 +2004,6 @@ input:checked + .toggle-slider:before {
         flex-wrap: wrap;
         justify-content: center;
     }
-}
-
-/* Style amélioré pour l'édition d'URL */
-.url-edit {
-    width: 100%;
-    padding: 8px 12px;
-    border: 2px solid #3b82f6;
-    border-radius: 6px;
-    font-size: 12px;
-    outline: none;
-    background: white;
-    font-family: 'Inter', sans-serif;
-}
-
-.url-edit:focus {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    border-color: #2563eb;
-}
-
-.url-edit::placeholder {
-    color: #94a3b8;
-    font-style: italic;
-}
-
-/* Amélioration du lien Voir */
-.url-link {
-    color: #2563eb;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 500;
-    display: inline-block;
-    padding: 4px 12px;
-    background: #eff6ff;
-    border-radius: 20px;
-    transition: all 0.2s;
-    cursor: pointer;
-    border: 1px solid #bfdbfe;
-}
-
-.url-link:hover {
-    background: #dbeafe;
-    color: #1d4ed8;
-    transform: translateY(-1px);
-    border-color: #3b82f6;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.empty-value {
-    color: #94a3b8;
-    font-style: italic;
-    font-size: 12px;
-    padding: 4px 8px;
-    background: #f8fafc;
-    border-radius: 4px;
-}
-
-/* Tooltip pour montrer l'URL complète au survol */
-.url-cell {
-    position: relative;
-}
-
-.url-cell:hover .url-link::after {
-    content: attr(data-url);
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    background: #1e293b;
-    color: white;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    white-space: nowrap;
-    z-index: 1000;
-    margin-bottom: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border: 1px solid #334155;
-}
-
-.url-cell:hover .url-link::before {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 20px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: #1e293b transparent transparent transparent;
-    z-index: 1000;
-    margin-bottom: -2px;
-}
-
-/* Indicateur visuel que la cellule est cliquable */
-.url-cell:not(.editing):hover {
-    background-color: #f0f9ff;
-    cursor: pointer;
-}
-
-.url-cell:not(.editing):hover .url-link {
-    background: #dbeafe;
 }
 </style>
 
@@ -2279,6 +2286,7 @@ document.addEventListener("mouseup", updateStickyPositions);
 const inlineEdit = {
     activeCell: null,
     originalValue: null,
+    originalHtml: null,
     inputTypes: {
         text: [1, 2, 3, 4, 5, 16, 25, 26, 27, 28, 29, 32, 33, 34, 35],
         select: [6, 10, 11, 12, 13, 14, 15, 17, 19, 20, 21, 23, 24],
@@ -2309,6 +2317,13 @@ document.addEventListener('DOMContentLoaded', function() {
     enableInlineEditing();
     addEditModeToggle();
     addCsrfMeta();
+    
+    // Gérer les clics sur les liens
+    document.querySelectorAll('.url-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
 });
 
 function enableInlineEditing() {
@@ -2352,44 +2367,45 @@ function startInlineEdit(cell) {
     }
     
     const columnIndex = cell.cellIndex;
-    const originalText = cell.innerText.trim();
     const row = cell.closest('tr');
     const leadId = row.getAttribute('data-lead-id');
     
     if (!leadId) return;
     
-    inlineEdit.activeCell = cell;
-    inlineEdit.originalValue = originalText;
+    // Sauvegarder le contenu original
+    inlineEdit.originalHtml = cell.innerHTML;
     
-    const input = createInputElement(columnIndex, originalText, leadId);
+    // Récupérer la valeur actuelle
+    let currentValue = '';
+    const link = cell.querySelector('.url-link');
+    const badge = cell.querySelector('.badge');
+    const checkbox = cell.querySelector('input[type="checkbox"]');
     
-    cell.innerHTML = '';
-    cell.appendChild(input);
-    cell.classList.add('editing');
-    
-    if (input.tagName === 'INPUT' || input.tagName === 'SELECT' || input.tagName === 'TEXTAREA') {
-        input.focus();
-        if (input.type === 'text' || input.type === 'url') {
-            input.select();
-        }
+    if (link) {
+        currentValue = link.getAttribute('data-url') || link.getAttribute('href');
+    } else if (badge) {
+        currentValue = badge.textContent.trim();
+    } else if (checkbox) {
+        currentValue = checkbox.checked ? 'Oui' : 'Non';
+    } else {
+        currentValue = cell.innerText.trim();
     }
     
-    setupInputEvents(input, cell, leadId, columnIndex);
-}
-
-function createInputElement(columnIndex, value, leadId) {
-    let input;
-    let cleanValue = value === '-' ? '' : value;
+    currentValue = currentValue === '-' ? '' : currentValue;
     
-    if (inlineEdit.inputTypes.checkbox.includes(columnIndex)) {
+    inlineEdit.activeCell = cell;
+    inlineEdit.originalValue = currentValue;
+    
+    // Créer l'élément d'édition
+    let input;
+    
+    if (inlineEdit.inputTypes.url.includes(columnIndex)) {
         input = document.createElement('input');
-        input.type = 'checkbox';
-        input.checked = value === 'Oui' || value === '1' || value === true;
-        input.style.transform = 'scale(1.5)';
-        input.style.margin = '0 auto';
-        input.style.display = 'block';
-    } 
-    else if (inlineEdit.inputTypes.select.includes(columnIndex)) {
+        input.type = 'url';
+        input.value = currentValue;
+        input.placeholder = 'https://...';
+        input.className = 'inline-input url-edit';
+    } else if (inlineEdit.inputTypes.select.includes(columnIndex)) {
         input = document.createElement('select');
         input.className = 'inline-select';
         
@@ -2404,47 +2420,45 @@ function createInputElement(columnIndex, value, leadId) {
             const option = document.createElement('option');
             option.value = optValue;
             option.textContent = optValue;
-            option.selected = (optValue === cleanValue);
+            option.selected = (optValue === currentValue);
             input.appendChild(option);
         });
-    }
-    else if (inlineEdit.inputTypes.date.includes(columnIndex)) {
+    } else if (inlineEdit.inputTypes.date.includes(columnIndex)) {
         input = document.createElement('input');
         input.type = 'date';
-        input.value = convertToDate(cleanValue);
+        input.value = convertToDate(currentValue);
         input.className = 'inline-input';
-    }
-    else if (inlineEdit.inputTypes.url.includes(columnIndex)) {
+    } else if (inlineEdit.inputTypes.checkbox.includes(columnIndex)) {
         input = document.createElement('input');
-        input.type = 'url';
-        input.value = cleanValue;
-        input.placeholder = 'https://...';
-        input.className = 'inline-input';
-    }
-    else if (columnIndex === 5) {
-        input = document.createElement('textarea');
-        input.value = cleanValue;
-        input.rows = 3;
-        input.className = 'inline-textarea';
-        input.style.width = '100%';
-        input.style.padding = '8px';
-    }
-    else {
+        input.type = 'checkbox';
+        input.checked = currentValue === 'Oui' || currentValue === '1';
+        input.style.transform = 'scale(1.5)';
+        input.style.margin = '0 auto';
+        input.style.display = 'block';
+    } else {
         input = document.createElement('input');
         input.type = 'text';
-        input.value = cleanValue;
+        input.value = currentValue;
         input.className = 'inline-input';
     }
     
     input.setAttribute('data-column', columnIndex);
     input.setAttribute('data-lead-id', leadId);
     
-    return input;
-}
-
-function setupInputEvents(input, cell, leadId, columnIndex) {
+    cell.innerHTML = '';
+    cell.appendChild(input);
+    cell.classList.add('editing');
+    
+    if (input.tagName === 'INPUT' || input.tagName === 'SELECT') {
+        input.focus();
+        if (input.type === 'text' || input.type === 'url') {
+            input.select();
+        }
+    }
+    
+    // Gestionnaires d'événements
     input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && input.tagName !== 'TEXTAREA') {
+        if (e.key === 'Enter') {
             e.preventDefault();
             saveInlineEdit(cell, leadId, columnIndex);
         }
@@ -2462,11 +2476,10 @@ function setupInputEvents(input, cell, leadId, columnIndex) {
     });
     
     input.addEventListener('click', e => e.stopPropagation());
-    input.addEventListener('dblclick', e => e.stopPropagation());
 }
 
 function saveInlineEdit(cell, leadId, columnIndex) {
-    const input = cell.querySelector('input, select, textarea');
+    const input = cell.querySelector('input, select');
     if (!input) return;
     
     let newValue;
@@ -2474,11 +2487,43 @@ function saveInlineEdit(cell, leadId, columnIndex) {
     if (input.type === 'checkbox') {
         newValue = input.checked ? 'Oui' : 'Non';
     } else {
-        newValue = input.value.trim() || '-';
+        newValue = input.value.trim();
     }
     
-    updateCellDisplay(cell, newValue, columnIndex);
-    saveToDatabase(leadId, getColumnName(columnIndex), newValue);
+    // Formater selon le type
+    if (inlineEdit.inputTypes.url.includes(columnIndex)) {
+        if (newValue && newValue !== '') {
+            if (!newValue.startsWith('http://') && !newValue.startsWith('https://')) {
+                newValue = 'https://' + newValue;
+            }
+            cell.innerHTML = `<a href="${newValue}" target="_blank" class="url-link" data-url="${newValue}" onclick="event.stopPropagation()">Voir</a>`;
+        } else {
+            cell.innerHTML = '<span class="empty-value">-</span>';
+        }
+    } else if (inlineEdit.inputTypes.select.includes(columnIndex)) {
+        const displayValue = newValue || '-';
+        const badgeClass = displayValue.toLowerCase().replace(/\s+/g, '-');
+        cell.innerHTML = `<span class="badge status-${badgeClass}" onclick="event.stopPropagation()">${displayValue}</span>`;
+    } else if (columnIndex === 22 || columnIndex === 31) {
+        const isChecked = newValue === 'Oui' || newValue === '1';
+        cell.innerHTML = `<input type="checkbox" disabled ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">`;
+    } else {
+        cell.innerHTML = newValue || '-';
+    }
+    
+    // Sauvegarder dans la base
+    const fieldName = getColumnName(columnIndex);
+    let valueToSave = newValue;
+    
+    if (inlineEdit.inputTypes.url.includes(columnIndex) && (!newValue || newValue === '')) {
+        valueToSave = '';
+    } else if (!newValue || newValue === '') {
+        valueToSave = '-';
+    }
+    
+    if (fieldName) {
+        saveToDatabase(leadId, fieldName, valueToSave);
+    }
     
     inlineEdit.activeCell = null;
 }
@@ -2487,26 +2532,9 @@ function cancelInlineEdit() {
     if (!inlineEdit.activeCell) return;
     
     const cell = inlineEdit.activeCell;
-    cell.innerHTML = inlineEdit.originalValue;
+    cell.innerHTML = inlineEdit.originalHtml;
     cell.classList.remove('editing');
     inlineEdit.activeCell = null;
-}
-
-function updateCellDisplay(cell, value, columnIndex) {
-    if (inlineEdit.inputTypes.select.includes(columnIndex)) {
-        const badgeClass = value.toLowerCase().replace(/\s+/g, '-');
-        cell.innerHTML = `<span class="badge status-${badgeClass}">${value}</span>`;
-    }
-    else if (inlineEdit.inputTypes.url.includes(columnIndex) && value !== '-') {
-        cell.innerHTML = `<a href="${value}" target="_blank" onclick="event.stopPropagation()">Voir</a>`;
-    }
-    else if (columnIndex === 22 || columnIndex === 31) {
-        const isChecked = value === 'Oui' || value === '1' || value === true;
-        cell.innerHTML = `<input type="checkbox" disabled ${isChecked ? 'checked' : ''}>`;
-    }
-    else {
-        cell.innerHTML = value;
-    }
 }
 
 function saveToDatabase(leadId, fieldName, value) {
@@ -2655,187 +2683,6 @@ function addCsrfMeta() {
         meta.content = '{{ csrf_token() }}';
         document.head.appendChild(meta);
     }
-}
-/*
-|--------------------------------------------------------------------------
-| GESTION AMÉLIORÉE DES LIENS
-|--------------------------------------------------------------------------
-*/
-document.addEventListener('DOMContentLoaded', function() {
-    // Gérer les clics sur les liens "Voir"
-    document.querySelectorAll('.url-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.stopPropagation(); // Empêcher la propagation vers la cellule
-        });
-    });
-});
-
-// Surcharger la fonction startInlineEdit pour gérer correctement les URLs
-function startInlineEdit(cell) {
-    if (inlineEdit.activeCell === cell) return;
-    
-    if (inlineEdit.activeCell) {
-        cancelInlineEdit();
-    }
-    
-    const columnIndex = cell.cellIndex;
-    const row = cell.closest('tr');
-    const leadId = row.getAttribute('data-lead-id');
-    
-    if (!leadId) return;
-    
-    // Récupérer la valeur actuelle correctement
-    let currentValue = '';
-    const link = cell.querySelector('.url-link');
-    
-    if (link) {
-        // Si c'est un lien, on récupère l'URL depuis l'attribut href ou data-url
-        currentValue = link.getAttribute('data-url') || link.getAttribute('href');
-    } else {
-        // Si c'est un tiret ou du texte, on récupère le texte
-        const text = cell.innerText.trim();
-        currentValue = text === '-' ? '' : text;
-    }
-    
-    inlineEdit.activeCell = cell;
-    inlineEdit.originalValue = currentValue || '-';
-    
-    // Créer l'élément d'édition approprié
-    let input;
-    
-    if (inlineEdit.inputTypes.url.includes(columnIndex)) {
-        // Pour les URLs, créer un input de type url
-        input = document.createElement('input');
-        input.type = 'url';
-        input.value = currentValue || '';
-        input.placeholder = 'https://...';
-        input.className = 'inline-input url-edit';
-    } else {
-        // Pour les autres types, utiliser la fonction existante
-        input = createInputElement(columnIndex, currentValue, leadId);
-    }
-    
-    input.setAttribute('data-column', columnIndex);
-    input.setAttribute('data-lead-id', leadId);
-    
-    // Vider la cellule et ajouter l'input
-    cell.innerHTML = '';
-    cell.appendChild(input);
-    cell.classList.add('editing');
-    
-    // Focus et sélection
-    if (input.tagName === 'INPUT' || input.tagName === 'SELECT' || input.tagName === 'TEXTAREA') {
-        input.focus();
-        if (input.type === 'text' || input.type === 'url') {
-            input.select();
-        }
-    }
-    
-    // Gestionnaires d'événements
-    setupInputEvents(input, cell, leadId, columnIndex);
-}
-
-// Surcharger setupInputEvents pour gérer la sauvegarde des URLs
-function setupInputEvents(input, cell, leadId, columnIndex) {
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && input.tagName !== 'TEXTAREA') {
-            e.preventDefault();
-            saveInlineEdit(cell, leadId, columnIndex);
-        }
-        if (e.key === 'Escape') {
-            cancelInlineEdit();
-        }
-    });
-    
-    input.addEventListener('blur', function() {
-        setTimeout(() => {
-            if (inlineEdit.activeCell === cell) {
-                saveInlineEdit(cell, leadId, columnIndex);
-            }
-        }, 200);
-    });
-    
-    input.addEventListener('click', e => e.stopPropagation());
-    input.addEventListener('dblclick', e => e.stopPropagation());
-}
-
-// Surcharger saveInlineEdit pour gérer les URLs correctement
-function saveInlineEdit(cell, leadId, columnIndex) {
-    const input = cell.querySelector('input, select, textarea');
-    if (!input) return;
-    
-    let newValue;
-    
-    if (input.type === 'checkbox') {
-        newValue = input.checked ? 'Oui' : 'Non';
-    } else {
-        newValue = input.value.trim();
-    }
-    
-    // Si c'est une URL et que la valeur est vide, mettre '-'
-    if (inlineEdit.inputTypes.url.includes(columnIndex)) {
-        newValue = newValue || '-';
-        
-        // Formater l'URL si elle n'est pas vide
-        if (newValue !== '-' && newValue !== '') {
-            if (!newValue.startsWith('http://') && !newValue.startsWith('https://')) {
-                newValue = 'https://' + newValue;
-            }
-        }
-    } else {
-        newValue = newValue || '-';
-    }
-    
-    // Mettre à jour l'affichage
-    if (inlineEdit.inputTypes.url.includes(columnIndex) && newValue !== '-') {
-        cell.innerHTML = `<a href="${newValue}" target="_blank" class="url-link" data-url="${newValue}" onclick="event.stopPropagation()">Voir</a>`;
-    } else if (inlineEdit.inputTypes.select.includes(columnIndex)) {
-        const badgeClass = newValue.toLowerCase().replace(/\s+/g, '-');
-        cell.innerHTML = `<span class="badge status-${badgeClass}" onclick="event.stopPropagation()">${newValue}</span>`;
-    } else if (columnIndex === 22 || columnIndex === 31) {
-        const isChecked = newValue === 'Oui' || newValue === '1' || newValue === true;
-        cell.innerHTML = `<input type="checkbox" disabled ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">`;
-    } else {
-        cell.innerHTML = newValue;
-    }
-    
-    // Sauvegarder dans la base de données
-    const fieldName = getColumnName(columnIndex);
-    let valueToSave = newValue;
-    
-    // Ne pas sauvegarder le tiret pour les URLs
-    if (inlineEdit.inputTypes.url.includes(columnIndex) && newValue === '-') {
-        valueToSave = '';
-    }
-    
-    saveToDatabase(leadId, fieldName, valueToSave);
-    
-    inlineEdit.activeCell = null;
-}
-
-// Ajouter aussi une fonction pour annuler correctement
-function cancelInlineEdit() {
-    if (!inlineEdit.activeCell) return;
-    
-    const cell = inlineEdit.activeCell;
-    const columnIndex = cell.cellIndex;
-    const originalValue = inlineEdit.originalValue;
-    
-    // Restaurer l'affichage original
-    if (inlineEdit.inputTypes.url.includes(columnIndex) && originalValue && originalValue !== '-') {
-        cell.innerHTML = `<a href="${originalValue}" target="_blank" class="url-link" data-url="${originalValue}" onclick="event.stopPropagation()">Voir</a>`;
-    } else if (inlineEdit.inputTypes.select.includes(columnIndex) && originalValue && originalValue !== '-') {
-        const badgeClass = originalValue.toLowerCase().replace(/\s+/g, '-');
-        cell.innerHTML = `<span class="badge status-${badgeClass}" onclick="event.stopPropagation()">${originalValue}</span>`;
-    } else if (columnIndex === 22 || columnIndex === 31) {
-        const isChecked = originalValue === 'Oui' || originalValue === '1' || originalValue === true;
-        cell.innerHTML = `<input type="checkbox" disabled ${isChecked ? 'checked' : ''} onclick="event.stopPropagation()">`;
-    } else {
-        cell.innerHTML = originalValue;
-    }
-    
-    cell.classList.remove('editing');
-    inlineEdit.activeCell = null;
 }
 </script>
 @endsection
