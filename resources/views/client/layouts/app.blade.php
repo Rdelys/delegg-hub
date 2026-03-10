@@ -234,7 +234,7 @@
             width: var(--sidebar-width-collapsed);
         }
 
-        /* Premium Collapse Toggle Button */
+        /* Premium Collapse Toggle Button - Flèche qui change de direction */
         .sidebar-toggle {
             position: absolute;
             top: 30px;
@@ -266,27 +266,28 @@
         }
 
         .sidebar-toggle:hover {
-            transform: scale(1.2) rotate(180deg);
+            transform: scale(1.2);
             background: linear-gradient(135deg, var(--accent-500), var(--primary-500));
             box-shadow: 0 0 30px var(--accent-400);
             animation: none;
         }
 
-        .sidebar.collapsed .sidebar-toggle {
+        /* La flèche change de direction quand la sidebar est réduite */
+        .sidebar.collapsed .sidebar-toggle i {
             transform: rotate(180deg);
         }
 
-        .sidebar.collapsed .sidebar-toggle:hover {
-            transform: scale(1.2) rotate(360deg);
-        }
-
         .sidebar-toggle i {
-            transition: transform 0.5s ease;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
 
         .sidebar-toggle:hover i {
             transform: scale(1.1);
+        }
+
+        .sidebar.collapsed .sidebar-toggle:hover i {
+            transform: rotate(180deg) scale(1.1);
         }
 
         /* Custom Scrollbar */
@@ -329,14 +330,16 @@
             position: relative;
         }
 
+        /* Quand la sidebar est réduite, le brand devient "follup" en minuscule */
         .sidebar.collapsed .brand {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             text-align: center;
             padding: 0;
             animation: none;
             background: linear-gradient(135deg, var(--primary-400), var(--secondary-400));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-transform: lowercase;
         }
 
         .brand::after {
@@ -987,7 +990,7 @@
         </div>
         
         <div class="brand">
-            FOLLUP.IO
+            FOLLUP
             <span>{{ session('client.company') }}</span>
         </div>
 
@@ -1157,7 +1160,7 @@
         loadSidebarState();
     });
 
-    // Premium Sidebar Toggle with animations
+    // Premium Sidebar Toggle with direction-changing arrow
     function initializeSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebar = document.getElementById('sidebar');
@@ -1171,20 +1174,18 @@
 
             const isCollapsed = sidebar.classList.contains('collapsed');
             
-            // Add spinning animation to icon
-            const icon = this.querySelector('i');
-            icon.style.transform = 'rotate(360deg) scale(1.3)';
-            
+            // Animate the toggle button
+            this.style.transform = 'scale(1.3)';
             setTimeout(() => {
-                icon.style.transform = '';
-            }, 500);
+                this.style.transform = '';
+            }, 200);
 
             if (!isCollapsed) {
-                // Collapse sidebar with animation
+                // Collapse sidebar
                 sidebar.classList.add('collapsed');
                 mainContent.classList.add('expanded');
                 
-                // Close all open submenus with fade out
+                // Close all open submenus
                 document.querySelectorAll('.submenu.open').forEach(menu => {
                     menu.style.transition = 'opacity 0.2s ease';
                     menu.classList.remove('open');
@@ -1200,22 +1201,17 @@
                 mainContent.classList.remove('expanded');
             }
 
-            // Save state with timestamp
+            // Save state
             localStorage.setItem('sidebarCollapsed', !isCollapsed);
-            localStorage.setItem('sidebarToggleTime', new Date().toISOString());
         });
 
-        // Hover effect for toggle button
+        // Hover effect
         sidebarToggle.addEventListener('mouseenter', function() {
-            if (!sidebar.classList.contains('collapsed')) {
-                this.style.transform = 'scale(1.2) rotate(0deg)';
-            }
+            this.style.transform = 'scale(1.2)';
         });
 
         sidebarToggle.addEventListener('mouseleave', function() {
-            if (!sidebar.classList.contains('collapsed')) {
-                this.style.transform = 'scale(1) rotate(0deg)';
-            }
+            this.style.transform = '';
         });
     }
 
@@ -1228,15 +1224,6 @@
         if (savedState === 'true' && sidebar && mainContent && window.innerWidth > 768) {
             sidebar.classList.add('collapsed');
             mainContent.classList.add('expanded');
-            
-            // Animate toggle button on load
-            const toggle = document.getElementById('sidebarToggle');
-            if (toggle) {
-                toggle.style.animation = 'togglePulse 1s';
-                setTimeout(() => {
-                    toggle.style.animation = '';
-                }, 1000);
-            }
         }
     }
 
@@ -1261,9 +1248,6 @@
                 const icon = this.querySelector('i');
                 icon.classList.remove('fa-bars-staggered');
                 icon.classList.add('fa-xmark');
-                
-                // Animate overlay
-                overlay.style.animation = 'fadeIn 0.3s ease';
             } else {
                 closeMobileMenu();
             }
@@ -1296,7 +1280,7 @@
         });
     }
 
-    // Menu System with animations
+    // Menu System
     function initializeMenuSystem() {
         const menuToggles = document.querySelectorAll('.menu-toggle');
         
@@ -1338,19 +1322,6 @@
                             }
                         });
                     }
-                    
-                    // Animate menu items on open
-                    if (isOpening) {
-                        const items = targetMenu.querySelectorAll('li');
-                        items.forEach((item, index) => {
-                            item.style.animation = `slideIn 0.3s ease ${index * 0.05}s forwards`;
-                            item.style.opacity = '0';
-                            setTimeout(() => {
-                                item.style.opacity = '1';
-                                item.style.animation = '';
-                            }, 300 + (index * 50));
-                        });
-                    }
                 }
             });
         });
@@ -1365,7 +1336,7 @@
             if (link.getAttribute('href') === currentPath) {
                 link.classList.add('active');
                 
-                // Open parent menus with animation
+                // Open parent menus
                 let parent = link.closest('.submenu');
                 while (parent) {
                     parent.classList.add('open');
@@ -1375,15 +1346,6 @@
                         const parentToggle = parentLi.querySelector(':scope > .menu-toggle');
                         if (parentToggle) {
                             parentToggle.classList.add('open');
-                            
-                            // Animate the toggle
-                            const icon = parentToggle.querySelector('i');
-                            if (icon) {
-                                icon.style.transform = 'rotate(90deg) scale(1.1)';
-                                setTimeout(() => {
-                                    icon.style.transform = '';
-                                }, 400);
-                            }
                         }
                     }
                     
@@ -1533,21 +1495,11 @@
     }
 }
 
-/* Smooth transitions for all interactive elements */
+/* Smooth transitions */
 * {
     transition: background-color 0.3s ease,
                 border-color 0.3s ease,
                 box-shadow 0.3s ease;
-}
-
-/* Loading animation for sidebar toggle */
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.sidebar-toggle:active i {
-    animation: spin 0.5s ease;
 }
 </style>
 
