@@ -1115,6 +1115,50 @@
             }
             </style>
 
+            @if(session('client.role') === 'superadmin')
+            <!-- INVOICE -->
+            <li>
+                <a href="#" class="menu-toggle" data-target="invoice-submenu">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <span>Invoice</span>
+                </a>
+                <ul class="submenu" id="invoice-submenu">
+                    <li>
+                        <a href="{{ route('client.invoice.clients') }}">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Clients</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('client.invoice.devis') }}">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>Devis</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('client.invoice.factures') }}">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <span>Factures</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('client.invoice.flux') }}">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Flux Auto</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- RESEAU IA -->
+            <li>
+                <a href="{{ route('client.reseau-ia') }}">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Réseau IA</span>
+                </a>
+            </li>
+            @endif
+
             <!-- PARAMETRES -->
             <li>
                 <a href="#" class="menu-toggle" data-target="params-submenu">
