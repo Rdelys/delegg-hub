@@ -57,8 +57,8 @@
                 </thead>
                 <tbody>
                     @foreach($clients as $client)
-                    <tr data-client-id="{{ $client->id }}">
-                        <td class="checkbox-column">
+<tr data-client-id="{{ $client->id }}" onclick="openViewClientModal({{ $client->id }})" style="cursor:pointer;">
+                            <td class="checkbox-column">
                             <label class="checkbox-label">
                                 <input type="checkbox" class="client-checkbox"
                                     value="{{ $client->id }}"
@@ -507,6 +507,110 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="viewClientModal">
+
+<div class="modal-overlay" onclick="closeModal('viewClientModal')"></div>
+
+<div class="modal-dialog modal-xl">
+<div class="modal-content">
+
+<div class="modal-header">
+<h5 class="modal-title">
+<i class="fas fa-user"></i> Détails du client
+</h5>
+
+<button class="btn-close" onclick="closeModal('viewClientModal')">&times;</button>
+</div>
+
+<div class="modal-body">
+
+<div class="form-section">
+<h6 class="section-title">Informations générales</h6>
+
+<p><strong>Type :</strong> <span id="viewType"></span></p>
+
+<!-- PROFESSIONNEL -->
+<div class="form-section">
+<!-- PROFESSIONNEL -->
+<div id="view-pro-fields">
+
+<p><strong>Entreprise :</strong> <span id="viewCompany"></span></p>
+<p><strong>SIRET :</strong> <span id="viewSiret"></span></p>
+<p><strong>TVA :</strong> <span id="viewTva"></span></p>
+
+</div>
+
+<!-- PARTICULIER -->
+<div id="view-part-fields" style="display:none">
+
+<p><strong>Nom :</strong> <span id="viewLastName"></span></p>
+<p><strong>Prénom :</strong> <span id="viewFirstName"></span></p>
+
+</div>
+
+<p><strong>Email :</strong> <span id="viewEmail"></span></p>
+<p><strong>Téléphone :</strong> <span id="viewPhone"></span></p>
+
+</div>
+
+
+<div class="form-section">
+<h6 class="section-title">Adresse</h6>
+
+<p><strong>Adresse :</strong> <span id="viewAddress"></span></p>
+<p><strong>Complément :</strong> <span id="viewAddressComplement"></span></p>
+<p><strong>Code postal :</strong> <span id="viewPostal"></span></p>
+<p><strong>Ville :</strong> <span id="viewCity"></span></p>
+<p><strong>Pays :</strong> <span id="viewCountry"></span></p>
+
+</div>
+
+
+
+<div class="form-section">
+<h6 class="section-title">Informations bancaires</h6>
+
+<p><strong>IBAN :</strong> <span id="viewIban"></span></p>
+<p><strong>BIC :</strong> <span id="viewBic"></span></p>
+
+</div>
+
+
+<div class="form-section">
+<h6 class="section-title">Contacts</h6>
+
+<div id="viewContacts"></div>
+
+</div>
+
+
+<div class="form-section">
+<h6 class="section-title">Notes</h6>
+
+<p id="viewNotes"></p>
+
+</div>
+
+</div>
+
+
+<div class="modal-footer">
+
+<button class="btn btn-outline"
+onclick="closeModal('viewClientModal')">
+Fermer
+</button>
+
+<button class="btn btn-success"
+onclick="closeModal('viewClientModal'); openEditModal(currentEditClientId)">
+Modifier
+</button>
+
+</div>
+
+</div>
+</div>
+</div>
 </div>
 
 <style>
@@ -2038,5 +2142,141 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+function openViewClientModal(clientId) {
+
+currentEditClientId = clientId;
+
+fetch("/invoice/clients/" + clientId + "/edit")
+.then(response => {
+    if (!response.ok) {
+        throw new Error("Erreur lors du chargement du client");
+    }
+    return response.json();
+})
+
+.then(data => {
+
+    /* TYPE CLIENT */
+
+    const typeText = data.type === "professionnel" ? "Professionnel" : "Particulier";
+    document.getElementById("viewType").innerText = typeText;
+
+    const proFields = document.getElementById("view-pro-fields");
+    const partFields = document.getElementById("view-part-fields");
+
+    if (data.type === "professionnel") {
+
+        if (proFields) proFields.style.display = "block";
+        if (partFields) partFields.style.display = "none";
+
+        document.getElementById("viewCompany").innerText = data.company_name ?? "";
+        document.getElementById("viewSiret").innerText = data.siret ?? "-";
+        document.getElementById("viewTva").innerText = data.tva ?? "-";
+
+    } else {
+
+        if (proFields) proFields.style.display = "none";
+        if (partFields) partFields.style.display = "block";
+
+        document.getElementById("viewFirstName").innerText = data.first_name ?? "";
+        document.getElementById("viewLastName").innerText = data.last_name ?? "";
+
+    }
+
+    /* EMAIL / PHONE */
+
+    document.getElementById("viewEmail").innerText = data.email ?? "";
+    document.getElementById("viewPhone").innerText = data.phone ?? "";
+
+    /* ADRESSE */
+
+    document.getElementById("viewAddress").innerText = data.address ?? "";
+    document.getElementById("viewAddressComplement").innerText = data.address_complement ?? "";
+    document.getElementById("viewPostal").innerText = data.postal_code ?? "";
+    document.getElementById("viewCity").innerText = data.city ?? "";
+    document.getElementById("viewCountry").innerText = data.country ?? "";
+
+    /* BANQUE */
+
+    document.getElementById("viewIban").innerText = data.iban ?? "-";
+    document.getElementById("viewBic").innerText = data.bic ?? "-";
+
+    /* NOTES */
+
+    document.getElementById("viewNotes").innerText = data.notes ?? "Aucune note";
+
+    /* CONTACTS */
+
+    const container = document.getElementById("viewContacts");
+    container.innerHTML = "";
+
+    let first = [];
+    let last = [];
+    let func = [];
+    let mail = [];
+    let phone = [];
+
+    try {
+
+        first = JSON.parse(data.contact_firstname ?? "[]");
+        last = JSON.parse(data.contact_lastname ?? "[]");
+        func = JSON.parse(data.contact_function ?? "[]");
+        mail = JSON.parse(data.contact_email ?? "[]");
+        phone = JSON.parse(data.contact_phone ?? "[]");
+
+    } catch (error) {
+
+        console.warn("Erreur parsing contacts JSON", error);
+
+    }
+
+    const maxContacts = Math.max(
+        first.length,
+        last.length,
+        func.length,
+        mail.length,
+        phone.length
+    );
+
+    if (maxContacts === 0) {
+
+        container.innerHTML = "<p>Aucun contact enregistré</p>";
+
+    } else {
+
+        for (let i = 0; i < maxContacts; i++) {
+
+            const div = document.createElement("div");
+            div.className = "contact-card";
+
+            div.innerHTML = `
+                <strong>${first[i] ?? ""} ${last[i] ?? ""}</strong><br>
+                ${func[i] ?? ""}<br>
+                ${mail[i] ?? ""}<br>
+                ${phone[i] ?? ""}
+            `;
+
+            container.appendChild(div);
+
+        }
+
+    }
+
+    /* OUVRIR MODAL */
+
+    openModal("viewClientModal");
+
+})
+
+.catch(error => {
+
+    console.error(error);
+    alert("Impossible de charger les informations du client.");
+
+});
+
+}
+
 </script>
 @endsection
