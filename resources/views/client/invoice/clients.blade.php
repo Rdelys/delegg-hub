@@ -1641,23 +1641,22 @@ function updateContactNumbers(modalType) {
 
 // Basculement des champs selon le type de client
 function toggleClientTypeFields(modalType) {
-    const selected = document.querySelector(`input[name="type"]:checked`);
+
+    const selected = document.querySelector(`#${modalType}ClientModal input[name="type"]:checked`);
 
     if (!selected) return;
 
-    const isProfessional = selected.value === 'professionnel';
+    const isProfessional = selected.value === "professionnel";
 
     const proFields = document.getElementById(`${modalType}-professionnel-fields`);
     const partFields = document.getElementById(`${modalType}-particulier-fields`);
 
-    if (proFields && partFields) {
-        if (isProfessional) {
-            proFields.style.display = 'block';
-            partFields.style.display = 'none';
-        } else {
-            proFields.style.display = 'none';
-            partFields.style.display = 'block';
-        }
+    if (isProfessional) {
+        proFields.style.display = "block";
+        partFields.style.display = "none";
+    } else {
+        proFields.style.display = "none";
+        partFields.style.display = "block";
     }
 }
 
@@ -1804,11 +1803,166 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Ouverture du modal d'édition
 function openEditModal(clientId) {
-    window.location.href = "{{ url('invoice/clients') }}/" + clientId + "/edit";
-}
 
+    fetch("/invoice/clients/" + clientId + "/edit")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Erreur lors du chargement du client");
+        }
+        return response.json();
+    })
+    .then(data => {
+
+        // ID
+        document.getElementById('editClientId').value = data.id ?? '';
+
+        // TYPE CLIENT
+        if (data.type === "professionnel") {
+            document.getElementById('editTypePro').checked = true;
+        } else {
+            document.getElementById('editTypePart').checked = true;
+        }
+
+        // ENTREPRISE
+        document.getElementById('editCompanyName').value = data.company_name ?? '';
+        document.getElementById('editSiret').value = data.siret ?? '';
+        document.getElementById('editTva').value = data.tva ?? '';
+
+        // PARTICULIER
+        document.getElementById('editFirstName').value = data.first_name ?? '';
+        document.getElementById('editLastName').value = data.last_name ?? '';
+
+        // EMAIL / PHONE (pour les deux types)
+        document.getElementById('editEmail').value = data.email ?? '';
+        document.getElementById('editEmailParticulier').value = data.email ?? '';
+
+        document.getElementById('editPhone').value = data.phone ?? '';
+        document.getElementById('editPhoneParticulier').value = data.phone ?? '';
+
+        // ADRESSE
+        document.getElementById('editAddress').value = data.address ?? '';
+        document.getElementById('editAddressComplement').value = data.address_complement ?? '';
+        document.getElementById('editPostalCode').value = data.postal_code ?? '';
+        document.getElementById('editCity').value = data.city ?? '';
+        document.getElementById('editCountry').value = data.country ?? '';
+
+        // BANQUE
+        document.getElementById('editIban').value = data.iban ?? '';
+        document.getElementById('editBic').value = data.bic ?? '';
+
+        // NOTES
+        document.getElementById('editNotes').value = data.notes ?? '';
+
+        // CHECKBOX
+        document.getElementById('editIncludeAddress').checked = data.include_address == 1;
+
+        // AFFICHER BON TYPE
+        toggleClientTypeFields('edit');
+
+        // -----------------------
+        // CONTACTS
+        // -----------------------
+
+        const container = document.getElementById('edit-contacts-container');
+        container.innerHTML = '';
+
+        let firstnames = [];
+        let lastnames = [];
+        let functions = [];
+        let emails = [];
+        let phones = [];
+
+        try {
+            firstnames = JSON.parse(data.contact_firstname ?? "[]");
+            lastnames = JSON.parse(data.contact_lastname ?? "[]");
+            functions = JSON.parse(data.contact_function ?? "[]");
+            emails = JSON.parse(data.contact_email ?? "[]");
+            phones = JSON.parse(data.contact_phone ?? "[]");
+        } catch (e) {
+            console.warn("Erreur parsing contacts JSON", e);
+        }
+
+        const maxContacts = Math.max(
+            firstnames.length,
+            lastnames.length,
+            functions.length,
+            emails.length,
+            phones.length
+        );
+
+        if (maxContacts === 0) {
+            addContactField('edit');
+        } else {
+
+            for (let i = 0; i < maxContacts; i++) {
+
+                let contactCard = document.createElement("div");
+                contactCard.className = "contact-card";
+                contactCard.id = "edit-contact-" + i;
+
+                contactCard.innerHTML = `
+                    <div class="contact-header">
+                        <span class="contact-number">Contact ${i + 1}</span>
+                        <button type="button" class="btn-remove-contact"
+                            onclick="removeContactField('edit', ${i})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input class="form-control"
+                                name="contact_lastname[]"
+                                value="${lastnames[i] ?? ''}"
+                                placeholder="Nom">
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-control"
+                                name="contact_firstname[]"
+                                value="${firstnames[i] ?? ''}"
+                                placeholder="Prénom">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-control"
+                            name="contact_function[]"
+                            value="${functions[i] ?? ''}"
+                            placeholder="Fonction">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input class="form-control"
+                                name="contact_email[]"
+                                value="${emails[i] ?? ''}"
+                                placeholder="Email">
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-control"
+                                name="contact_phone[]"
+                                value="${phones[i] ?? ''}"
+                                placeholder="Téléphone">
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(contactCard);
+            }
+        }
+
+        // ouvrir modal
+        openModal('editClientModal');
+
+    })
+    .catch(error => {
+        console.error(error);
+        alert("Impossible de charger les données du client.");
+    });
+}
 // Sauvegarde des modifications
 function saveClientChanges() {
     const form = document.getElementById('editClientForm');
