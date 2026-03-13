@@ -99,11 +99,11 @@
                         </td>
                         <td class="actions-cell">
                             <button
-                                class="btn-icon btn-edit"
-                                onclick="openEditModal({{ $client->id }})"
-                                title="Modifier"
-                                type="button">
-                                <i class="fas fa-edit"></i>
+                            class="btn-icon btn-edit"
+                            onclick="event.stopPropagation(); openEditModal({{ $client->id }})"
+                            title="Modifier"
+                            type="button">
+                            <i class="fas fa-edit"></i>
                             </button>
                             <form
                                 action="{{ route('clients.delete', $client->id) }}"
@@ -112,11 +112,11 @@
                                 @csrf
                                 @method('DELETE')
                                 <button
-                                    class="btn-icon btn-delete"
-                                    title="Supprimer"
-                                    type="button"
-                                    onclick="return confirmDelete(event, 'Supprimer ce client ?')">
-                                    <i class="fas fa-trash"></i>
+                                class="btn-icon btn-delete"
+                                title="Supprimer"
+                                type="submit"
+                                onclick="event.stopPropagation(); return confirmDelete(event,'Supprimer ce client ?')">
+                                <i class="fas fa-trash"></i>
                                 </button>
                             </form>
                         </td>
