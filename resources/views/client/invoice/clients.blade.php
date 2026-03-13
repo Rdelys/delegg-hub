@@ -182,7 +182,7 @@
                     {{-- TABS --}}
                     <div class="nav-tabs">
                         <button class="nav-link active" onclick="switchTab('add', 'info', event)">Informations</button>
-                        <button class="nav-link" onclick="switchTab('add', 'contact', event)">Contact</button>
+                        <button class="nav-link" onclick="switchTab('add', 'contact', event)">Contacts</button>
                         <button class="nav-link" onclick="switchTab('add', 'notes', event)">Notes</button>
                     </div>
 
@@ -302,28 +302,42 @@
                             </div>
                         </div>
 
-                        {{-- TAB CONTACT --}}
+                        {{-- TAB CONTACTS MULTIPLES --}}
                         <div class="tab-pane" id="add-contact-tab">
                             <div class="form-section">
-                                <h6 class="section-title">Contact principal</h6>
-                                <div class="contact-card">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" id="addContactLastName" placeholder="Nom">
+                                <div class="section-header">
+                                    <h6 class="section-title">Contacts</h6>
+                                    <button type="button" class="btn-add-contact" onclick="addContactField('add')">
+                                        <i class="fas fa-plus"></i> Ajouter un contact
+                                    </button>
+                                </div>
+                                <div id="add-contacts-container">
+                                    {{-- Premier contact par défaut --}}
+                                    <div class="contact-card" id="add-contact-0">
+                                        <div class="contact-header">
+                                            <span class="contact-number">Contact 1</span>
+                                            <button type="button" class="btn-remove-contact" onclick="removeContactField('add', 0)" style="display: none;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" name="addContactLastName[]" placeholder="Nom">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" name="addContactFirstName[]" placeholder="Prénom">
+                                            </div>
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="addContactFirstName" placeholder="Prénom">
+                                            <input type="text" class="form-control" name="addContactFunction[]" placeholder="Fonction">
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="addContactFunction" placeholder="Fonction">
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <input type="email" class="form-control" id="addContactEmail" placeholder="Email">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="tel" class="form-control" id="addContactPhone" placeholder="Téléphone">
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <input type="email" class="form-control" name="addContactEmail[]" placeholder="Email">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="tel" class="form-control" name="addContactPhone[]" placeholder="Téléphone">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -335,20 +349,6 @@
                             <div class="form-section">
                                 <h6 class="section-title">Notes client</h6>
                                 <textarea class="form-control" id="addNotes" rows="6" placeholder="Informations complémentaires, remarques, historique des échanges..."></textarea>
-                            </div>
-
-                            <div class="form-section">
-                                <h6 class="section-title">Tags</h6>
-                                <div class="tags-container" id="addTags">
-                                    <span class="tag" onclick="toggleTag(this)">Important</span>
-                                    <span class="tag" onclick="toggleTag(this)">Fidèle</span>
-                                    <span class="tag" onclick="toggleTag(this)">Nouveau</span>
-                                    <span class="tag" onclick="toggleTag(this)">À relancer</span>
-                                </div>
-                                <div class="tag-input-container">
-                                    <input type="text" class="form-control" id="addNewTag" placeholder="Ajouter un tag...">
-                                    <button type="button" class="btn-add-tag" onclick="addTag('add')">+</button>
-                                </div>
                             </div>
                         </div>
                     </form>
@@ -382,7 +382,7 @@
                     {{-- TABS --}}
                     <div class="nav-tabs">
                         <button class="nav-link active" onclick="switchTab('edit', 'info', event)">Informations</button>
-                        <button class="nav-link" onclick="switchTab('edit', 'contact', event)">Contact</button>
+                        <button class="nav-link" onclick="switchTab('edit', 'contact', event)">Contacts</button>
                         <button class="nav-link" onclick="switchTab('edit', 'notes', event)">Notes</button>
                     </div>
 
@@ -504,30 +504,17 @@
                             </div>
                         </div>
 
-                        {{-- TAB CONTACT --}}
+                        {{-- TAB CONTACTS MULTIPLES --}}
                         <div class="tab-pane" id="edit-contact-tab">
                             <div class="form-section">
-                                <h6 class="section-title">Contact principal</h6>
-                                <div class="contact-card">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" id="editContactLastName" placeholder="Nom">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" id="editContactFirstName" placeholder="Prénom">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="editContactFunction" placeholder="Fonction">
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <input type="email" class="form-control" id="editContactEmail" placeholder="Email">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="tel" class="form-control" id="editContactPhone" placeholder="Téléphone">
-                                        </div>
-                                    </div>
+                                <div class="section-header">
+                                    <h6 class="section-title">Contacts</h6>
+                                    <button type="button" class="btn-add-contact" onclick="addContactField('edit')">
+                                        <i class="fas fa-plus"></i> Ajouter un contact
+                                    </button>
+                                </div>
+                                <div id="edit-contacts-container">
+                                    {{-- Les contacts seront chargés dynamiquement --}}
                                 </div>
                             </div>
                         </div>
@@ -537,15 +524,6 @@
                             <div class="form-section">
                                 <h6 class="section-title">Notes client</h6>
                                 <textarea class="form-control" id="editNotes" rows="6" placeholder="Informations complémentaires..."></textarea>
-                            </div>
-
-                            <div class="form-section">
-                                <h6 class="section-title">Tags</h6>
-                                <div class="tags-container" id="editTags"></div>
-                                <div class="tag-input-container">
-                                    <input type="text" class="form-control" id="editNewTag" placeholder="Ajouter un tag...">
-                                    <button type="button" class="btn-add-tag" onclick="addTag('edit')">+</button>
-                                </div>
                             </div>
                         </div>
                     </form>
@@ -1094,6 +1072,19 @@
     border-bottom: 2px solid var(--border-light);
 }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header .section-title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
 .form-row {
     display: flex;
     gap: 16px;
@@ -1246,55 +1237,63 @@
     border-radius: 12px;
     padding: 20px;
     border: 1px solid var(--border-light);
+    margin-bottom: 16px;
+    position: relative;
 }
 
-/* TAGS */
-.tags-container {
+.contact-card:last-child {
+    margin-bottom: 0;
+}
+
+.contact-header {
     display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
 }
 
-.tag {
-    padding: 6px 14px;
-    background: var(--border-light);
-    border-radius: 20px;
-    font-size: 0.85rem;
+.contact-number {
+    font-weight: 600;
     color: var(--text-medium);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 0.95rem;
 }
 
-.tag:hover {
-    background: var(--text-lighter);
-    transform: translateY(-1px);
-}
-
-.tag.selected {
-    background: var(--primary);
-    color: white;
-}
-
-.tag-input-container {
-    display: flex;
-    gap: 8px;
-}
-
-.btn-add-tag {
+.btn-add-contact {
     padding: 8px 16px;
-    background: var(--primary);
+    background: var(--success);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     transition: all 0.2s ease;
 }
 
-.btn-add-tag:hover {
-    background: #2563eb;
+.btn-add-contact:hover {
+    background: var(--success-dark);
     transform: translateY(-1px);
+}
+
+.btn-remove-contact {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-contact:hover {
+    background: rgba(239, 68, 68, 0.1);
+    transform: scale(1.1);
 }
 
 /* COLLAPSIBLE */
@@ -1462,6 +1461,12 @@
         right: 16px;
         bottom: 16px;
     }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1524,15 +1529,23 @@ const clientsData = {
         iban: 'FR76 1234 5678 9012 3456 7890 123',
         bic: 'CMCIFR2A',
         includeAddress: true,
-        contact: {
-            lastName: 'Martin',
-            firstName: 'Sophie',
-            function: 'Directrice Commerciale',
-            email: 's.martin@techsolutions.fr',
-            phone: '0645789123'
-        },
-        notes: 'Client fidèle depuis 2019. Projets majeurs : refonte site web, application mobile.',
-        tags: ['Important', 'Fidèle']
+        contacts: [
+            {
+                lastName: 'Martin',
+                firstName: 'Sophie',
+                function: 'Directrice Commerciale',
+                email: 's.martin@techsolutions.fr',
+                phone: '0645789123'
+            },
+            {
+                lastName: 'Bernard',
+                firstName: 'Pierre',
+                function: 'Responsable Technique',
+                email: 'p.bernard@techsolutions.fr',
+                phone: '0678901234'
+            }
+        ],
+        notes: 'Client fidèle depuis 2019. Projets majeurs : refonte site web, application mobile.'
     },
     2: {
         type: 'professionnel',
@@ -1549,15 +1562,16 @@ const clientsData = {
         iban: 'FR76 9876 5432 1098 7654 3210 987',
         bic: 'AGRIFRPP',
         includeAddress: false,
-        contact: {
-            lastName: 'Dubois',
-            firstName: 'Thomas',
-            function: 'Responsable Projet',
-            email: 't.dubois@innovation-plus.fr',
-            phone: '0623344556'
-        },
-        notes: 'Nouveau client depuis janvier 2024. Première mission en cours.',
-        tags: ['Nouveau']
+        contacts: [
+            {
+                lastName: 'Dubois',
+                firstName: 'Thomas',
+                function: 'Responsable Projet',
+                email: 't.dubois@innovation-plus.fr',
+                phone: '0623344556'
+            }
+        ],
+        notes: 'Nouveau client depuis janvier 2024. Première mission en cours.'
     },
     3: {
         type: 'professionnel',
@@ -1574,15 +1588,16 @@ const clientsData = {
         iban: 'FR76 5678 1234 9012 3456 7890 234',
         bic: 'BNPAFRPP',
         includeAddress: true,
-        contact: {
-            lastName: 'Bernard',
-            firstName: 'Julie',
-            function: 'Directrice Technique',
-            email: 'j.bernard@digitalfactory.fr',
-            phone: '0655678899'
-        },
-        notes: 'Client très exigeant mais fidèle. Plusieurs projets réussis.',
-        tags: ['Important']
+        contacts: [
+            {
+                lastName: 'Bernard',
+                firstName: 'Julie',
+                function: 'Directrice Technique',
+                email: 'j.bernard@digitalfactory.fr',
+                phone: '0655678899'
+            }
+        ],
+        notes: 'Client très exigeant mais fidèle. Plusieurs projets réussis.'
     },
     4: {
         type: 'particulier',
@@ -1598,20 +1613,22 @@ const clientsData = {
         iban: '',
         bic: '',
         includeAddress: true,
-        contact: {
-            lastName: 'Dupont',
-            firstName: 'Jean',
-            function: '',
-            email: 'jean.dupont@email.com',
-            phone: '0612345678'
-        },
-        notes: 'Client particulier. Demande de devis pour site vitrine.',
-        tags: ['À relancer']
+        contacts: [
+            {
+                lastName: 'Dupont',
+                firstName: 'Jean',
+                function: '',
+                email: 'jean.dupont@email.com',
+                phone: '0612345678'
+            }
+        ],
+        notes: 'Client particulier. Demande de devis pour site vitrine.'
     }
 };
 
 // Variable pour stocker l'ID du client en cours d'édition
 let currentEditClientId = null;
+let contactCounters = { add: 1, edit: 0 };
 
 // Gestion des modales
 function openModal(modalId) {
@@ -1644,9 +1661,38 @@ function resetAddForm() {
     document.getElementById('addIncludeAddress').checked = true;
     document.getElementById('addCountry').value = 'France';
     
-    // Réinitialiser les tags
-    const tags = document.querySelectorAll('#addTags .tag');
-    tags.forEach(tag => tag.classList.remove('selected'));
+    // Réinitialiser les contacts
+    const contactsContainer = document.getElementById('add-contacts-container');
+    contactsContainer.innerHTML = `
+        <div class="contact-card" id="add-contact-0">
+            <div class="contact-header">
+                <span class="contact-number">Contact 1</span>
+                <button type="button" class="btn-remove-contact" onclick="removeContactField('add', 0)" style="display: none;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="addContactLastName[]" placeholder="Nom">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="addContactFirstName[]" placeholder="Prénom">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="addContactFunction[]" placeholder="Fonction">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="email" class="form-control" name="addContactEmail[]" placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <input type="tel" class="form-control" name="addContactPhone[]" placeholder="Téléphone">
+                </div>
+            </div>
+        </div>
+    `;
+    contactCounters.add = 1;
 }
 
 // Gestion des onglets
@@ -1671,24 +1717,154 @@ function switchTab(type, tabName, event) {
     }
 }
 
-// Gestion des tags
-function toggleTag(element) {
-    element.classList.toggle('selected');
+// Gestion des contacts multiples
+function addContactField(modalType) {
+    const container = document.getElementById(`${modalType}-contacts-container`);
+    const contactCount = container.children.length;
+    const newIndex = contactCount;
+    
+    const contactCard = document.createElement('div');
+    contactCard.className = 'contact-card';
+    contactCard.id = `${modalType}-contact-${newIndex}`;
+    
+    contactCard.innerHTML = `
+        <div class="contact-header">
+            <span class="contact-number">Contact ${contactCount + 1}</span>
+            <button type="button" class="btn-remove-contact" onclick="removeContactField('${modalType}', ${newIndex})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <input type="text" class="form-control" name="${modalType}ContactLastName[]" placeholder="Nom">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" name="${modalType}ContactFirstName[]" placeholder="Prénom">
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" name="${modalType}ContactFunction[]" placeholder="Fonction">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <input type="email" class="form-control" name="${modalType}ContactEmail[]" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <input type="tel" class="form-control" name="${modalType}ContactPhone[]" placeholder="Téléphone">
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(contactCard);
+    
+    // Mettre à jour les numéros de contact
+    updateContactNumbers(modalType);
 }
 
-function addTag(modalType) {
-    const input = document.getElementById(`${modalType}NewTag`);
-    const tagText = input.value.trim();
-    
-    if (tagText) {
-        const tagsContainer = document.getElementById(`${modalType}Tags`);
-        const tagSpan = document.createElement('span');
-        tagSpan.className = 'tag';
-        tagSpan.textContent = tagText;
-        tagSpan.onclick = function() { toggleTag(this); };
-        tagsContainer.appendChild(tagSpan);
-        input.value = '';
+function removeContactField(modalType, index) {
+    const contactCard = document.getElementById(`${modalType}-contact-${index}`);
+    if (contactCard) {
+        contactCard.remove();
+        updateContactNumbers(modalType);
     }
+}
+
+function updateContactNumbers(modalType) {
+    const container = document.getElementById(`${modalType}-contacts-container`);
+    const contacts = container.children;
+    
+    for (let i = 0; i < contacts.length; i++) {
+        const contact = contacts[i];
+        const numberSpan = contact.querySelector('.contact-number');
+        if (numberSpan) {
+            numberSpan.textContent = `Contact ${i + 1}`;
+        }
+        
+        // Mettre à jour l'ID et l'attribut onclick du bouton de suppression
+        const removeBtn = contact.querySelector('.btn-remove-contact');
+        if (removeBtn) {
+            const oldId = contact.id.split('-').pop();
+            contact.id = `${modalType}-contact-${i}`;
+            removeBtn.setAttribute('onclick', `removeContactField('${modalType}', ${i})`);
+        }
+    }
+}
+
+function getContactsFromForm(modalType) {
+    const container = document.getElementById(`${modalType}-contacts-container`);
+    const contacts = [];
+    
+    for (let i = 0; i < container.children.length; i++) {
+        const contact = container.children[i];
+        const lastName = contact.querySelector(`input[name="${modalType}ContactLastName[]"]`)?.value || '';
+        const firstName = contact.querySelector(`input[name="${modalType}ContactFirstName[]"]`)?.value || '';
+        const func = contact.querySelector(`input[name="${modalType}ContactFunction[]"]`)?.value || '';
+        const email = contact.querySelector(`input[name="${modalType}ContactEmail[]"]`)?.value || '';
+        const phone = contact.querySelector(`input[name="${modalType}ContactPhone[]"]`)?.value || '';
+        
+        contacts.push({
+            lastName,
+            firstName,
+            function: func,
+            email,
+            phone
+        });
+    }
+    
+    return contacts;
+}
+
+function loadContactsIntoForm(modalType, contacts) {
+    const container = document.getElementById(`${modalType}-contacts-container`);
+    container.innerHTML = '';
+    
+    if (contacts && contacts.length > 0) {
+        contacts.forEach((contact, index) => {
+            const contactCard = document.createElement('div');
+            contactCard.className = 'contact-card';
+            contactCard.id = `${modalType}-contact-${index}`;
+            
+            contactCard.innerHTML = `
+                <div class="contact-header">
+                    <span class="contact-number">Contact ${index + 1}</span>
+                    <button type="button" class="btn-remove-contact" onclick="removeContactField('${modalType}', ${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="${modalType}ContactLastName[]" value="${escapeHtml(contact.lastName || '')}" placeholder="Nom">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="${modalType}ContactFirstName[]" value="${escapeHtml(contact.firstName || '')}" placeholder="Prénom">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="${modalType}ContactFunction[]" value="${escapeHtml(contact.function || '')}" placeholder="Fonction">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="email" class="form-control" name="${modalType}ContactEmail[]" value="${escapeHtml(contact.email || '')}" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-control" name="${modalType}ContactPhone[]" value="${escapeHtml(contact.phone || '')}" placeholder="Téléphone">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(contactCard);
+        });
+    } else {
+        // Ajouter un contact vide par défaut
+        addContactField(modalType);
+    }
+}
+
+// Helper pour échapper les caractères HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Basculement des champs selon le type de client
@@ -1904,30 +2080,11 @@ function openEditModal(clientId) {
     // Toggle d'inclusion d'adresse
     document.getElementById('editIncludeAddress').checked = client.includeAddress || false;
     
-    // Contact
-    if (client.contact) {
-        document.getElementById('editContactLastName').value = client.contact.lastName || '';
-        document.getElementById('editContactFirstName').value = client.contact.firstName || '';
-        document.getElementById('editContactFunction').value = client.contact.function || '';
-        document.getElementById('editContactEmail').value = client.contact.email || '';
-        document.getElementById('editContactPhone').value = client.contact.phone || '';
-    }
+    // Contacts multiples
+    loadContactsIntoForm('edit', client.contacts || []);
     
     // Notes
     document.getElementById('editNotes').value = client.notes || '';
-    
-    // Tags
-    const tagsContainer = document.getElementById('editTags');
-    tagsContainer.innerHTML = '';
-    if (client.tags && client.tags.length > 0) {
-        client.tags.forEach(tag => {
-            const tagSpan = document.createElement('span');
-            tagSpan.className = 'tag selected';
-            tagSpan.textContent = tag;
-            tagSpan.onclick = function() { toggleTag(this); };
-            tagsContainer.appendChild(tagSpan);
-        });
-    }
     
     // Ouvrir le modal
     openModal('editClientModal');
@@ -1949,15 +2106,8 @@ function saveClientChanges() {
         country: document.getElementById('editCountry').value,
         iban: document.getElementById('editIban').value,
         bic: document.getElementById('editBic').value,
-        contact: {
-            lastName: document.getElementById('editContactLastName').value,
-            firstName: document.getElementById('editContactFirstName').value,
-            function: document.getElementById('editContactFunction').value,
-            email: document.getElementById('editContactEmail').value,
-            phone: document.getElementById('editContactPhone').value
-        },
-        notes: document.getElementById('editNotes').value,
-        tags: Array.from(document.querySelectorAll('#editTags .tag.selected')).map(tag => tag.textContent)
+        contacts: getContactsFromForm('edit'),
+        notes: document.getElementById('editNotes').value
     };
     
     if (clientType === 'professionnel') {
@@ -2006,6 +2156,9 @@ function saveClient(type) {
         showToast('Veuillez remplir l\'adresse complète', 'error');
         return;
     }
+    
+    // Récupérer les contacts
+    const contacts = getContactsFromForm('add');
     
     showToast('Client ajouté avec succès !', 'success');
     closeModal('addClientModal');
