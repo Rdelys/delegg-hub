@@ -26,10 +26,10 @@
             <span id="selectedCount">0</span> client(s) sélectionné(s)
         </div>
         <div class="selection-actions">
-            <button class="btn btn-outline" onclick="selectAll()">
+            <button class="btn btn-outline" type="button" onclick="selectAll()">
                 <i class="fas fa-check-double"></i> Tout sélectionner
             </button>
-            <button class="btn btn-outline" onclick="deselectAll()">
+            <button class="btn btn-outline" type="button" onclick="deselectAll()">
                 <i class="fas fa-times"></i> Tout désélectionner
             </button>
         </div>
@@ -56,111 +56,72 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{-- Données statiques pour les clients --}}
-                    <tr data-client-id="1">
+                    @foreach($clients as $client)
+                    <tr data-client-id="{{ $client->id }}">
                         <td class="checkbox-column">
                             <label class="checkbox-label">
-                                <input type="checkbox" class="client-checkbox" value="1" onchange="updateSelectionBar()">
+                                <input type="checkbox" class="client-checkbox"
+                                    value="{{ $client->id }}"
+                                    onchange="updateSelectionBar()">
                                 <span class="checkbox-custom"></span>
                             </label>
                         </td>
                         <td>
                             <div class="company-cell">
-                                <span class="company-name">Tech Solutions SARL</span>
-                                <small class="company-siret">SIRET: 823 456 789 00012</small>
+                                @if($client->type == 'professionnel')
+                                    <span class="company-name">
+                                        {{ $client->company_name }}
+                                    </span>
+                                    @if($client->siret)
+                                        <small class="company-siret">
+                                            SIRET: {{ $client->siret }}
+                                        </small>
+                                    @endif
+                                @else
+                                    <span class="company-name">
+                                        {{ $client->first_name }} {{ $client->last_name }}
+                                    </span>
+                                    <small class="company-siret">
+                                        Particulier
+                                    </small>
+                                @endif
                             </div>
                         </td>
-                        <td>contact@techsolutions.fr</td>
-                        <td>01 42 68 94 32</td>
-                        <td>Lyon</td>
-                        <td><span class="badge badge-pro">Professionnel</span></td>
-                        <td class="actions-cell">
-                            <button class="btn-icon btn-edit" onclick="openEditModal(1)" title="Modifier" type="button">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon btn-delete" onclick="deleteClient(1)" title="Supprimer" type="button">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr data-client-id="2">
-                        <td class="checkbox-column">
-                            <label class="checkbox-label">
-                                <input type="checkbox" class="client-checkbox" value="2" onchange="updateSelectionBar()">
-                                <span class="checkbox-custom"></span>
-                            </label>
-                        </td>
+                        <td>{{ $client->email }}</td>
+                        <td>{{ $client->phone }}</td>
+                        <td>{{ $client->city }}</td>
                         <td>
-                            <div class="company-cell">
-                                <span class="company-name">Innovation Plus</span>
-                                <small class="company-siret">SIRET: 912 345 678 00045</small>
-                            </div>
+                            @if($client->type == 'professionnel')
+                                <span class="badge badge-pro">Professionnel</span>
+                            @else
+                                <span class="badge badge-part">Particulier</span>
+                            @endif
                         </td>
-                        <td>contact@innovation-plus.fr</td>
-                        <td>04 91 23 45 67</td>
-                        <td>Marseille</td>
-                        <td><span class="badge badge-pro">Professionnel</span></td>
                         <td class="actions-cell">
-                            <button class="btn-icon btn-edit" onclick="openEditModal(2)" title="Modifier" type="button">
+                            <button
+                                class="btn-icon btn-edit"
+                                onclick="openEditModal({{ $client->id }})"
+                                title="Modifier"
+                                type="button">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn-icon btn-delete" onclick="deleteClient(2)" title="Supprimer" type="button">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                            <form
+                                action="{{ route('clients.delete', $client->id) }}"
+                                method="POST"
+                                style="display:inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <button
+                                    class="btn-icon btn-delete"
+                                    title="Supprimer"
+                                    type="button"
+                                    onclick="return confirmDelete(event, 'Supprimer ce client ?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </td>
                     </tr>
-                    <tr data-client-id="3">
-                        <td class="checkbox-column">
-                            <label class="checkbox-label">
-                                <input type="checkbox" class="client-checkbox" value="3" onchange="updateSelectionBar()">
-                                <span class="checkbox-custom"></span>
-                            </label>
-                        </td>
-                        <td>
-                            <div class="company-cell">
-                                <span class="company-name">Digital Factory</span>
-                                <small class="company-siret">SIRET: 734 567 891 00023</small>
-                            </div>
-                        </td>
-                        <td>contact@digitalfactory.fr</td>
-                        <td>05 57 89 12 34</td>
-                        <td>Bordeaux</td>
-                        <td><span class="badge badge-pro">Professionnel</span></td>
-                        <td class="actions-cell">
-                            <button class="btn-icon btn-edit" onclick="openEditModal(3)" title="Modifier" type="button">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon btn-delete" onclick="deleteClient(3)" title="Supprimer" type="button">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr data-client-id="4">
-                        <td class="checkbox-column">
-                            <label class="checkbox-label">
-                                <input type="checkbox" class="client-checkbox" value="4" onchange="updateSelectionBar()">
-                                <span class="checkbox-custom"></span>
-                            </label>
-                        </td>
-                        <td>
-                            <div class="company-cell">
-                                <span class="company-name">Jean Dupont</span>
-                                <small class="company-siret">Particulier</small>
-                            </div>
-                        </td>
-                        <td>jean.dupont@email.com</td>
-                        <td>06 12 34 56 78</td>
-                        <td>Paris</td>
-                        <td><span class="badge badge-part">Particulier</span></td>
-                        <td class="actions-cell">
-                            <button class="btn-icon btn-edit" onclick="openEditModal(4)" title="Modifier" type="button">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-icon btn-delete" onclick="deleteClient(4)" title="Supprimer" type="button">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -181,24 +142,25 @@
                 <div class="modal-body">
                     {{-- TABS --}}
                     <div class="nav-tabs">
-                        <button class="nav-link active" onclick="switchTab('add', 'info', event)">Informations</button>
-                        <button class="nav-link" onclick="switchTab('add', 'contact', event)">Contacts</button>
-                        <button class="nav-link" onclick="switchTab('add', 'notes', event)">Notes</button>
+                        <button class="nav-link active" type="button" onclick="switchTab('add', 'info', event)">Informations</button>
+                        <button class="nav-link" type="button" onclick="switchTab('add', 'contact', event)">Contacts</button>
+                        <button class="nav-link" type="button" onclick="switchTab('add', 'notes', event)">Notes</button>
                     </div>
 
-                    <form id="addClientForm">
+                    <form id="addClientForm" method="POST" action="{{ route('clients.store') }}">
+                        @csrf
                         {{-- TAB INFORMATIONS --}}
                         <div class="tab-pane active" id="add-info-tab">
                             <div class="form-section">
                                 <h6 class="section-title">Type de client</h6>
                                 <div class="client-type-group">
                                     <label class="radio-label">
-                                        <input type="radio" name="addClientType" value="professionnel" checked onchange="toggleClientTypeFields('add')">
+                                        <input type="radio" name="type" value="professionnel" checked onchange="toggleClientTypeFields('add')">
                                         <span class="radio-custom"></span>
                                         Professionnel
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="addClientType" value="particulier" onchange="toggleClientTypeFields('add')">
+                                        <input type="radio" name="type" value="particulier" onchange="toggleClientTypeFields('add')">
                                         <span class="radio-custom"></span>
                                         Particulier
                                     </label>
@@ -210,22 +172,22 @@
                                 <div class="form-section">
                                     <h6 class="section-title">Informations de l'entreprise</h6>
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="addCompanyName" placeholder="Nom de l'entreprise *" required>
+                                        <input type="text" class="form-control" name="company_name" placeholder="Nom de l'entreprise *">
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="addSiret" placeholder="N° de SIREN ou SIRET">
+                                            <input type="text" class="form-control" name="siret" placeholder="N° de SIREN ou SIRET">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="addTva" placeholder="N° de TVA intracom">
+                                            <input type="text" class="form-control" name="tva" placeholder="N° de TVA intracom">
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="email" class="form-control" id="addEmail" placeholder="Mail *" required>
+                                            <input type="email" class="form-control" name="email" placeholder="Mail *" required>
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" id="addPhone" placeholder="Téléphone">
+                                            <input type="tel" class="form-control" name="phone" placeholder="Téléphone">
                                         </div>
                                     </div>
                                 </div>
@@ -235,18 +197,20 @@
                             <div id="add-particulier-fields" style="display: none;">
                                 <div class="form-section">
                                     <h6 class="section-title">Informations personnelles</h6>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="addLastName" placeholder="Nom *" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="addFirstName" placeholder="Prénom *" required>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="last_name" placeholder="Nom *">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="first_name" placeholder="Prénom *">
+                                        </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="email" class="form-control" id="addEmailParticulier" placeholder="Mail *" required>
+                                            <input type="email" class="form-control" name="email" placeholder="Mail *" required>
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" id="addPhoneParticulier" placeholder="Téléphone">
+                                            <input type="tel" class="form-control" name="phone" placeholder="Téléphone">
                                         </div>
                                     </div>
                                 </div>
@@ -256,7 +220,7 @@
                             <div class="form-section">
                                 <div class="toggle-container">
                                     <label class="toggle-label">
-                                        <input type="checkbox" class="toggle-checkbox" id="addIncludeAddress" checked>
+                                        <input type="checkbox" class="toggle-checkbox" name="include_address" value="1" checked>
                                         <span class="toggle-switch"></span>
                                         <span class="toggle-text">Inclure cette adresse lors des envois par mail</span>
                                     </label>
@@ -266,36 +230,36 @@
                             <div class="form-section">
                                 <h6 class="section-title">Adresse</h6>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="addAddress" placeholder="Adresse *" required>
+                                    <input type="text" class="form-control" name="address" placeholder="Adresse *" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="addAddressComplement" placeholder="Complément d'adresse">
+                                    <input type="text" class="form-control" name="address_complement" placeholder="Complément d'adresse">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="addPostalCode" placeholder="Code postal *" required>
+                                        <input type="text" class="form-control" name="postal_code" placeholder="Code postal *" required>
                                     </div>
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="addCity" placeholder="Ville *" required>
+                                        <input type="text" class="form-control" name="city" placeholder="Ville *" required>
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="addCountry" placeholder="Pays *" required value="France">
+                                    <input type="text" class="form-control" name="country" placeholder="Pays *" required value="France">
                                 </div>
                             </div>
 
                             <div class="form-section collapsible">
-                                <div class="collapsible-header" onclick="toggleBankSection('add')">
+                                <div class="collapsible-header" type="button" onclick="toggleBankSection('add')">
                                     <span>Informations bancaires</span>
                                     <span class="arrow" id="add-bank-arrow">▼</span>
                                 </div>
                                 <div class="collapsible-body" id="add-bank-fields" style="display: none;">
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="addIban" placeholder="IBAN">
+                                            <input type="text" class="form-control" name="iban" placeholder="IBAN">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="addBic" placeholder="BIC">
+                                            <input type="text" class="form-control" name="bic" placeholder="BIC">
                                         </div>
                                     </div>
                                 </div>
@@ -322,21 +286,21 @@
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="addContactLastName[]" placeholder="Nom">
+                                                <input type="text" class="form-control" name="contact_lastname[]" placeholder="Nom">
                                             </div>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="addContactFirstName[]" placeholder="Prénom">
+                                                <input type="text" class="form-control" name="contact_firstname[]" placeholder="Prénom">
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" name="addContactFunction[]" placeholder="Fonction">
+                                            <input type="text" class="form-control" name="contact_function[]" placeholder="Fonction">
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <input type="email" class="form-control" name="addContactEmail[]" placeholder="Email">
+                                                <input type="email" class="form-control" name="contact_email[]" placeholder="Email">
                                             </div>
                                             <div class="form-group">
-                                                <input type="tel" class="form-control" name="addContactPhone[]" placeholder="Téléphone">
+                                                <input type="tel" class="form-control" name="contact_phone[]" placeholder="Téléphone">
                                             </div>
                                         </div>
                                     </div>
@@ -348,7 +312,7 @@
                         <div class="tab-pane" id="add-notes-tab">
                             <div class="form-section">
                                 <h6 class="section-title">Notes client</h6>
-                                <textarea class="form-control" id="addNotes" rows="6" placeholder="Informations complémentaires, remarques, historique des échanges..."></textarea>
+                                <textarea class="form-control" name="notes" rows="6" placeholder="Informations complémentaires, remarques, historique des échanges..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -358,7 +322,7 @@
                     <button type="button" class="btn btn-outline" onclick="closeModal('addClientModal')">
                         Annuler
                     </button>
-                    <button type="button" class="btn btn-success" onclick="saveClient('add')">
+                    <button type="button" class="btn btn-success" onclick="document.getElementById('addClientForm').submit();">
                         <i class="fas fa-save"></i> Ajouter le client
                     </button>
                 </div>
@@ -381,13 +345,14 @@
                 <div class="modal-body">
                     {{-- TABS --}}
                     <div class="nav-tabs">
-                        <button class="nav-link active" onclick="switchTab('edit', 'info', event)">Informations</button>
-                        <button class="nav-link" onclick="switchTab('edit', 'contact', event)">Contacts</button>
-                        <button class="nav-link" onclick="switchTab('edit', 'notes', event)">Notes</button>
+                        <button class="nav-link active" type="button" onclick="switchTab('edit', 'info', event)">Informations</button>
+                        <button class="nav-link" type="button" onclick="switchTab('edit', 'contact', event)">Contacts</button>
+                        <button class="nav-link" type="button" onclick="switchTab('edit', 'notes', event)">Notes</button>
                     </div>
 
-                    <form id="editClientForm">
-                        <input type="hidden" id="editClientId">
+                    <form id="editClientForm" method="POST" action="">
+                        @csrf
+                        <input type="hidden" name="id" id="editClientId">
                         
                         {{-- TAB INFORMATIONS --}}
                         <div class="tab-pane active" id="edit-info-tab">
@@ -395,12 +360,12 @@
                                 <h6 class="section-title">Type de client</h6>
                                 <div class="client-type-group">
                                     <label class="radio-label">
-                                        <input type="radio" name="editClientType" value="professionnel" id="editTypePro" onchange="toggleClientTypeFields('edit')">
+                                        <input type="radio" name="type" value="professionnel" id="editTypePro" onchange="toggleClientTypeFields('edit')">
                                         <span class="radio-custom"></span>
                                         Professionnel
                                     </label>
                                     <label class="radio-label">
-                                        <input type="radio" name="editClientType" value="particulier" id="editTypePart" onchange="toggleClientTypeFields('edit')">
+                                        <input type="radio" name="type" value="particulier" id="editTypePart" onchange="toggleClientTypeFields('edit')">
                                         <span class="radio-custom"></span>
                                         Particulier
                                     </label>
@@ -412,22 +377,22 @@
                                 <div class="form-section">
                                     <h6 class="section-title">Informations de l'entreprise</h6>
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="editCompanyName" placeholder="Nom de l'entreprise *">
+                                        <input type="text" class="form-control" name="company_name" id="editCompanyName" placeholder="Nom de l'entreprise *">
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="editSiret" placeholder="N° de SIREN ou SIRET">
+                                            <input type="text" class="form-control" name="siret" id="editSiret" placeholder="N° de SIREN ou SIRET">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="editTva" placeholder="N° de TVA intracom">
+                                            <input type="text" class="form-control" name="tva" id="editTva" placeholder="N° de TVA intracom">
                                         </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="email" class="form-control" id="editEmail" placeholder="Mail *">
+                                            <input type="email" class="form-control" name="email" id="editEmail" placeholder="Mail *">
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" id="editPhone" placeholder="Téléphone">
+                                            <input type="tel" class="form-control" name="phone" id="editPhone" placeholder="Téléphone">
                                         </div>
                                     </div>
                                 </div>
@@ -437,18 +402,20 @@
                             <div id="edit-particulier-fields" style="display: none;">
                                 <div class="form-section">
                                     <h6 class="section-title">Informations personnelles</h6>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="editLastName" placeholder="Nom *">
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="editFirstName" placeholder="Prénom *">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="last_name" id="editLastName" placeholder="Nom *">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="first_name" id="editFirstName" placeholder="Prénom *">
+                                        </div>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="email" class="form-control" id="editEmailParticulier" placeholder="Mail *">
+                                            <input type="email" class="form-control" name="email" id="editEmailParticulier" placeholder="Mail *">
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" id="editPhoneParticulier" placeholder="Téléphone">
+                                            <input type="tel" class="form-control" name="phone" id="editPhoneParticulier" placeholder="Téléphone">
                                         </div>
                                     </div>
                                 </div>
@@ -458,7 +425,7 @@
                             <div class="form-section">
                                 <div class="toggle-container">
                                     <label class="toggle-label">
-                                        <input type="checkbox" class="toggle-checkbox" id="editIncludeAddress">
+                                        <input type="checkbox" class="toggle-checkbox" name="include_address" id="editIncludeAddress" value="1">
                                         <span class="toggle-switch"></span>
                                         <span class="toggle-text">Inclure cette adresse lors des envois par mail</span>
                                     </label>
@@ -468,36 +435,36 @@
                             <div class="form-section">
                                 <h6 class="section-title">Adresse</h6>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="editAddress" placeholder="Adresse *">
+                                    <input type="text" class="form-control" name="address" id="editAddress" placeholder="Adresse *">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="editAddressComplement" placeholder="Complément d'adresse">
+                                    <input type="text" class="form-control" name="address_complement" id="editAddressComplement" placeholder="Complément d'adresse">
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="editPostalCode" placeholder="Code postal *">
+                                        <input type="text" class="form-control" name="postal_code" id="editPostalCode" placeholder="Code postal *">
                                     </div>
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="editCity" placeholder="Ville *">
+                                        <input type="text" class="form-control" name="city" id="editCity" placeholder="Ville *">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="editCountry" placeholder="Pays *">
+                                    <input type="text" class="form-control" name="country" id="editCountry" placeholder="Pays *">
                                 </div>
                             </div>
 
                             <div class="form-section collapsible">
-                                <div class="collapsible-header" onclick="toggleBankSection('edit')">
+                                <div class="collapsible-header" type="button" onclick="toggleBankSection('edit')">
                                     <span>Informations bancaires</span>
                                     <span class="arrow" id="edit-bank-arrow">▼</span>
                                 </div>
                                 <div class="collapsible-body" id="edit-bank-fields" style="display: none;">
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="editIban" placeholder="IBAN">
+                                            <input type="text" class="form-control" name="iban" id="editIban" placeholder="IBAN">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" class="form-control" id="editBic" placeholder="BIC">
+                                            <input type="text" class="form-control" name="bic" id="editBic" placeholder="BIC">
                                         </div>
                                     </div>
                                 </div>
@@ -523,7 +490,7 @@
                         <div class="tab-pane" id="edit-notes-tab">
                             <div class="form-section">
                                 <h6 class="section-title">Notes client</h6>
-                                <textarea class="form-control" id="editNotes" rows="6" placeholder="Informations complémentaires..."></textarea>
+                                <textarea class="form-control" name="notes" id="editNotes" rows="6" placeholder="Informations complémentaires..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -1512,123 +1479,8 @@
 </style>
 
 <script>
-// Données statiques des clients
-const clientsData = {
-    1: {
-        type: 'professionnel',
-        companyName: 'Tech Solutions SARL',
-        siret: '82345678900012',
-        tva: 'FR23823456789',
-        email: 'contact@techsolutions.fr',
-        phone: '0142689432',
-        address: '15 Rue de la République',
-        addressComplement: 'Bâtiment B',
-        postalCode: '69002',
-        city: 'Lyon',
-        country: 'France',
-        iban: 'FR76 1234 5678 9012 3456 7890 123',
-        bic: 'CMCIFR2A',
-        includeAddress: true,
-        contacts: [
-            {
-                lastName: 'Martin',
-                firstName: 'Sophie',
-                function: 'Directrice Commerciale',
-                email: 's.martin@techsolutions.fr',
-                phone: '0645789123'
-            },
-            {
-                lastName: 'Bernard',
-                firstName: 'Pierre',
-                function: 'Responsable Technique',
-                email: 'p.bernard@techsolutions.fr',
-                phone: '0678901234'
-            }
-        ],
-        notes: 'Client fidèle depuis 2019. Projets majeurs : refonte site web, application mobile.'
-    },
-    2: {
-        type: 'professionnel',
-        companyName: 'Innovation Plus',
-        siret: '91234567800045',
-        tva: 'FR91912345678',
-        email: 'contact@innovation-plus.fr',
-        phone: '0491234567',
-        address: '45 Rue de la Canebière',
-        addressComplement: '',
-        postalCode: '13001',
-        city: 'Marseille',
-        country: 'France',
-        iban: 'FR76 9876 5432 1098 7654 3210 987',
-        bic: 'AGRIFRPP',
-        includeAddress: false,
-        contacts: [
-            {
-                lastName: 'Dubois',
-                firstName: 'Thomas',
-                function: 'Responsable Projet',
-                email: 't.dubois@innovation-plus.fr',
-                phone: '0623344556'
-            }
-        ],
-        notes: 'Nouveau client depuis janvier 2024. Première mission en cours.'
-    },
-    3: {
-        type: 'professionnel',
-        companyName: 'Digital Factory',
-        siret: '73456789100023',
-        tva: 'FR34734567891',
-        email: 'contact@digitalfactory.fr',
-        phone: '0557891234',
-        address: '8 Cours de l\'Intendance',
-        addressComplement: '3ème étage',
-        postalCode: '33000',
-        city: 'Bordeaux',
-        country: 'France',
-        iban: 'FR76 5678 1234 9012 3456 7890 234',
-        bic: 'BNPAFRPP',
-        includeAddress: true,
-        contacts: [
-            {
-                lastName: 'Bernard',
-                firstName: 'Julie',
-                function: 'Directrice Technique',
-                email: 'j.bernard@digitalfactory.fr',
-                phone: '0655678899'
-            }
-        ],
-        notes: 'Client très exigeant mais fidèle. Plusieurs projets réussis.'
-    },
-    4: {
-        type: 'particulier',
-        lastName: 'Dupont',
-        firstName: 'Jean',
-        email: 'jean.dupont@email.com',
-        phone: '0612345678',
-        address: '12 Rue de Rivoli',
-        addressComplement: '',
-        postalCode: '75004',
-        city: 'Paris',
-        country: 'France',
-        iban: '',
-        bic: '',
-        includeAddress: true,
-        contacts: [
-            {
-                lastName: 'Dupont',
-                firstName: 'Jean',
-                function: '',
-                email: 'jean.dupont@email.com',
-                phone: '0612345678'
-            }
-        ],
-        notes: 'Client particulier. Demande de devis pour site vitrine.'
-    }
-};
-
 // Variable pour stocker l'ID du client en cours d'édition
 let currentEditClientId = null;
-let contactCounters = { add: 1, edit: 0 };
 
 // Gestion des modales
 function openModal(modalId) {
@@ -1657,7 +1509,7 @@ function resetAddForm() {
     document.getElementById('addClientForm').reset();
     document.getElementById('add-professionnel-fields').style.display = 'block';
     document.getElementById('add-particulier-fields').style.display = 'none';
-    document.querySelector('input[name="addClientType"][value="professionnel"]').checked = true;
+    document.querySelector('input[name="type"][value="professionnel"]').checked = true;
     document.getElementById('addIncludeAddress').checked = true;
     document.getElementById('addCountry').value = 'France';
     
@@ -1673,45 +1525,44 @@ function resetAddForm() {
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <input type="text" class="form-control" name="addContactLastName[]" placeholder="Nom">
+                    <input type="text" class="form-control" name="contact_lastname[]" placeholder="Nom">
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="addContactFirstName[]" placeholder="Prénom">
+                    <input type="text" class="form-control" name="contact_firstname[]" placeholder="Prénom">
                 </div>
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" name="addContactFunction[]" placeholder="Fonction">
+                <input type="text" class="form-control" name="contact_function[]" placeholder="Fonction">
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <input type="email" class="form-control" name="addContactEmail[]" placeholder="Email">
+                    <input type="email" class="form-control" name="contact_email[]" placeholder="Email">
                 </div>
                 <div class="form-group">
-                    <input type="tel" class="form-control" name="addContactPhone[]" placeholder="Téléphone">
+                    <input type="tel" class="form-control" name="contact_phone[]" placeholder="Téléphone">
                 </div>
             </div>
         </div>
     `;
-    contactCounters.add = 1;
 }
 
 // Gestion des onglets
-function switchTab(type, tabName, event) {
+function switchTab(modalType, tabName, event) {
     event.preventDefault();
     
     // Désactiver tous les onglets
-    const tabs = document.querySelectorAll(`#${type}ClientModal .nav-link`);
+    const tabs = document.querySelectorAll(`#${modalType}ClientModal .nav-link`);
     tabs.forEach(tab => tab.classList.remove('active'));
     
     // Activer l'onglet cliqué
     event.target.classList.add('active');
     
     // Cacher tous les contenus d'onglets
-    const panes = document.querySelectorAll(`#${type}ClientModal .tab-pane`);
+    const panes = document.querySelectorAll(`#${modalType}ClientModal .tab-pane`);
     panes.forEach(pane => pane.classList.remove('active'));
     
     // Afficher le contenu correspondant
-    const targetPane = document.getElementById(`${type}-${tabName}-tab`);
+    const targetPane = document.getElementById(`${modalType}-${tabName}-tab`);
     if (targetPane) {
         targetPane.classList.add('active');
     }
@@ -1721,36 +1572,35 @@ function switchTab(type, tabName, event) {
 function addContactField(modalType) {
     const container = document.getElementById(`${modalType}-contacts-container`);
     const contactCount = container.children.length;
-    const newIndex = contactCount;
     
     const contactCard = document.createElement('div');
     contactCard.className = 'contact-card';
-    contactCard.id = `${modalType}-contact-${newIndex}`;
+    contactCard.id = `${modalType}-contact-${contactCount}`;
     
     contactCard.innerHTML = `
         <div class="contact-header">
             <span class="contact-number">Contact ${contactCount + 1}</span>
-            <button type="button" class="btn-remove-contact" onclick="removeContactField('${modalType}', ${newIndex})">
+            <button type="button" class="btn-remove-contact" onclick="removeContactField('${modalType}', ${contactCount})">
                 <i class="fas fa-trash"></i>
             </button>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <input type="text" class="form-control" name="${modalType}ContactLastName[]" placeholder="Nom">
+                <input type="text" class="form-control" name="contact_lastname[]" placeholder="Nom">
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" name="${modalType}ContactFirstName[]" placeholder="Prénom">
+                <input type="text" class="form-control" name="contact_firstname[]" placeholder="Prénom">
             </div>
         </div>
         <div class="form-group">
-            <input type="text" class="form-control" name="${modalType}ContactFunction[]" placeholder="Fonction">
+            <input type="text" class="form-control" name="contact_function[]" placeholder="Fonction">
         </div>
         <div class="form-row">
             <div class="form-group">
-                <input type="email" class="form-control" name="${modalType}ContactEmail[]" placeholder="Email">
+                <input type="email" class="form-control" name="contact_email[]" placeholder="Email">
             </div>
             <div class="form-group">
-                <input type="tel" class="form-control" name="${modalType}ContactPhone[]" placeholder="Téléphone">
+                <input type="tel" class="form-control" name="contact_phone[]" placeholder="Téléphone">
             </div>
         </div>
     `;
@@ -1783,94 +1633,15 @@ function updateContactNumbers(modalType) {
         // Mettre à jour l'ID et l'attribut onclick du bouton de suppression
         const removeBtn = contact.querySelector('.btn-remove-contact');
         if (removeBtn) {
-            const oldId = contact.id.split('-').pop();
             contact.id = `${modalType}-contact-${i}`;
             removeBtn.setAttribute('onclick', `removeContactField('${modalType}', ${i})`);
         }
     }
 }
 
-function getContactsFromForm(modalType) {
-    const container = document.getElementById(`${modalType}-contacts-container`);
-    const contacts = [];
-    
-    for (let i = 0; i < container.children.length; i++) {
-        const contact = container.children[i];
-        const lastName = contact.querySelector(`input[name="${modalType}ContactLastName[]"]`)?.value || '';
-        const firstName = contact.querySelector(`input[name="${modalType}ContactFirstName[]"]`)?.value || '';
-        const func = contact.querySelector(`input[name="${modalType}ContactFunction[]"]`)?.value || '';
-        const email = contact.querySelector(`input[name="${modalType}ContactEmail[]"]`)?.value || '';
-        const phone = contact.querySelector(`input[name="${modalType}ContactPhone[]"]`)?.value || '';
-        
-        contacts.push({
-            lastName,
-            firstName,
-            function: func,
-            email,
-            phone
-        });
-    }
-    
-    return contacts;
-}
-
-function loadContactsIntoForm(modalType, contacts) {
-    const container = document.getElementById(`${modalType}-contacts-container`);
-    container.innerHTML = '';
-    
-    if (contacts && contacts.length > 0) {
-        contacts.forEach((contact, index) => {
-            const contactCard = document.createElement('div');
-            contactCard.className = 'contact-card';
-            contactCard.id = `${modalType}-contact-${index}`;
-            
-            contactCard.innerHTML = `
-                <div class="contact-header">
-                    <span class="contact-number">Contact ${index + 1}</span>
-                    <button type="button" class="btn-remove-contact" onclick="removeContactField('${modalType}', ${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="${modalType}ContactLastName[]" value="${escapeHtml(contact.lastName || '')}" placeholder="Nom">
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" name="${modalType}ContactFirstName[]" value="${escapeHtml(contact.firstName || '')}" placeholder="Prénom">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" name="${modalType}ContactFunction[]" value="${escapeHtml(contact.function || '')}" placeholder="Fonction">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <input type="email" class="form-control" name="${modalType}ContactEmail[]" value="${escapeHtml(contact.email || '')}" placeholder="Email">
-                    </div>
-                    <div class="form-group">
-                        <input type="tel" class="form-control" name="${modalType}ContactPhone[]" value="${escapeHtml(contact.phone || '')}" placeholder="Téléphone">
-                    </div>
-                </div>
-            `;
-            
-            container.appendChild(contactCard);
-        });
-    } else {
-        // Ajouter un contact vide par défaut
-        addContactField(modalType);
-    }
-}
-
-// Helper pour échapper les caractères HTML
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 // Basculement des champs selon le type de client
 function toggleClientTypeFields(modalType) {
-    const radioName = modalType === 'add' ? 'addClientType' : 'editClientType';
-    const selected = document.querySelector(`input[name="${radioName}"]:checked`);
+    const selected = document.querySelector(`input[name="type"]:checked`);
 
     if (!selected) return;
 
@@ -1879,12 +1650,14 @@ function toggleClientTypeFields(modalType) {
     const proFields = document.getElementById(`${modalType}-professionnel-fields`);
     const partFields = document.getElementById(`${modalType}-particulier-fields`);
 
-    if (isProfessional) {
-        proFields.style.display = 'block';
-        partFields.style.display = 'none';
-    } else {
-        proFields.style.display = 'none';
-        partFields.style.display = 'block';
+    if (proFields && partFields) {
+        if (isProfessional) {
+            proFields.style.display = 'block';
+            partFields.style.display = 'none';
+        } else {
+            proFields.style.display = 'none';
+            partFields.style.display = 'block';
+        }
     }
 }
 
@@ -1897,10 +1670,10 @@ function toggleBankSection(type) {
 
     if (section.style.display === "none" || section.style.display === "") {
         section.style.display = "block";
-        arrow.style.transform = "rotate(180deg)";
+        if (arrow) arrow.style.transform = "rotate(180deg)";
     } else {
         section.style.display = "none";
-        arrow.style.transform = "rotate(0deg)";
+        if (arrow) arrow.style.transform = "rotate(0deg)";
     }
 }
 
@@ -1929,11 +1702,12 @@ function updateSelectionBar() {
     // Afficher/masquer la barre de sélection
     if (selectedCount > 0) {
         selectionBar.style.display = 'flex';
-        document.getElementById('selectedCount').textContent = selectedCount;
-        exportBtn.disabled = false;
+        const countSpan = document.getElementById('selectedCount');
+        if (countSpan) countSpan.textContent = selectedCount;
+        if (exportBtn) exportBtn.disabled = false;
     } else {
         selectionBar.style.display = 'none';
-        exportBtn.disabled = true;
+        if (exportBtn) exportBtn.disabled = true;
     }
 }
 
@@ -1964,14 +1738,18 @@ function exportToTiime() {
     
     // Désactiver temporairement le bouton
     const exportBtn = document.getElementById('exportTiimeBtn');
-    exportBtn.disabled = true;
-    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Export...';
+    if (exportBtn) {
+        exportBtn.disabled = true;
+        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Export...';
+    }
     
     // Simuler un délai d'export
     setTimeout(() => {
         showToast(`${selectedIds.length} client(s) exporté(s) avec succès vers Tiime !`, 'success');
-        exportBtn.disabled = false;
-        exportBtn.innerHTML = '<i class="fas fa-file-export"></i> Exporter vers Tiime';
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            exportBtn.innerHTML = '<i class="fas fa-file-export"></i> Exporter vers Tiime';
+        }
         
         // Désélectionner tous les clients après export
         deselectAll();
@@ -1982,20 +1760,26 @@ function syncTiime() {
     showToast('Synchronisation avec Tiime en cours...', 'info');
     
     const syncBtn = document.querySelector('.btn-sync');
-    const originalText = syncBtn.innerHTML;
-    syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronisation...';
-    syncBtn.disabled = true;
-    
-    // Simuler un délai de synchronisation
-    setTimeout(() => {
-        showToast('Synchronisation avec Tiime terminée avec succès !', 'success');
-        syncBtn.innerHTML = originalText;
-        syncBtn.disabled = false;
-    }, 2000);
+    if (syncBtn) {
+        const originalText = syncBtn.innerHTML;
+        syncBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Synchronisation...';
+        syncBtn.disabled = true;
+        
+        // Simuler un délai de synchronisation
+        setTimeout(() => {
+            showToast('Synchronisation avec Tiime terminée avec succès !', 'success');
+            syncBtn.innerHTML = originalText;
+            syncBtn.disabled = false;
+        }, 2000);
+    }
 }
 
 // Toast notification
 function showToast(message, type = 'info') {
+    // Supprimer les toasts existants
+    const existingToasts = document.querySelectorAll('.toast');
+    existingToasts.forEach(toast => toast.remove());
+    
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     
@@ -2013,171 +1797,37 @@ function showToast(message, type = 'info') {
     setTimeout(() => {
         toast.style.animation = 'slideOutRight 0.3s ease forwards';
         setTimeout(() => {
-            document.body.removeChild(toast);
+            if (toast.parentNode) {
+                document.body.removeChild(toast);
+            }
         }, 300);
     }, 3000);
 }
 
 // Ouverture du modal d'édition
 function openEditModal(clientId) {
-    console.log('Opening modal for client:', clientId);
-    
-    const client = clientsData[clientId];
-    if (!client) {
-        console.error('Client not found:', clientId);
-        return;
-    }
-
-    currentEditClientId = clientId;
-    document.getElementById('editClientId').value = clientId;
-
-    // Type de client
-    if (client.type === 'professionnel') {
-        document.getElementById('editTypePro').checked = true;
-        toggleClientTypeFields('edit');
-        
-        // Remplir les champs professionnel
-        document.getElementById('editCompanyName').value = client.companyName || '';
-        document.getElementById('editSiret').value = client.siret || '';
-        document.getElementById('editTva').value = client.tva || '';
-        document.getElementById('editEmail').value = client.email || '';
-        document.getElementById('editPhone').value = client.phone || '';
-        
-        // Vider les champs particulier
-        document.getElementById('editLastName').value = '';
-        document.getElementById('editFirstName').value = '';
-        document.getElementById('editEmailParticulier').value = '';
-        document.getElementById('editPhoneParticulier').value = '';
-    } else {
-        document.getElementById('editTypePart').checked = true;
-        toggleClientTypeFields('edit');
-        
-        // Remplir les champs particulier
-        document.getElementById('editLastName').value = client.lastName || '';
-        document.getElementById('editFirstName').value = client.firstName || '';
-        document.getElementById('editEmailParticulier').value = client.email || '';
-        document.getElementById('editPhoneParticulier').value = client.phone || '';
-        
-        // Vider les champs professionnel
-        document.getElementById('editCompanyName').value = '';
-        document.getElementById('editSiret').value = '';
-        document.getElementById('editTva').value = '';
-        document.getElementById('editEmail').value = '';
-        document.getElementById('editPhone').value = '';
-    }
-    
-    // Adresse
-    document.getElementById('editAddress').value = client.address || '';
-    document.getElementById('editAddressComplement').value = client.addressComplement || '';
-    document.getElementById('editPostalCode').value = client.postalCode || '';
-    document.getElementById('editCity').value = client.city || '';
-    document.getElementById('editCountry').value = client.country || 'France';
-    
-    // Coordonnées bancaires
-    document.getElementById('editIban').value = client.iban || '';
-    document.getElementById('editBic').value = client.bic || '';
-    
-    // Toggle d'inclusion d'adresse
-    document.getElementById('editIncludeAddress').checked = client.includeAddress || false;
-    
-    // Contacts multiples
-    loadContactsIntoForm('edit', client.contacts || []);
-    
-    // Notes
-    document.getElementById('editNotes').value = client.notes || '';
-    
-    // Ouvrir le modal
-    openModal('editClientModal');
+    window.location.href = "{{ url('invoice/clients') }}/" + clientId + "/edit";
 }
 
 // Sauvegarde des modifications
 function saveClientChanges() {
+    const form = document.getElementById('editClientForm');
     const clientId = document.getElementById('editClientId').value;
-    const clientType = document.querySelector('input[name="editClientType"]:checked').value;
-    
-    // Récupérer les données du formulaire
-    const clientData = {
-        type: clientType,
-        includeAddress: document.getElementById('editIncludeAddress').checked,
-        address: document.getElementById('editAddress').value,
-        addressComplement: document.getElementById('editAddressComplement').value,
-        postalCode: document.getElementById('editPostalCode').value,
-        city: document.getElementById('editCity').value,
-        country: document.getElementById('editCountry').value,
-        iban: document.getElementById('editIban').value,
-        bic: document.getElementById('editBic').value,
-        contacts: getContactsFromForm('edit'),
-        notes: document.getElementById('editNotes').value
-    };
-    
-    if (clientType === 'professionnel') {
-        clientData.companyName = document.getElementById('editCompanyName').value;
-        clientData.siret = document.getElementById('editSiret').value;
-        clientData.tva = document.getElementById('editTva').value;
-        clientData.email = document.getElementById('editEmail').value;
-        clientData.phone = document.getElementById('editPhone').value;
-    } else {
-        clientData.lastName = document.getElementById('editLastName').value;
-        clientData.firstName = document.getElementById('editFirstName').value;
-        clientData.email = document.getElementById('editEmailParticulier').value;
-        clientData.phone = document.getElementById('editPhoneParticulier').value;
-    }
-    
-    // Mettre à jour les données (simulation)
-    clientsData[clientId] = { ...clientsData[clientId], ...clientData };
-    
-    showToast('Client modifié avec succès !', 'success');
-    closeModal('editClientModal');
-    
-    // Recharger la page pour voir les modifications (simulation)
-    setTimeout(() => {
-        location.reload();
-    }, 1500);
+
+    let url = "{{ route('clients.update', ':id') }}";
+    url = url.replace(':id', clientId);
+
+    form.action = url;
+    form.submit();
 }
 
-// Sauvegarde d'un nouveau client
-function saveClient(type) {
-    const clientType = document.querySelector('input[name="addClientType"]:checked').value;
-    
-    // Validation de base
-    if (clientType === 'professionnel') {
-        if (!document.getElementById('addCompanyName').value || !document.getElementById('addEmail').value) {
-            showToast('Veuillez remplir tous les champs obligatoires', 'error');
-            return;
-        }
+// Confirmation de suppression
+function confirmDelete(event, message) {
+    if (confirm(message)) {
+        return true;
     } else {
-        if (!document.getElementById('addLastName').value || !document.getElementById('addFirstName').value || !document.getElementById('addEmailParticulier').value) {
-            showToast('Veuillez remplir tous les champs obligatoires', 'error');
-            return;
-        }
-    }
-    
-    if (!document.getElementById('addAddress').value || !document.getElementById('addPostalCode').value || !document.getElementById('addCity').value) {
-        showToast('Veuillez remplir l\'adresse complète', 'error');
-        return;
-    }
-    
-    // Récupérer les contacts
-    const contacts = getContactsFromForm('add');
-    
-    showToast('Client ajouté avec succès !', 'success');
-    closeModal('addClientModal');
-    
-    // Simuler l'ajout du client
-    setTimeout(() => {
-        location.reload();
-    }, 1500);
-}
-
-// Suppression d'un client
-function deleteClient(clientId) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) {
-        showToast('Client supprimé avec succès !', 'success');
-        
-        // Simuler la suppression
-        setTimeout(() => {
-            location.reload();
-        }, 1500);
+        event.preventDefault();
+        return false;
     }
 }
 
@@ -2187,8 +1837,11 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleClientTypeFields('add');
     
     // Initialiser la section bancaire repliée
-    document.getElementById('add-bank-fields').style.display = 'none';
-    document.getElementById('edit-bank-fields').style.display = 'none';
+    const addBankFields = document.getElementById('add-bank-fields');
+    if (addBankFields) addBankFields.style.display = 'none';
+    
+    const editBankFields = document.getElementById('edit-bank-fields');
+    if (editBankFields) editBankFields.style.display = 'none';
     
     // Fermeture des modales en cliquant sur l'overlay
     const overlays = document.querySelectorAll('.modal-overlay');
@@ -2216,7 +1869,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSelectionBar();
 });
 
-// Animation de slideOut pour les toasts
+// Ajouter le style pour slideOutRight
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideOutRight {
