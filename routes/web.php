@@ -20,6 +20,7 @@ use App\Http\Controllers\Client\MailMassController;
 use App\Http\Controllers\Client\PromptIaController;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Controllers\SmsController;
+use App\Http\Controllers\Client\ClientInvoiceController;
 
 
 /*
@@ -306,9 +307,20 @@ Route::post('/crm/leads/{lead}/inline-update', [LeadController::class, 'inlineUp
 |--------------------------------------------------------------------------
 */
 
-Route::get('/invoice/clients', fn() => view('client.invoice.clients'))
-    ->name('client.invoice.clients');
+Route::prefix('invoice/clients')->group(function(){
 
+    Route::get('/',[ClientInvoiceController::class,'index'])->name('clients.index');
+
+    Route::post('/store',[ClientInvoiceController::class,'store'])->name('clients.store');
+
+    Route::post('/update/{id}',[ClientInvoiceController::class,'update'])->name('clients.update');
+
+    Route::delete('/delete/{id}',[ClientInvoiceController::class,'destroy'])->name('clients.delete');
+
+    Route::get('/{id}/edit', [ClientInvoiceController::class, 'edit'])
+        ->name('clients.edit');
+
+});
 Route::get('/invoice/devis', fn() => view('client.invoice.devis'))
     ->name('client.invoice.devis');
 
