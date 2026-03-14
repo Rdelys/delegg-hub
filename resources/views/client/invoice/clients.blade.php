@@ -220,7 +220,7 @@
                             <div class="form-section">
                                 <div class="toggle-container">
                                     <label class="toggle-label">
-                                        <input type="checkbox" class="toggle-checkbox" name="include_address" value="1" checked>
+                                        <input type="checkbox" class="toggle-checkbox" id="addIncludeAddress" name="include_address" value="1" checked>
                                         <span class="toggle-switch"></span>
                                         <span class="toggle-text">Inclure cette adresse lors des envois par mail</span>
                                     </label>
@@ -244,7 +244,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="country" placeholder="Pays *" required value="France">
+                                    <input type="text" id="addCountry" class="form-control" name="country" placeholder="Pays *" required value="France">
                                 </div>
                             </div>
 
@@ -1747,7 +1747,6 @@ function updateContactNumbers(modalType) {
 function toggleClientTypeFields(modalType) {
 
     const selected = document.querySelector(`#${modalType}ClientModal input[name="type"]:checked`);
-
     if (!selected) return;
 
     const isProfessional = selected.value === "professionnel";
@@ -1755,12 +1754,24 @@ function toggleClientTypeFields(modalType) {
     const proFields = document.getElementById(`${modalType}-professionnel-fields`);
     const partFields = document.getElementById(`${modalType}-particulier-fields`);
 
+    const proInputs = proFields.querySelectorAll("input");
+    const partInputs = partFields.querySelectorAll("input");
+
     if (isProfessional) {
+
         proFields.style.display = "block";
         partFields.style.display = "none";
+
+        proInputs.forEach(i => i.disabled = false);
+        partInputs.forEach(i => i.disabled = true);
+
     } else {
+
         proFields.style.display = "none";
         partFields.style.display = "block";
+
+        proInputs.forEach(i => i.disabled = true);
+        partInputs.forEach(i => i.disabled = false);
     }
 }
 
