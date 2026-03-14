@@ -21,6 +21,7 @@ use App\Http\Controllers\Client\PromptIaController;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\Client\ClientInvoiceController;
+use App\Http\Controllers\Client\ClientAiNetworkController;
 
 
 /*
@@ -340,5 +341,8 @@ Route::get('/invoice/parametres', fn() => view('client.invoice.params'))
 |--------------------------------------------------------------------------
 */
 
-Route::get('/reseau-ia', fn() => view('client.reseau-ia'))
-    ->name('client.reseau-ia');
+Route::get('/client/reseau-ia',[ClientAiNetworkController::class,'index'])
+->name('client.reseau.ia');
+
+Route::post('/client/reseau-ia/generate',[ClientAiNetworkController::class,'generate'])
+->name('client.reseau.ia.generate');
