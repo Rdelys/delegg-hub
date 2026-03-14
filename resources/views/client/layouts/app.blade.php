@@ -1152,7 +1152,7 @@
 
             <!-- RESEAU IA -->
             <li>
-                <a href="{{ route('client.reseau-ia') }}">
+                <a href="{{ route('client.reseau.ia') }}">
                     <i class="fa-solid fa-network-wired"></i>
                     <span>Réseau IA</span>
                 </a>
