@@ -106,15 +106,30 @@
     </form>
 
     @if(request('filter_scrapping'))
-        <form method="POST" action="{{ route('client.google.export.lead.scrapping') }}" class="export-form">
-            @csrf
-            <input type="hidden" name="nom_scrapping" value="{{ request('filter_scrapping') }}">
-            <button class="btn btn-export-all">
-                <i class="fa-solid fa-download"></i>
-                Exporter tout le scrapping
-            </button>
-        </form>
-    @endif
+<div style="display:flex; gap:10px; margin-bottom:15px;">
+
+    {{-- EXPORT AVEC MAILS --}}
+    <form method="POST" action="{{ route('client.google.export.lead.scrapping.with-mails') }}">
+        @csrf
+        <input type="hidden" name="nom_scrapping" value="{{ request('filter_scrapping') }}">
+        <button class="btn btn-export-all">
+            <i class="fa-solid fa-envelope"></i>
+            Exporter avec mails
+        </button>
+    </form>
+
+    {{-- EXPORT SANS MAILS --}}
+    <form method="POST" action="{{ route('client.google.export.lead.scrapping.without-mails') }}">
+        @csrf
+        <input type="hidden" name="nom_scrapping" value="{{ request('filter_scrapping') }}">
+        <button class="btn btn-export-all" style="background:linear-gradient(135deg,#64748b,#475569);">
+            <i class="fa-solid fa-envelope-open"></i>
+            Exporter sans mails
+        </button>
+    </form>
+
+</div>
+@endif
 
     {{-- Results Section --}}
     @if(isset($places) && $places->count())
