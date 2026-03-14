@@ -17,6 +17,9 @@ use App\Http\Controllers\Client\ClientMailController;
 use App\Http\Controllers\Client\ClientImapController;
 use App\Http\Controllers\Client\ClientScheduledMailController;
 use App\Http\Controllers\Client\MailMassController;
+use App\Http\Controllers\Client\PromptIaController;
+use App\Http\Controllers\WhatsAppController;
+use App\Http\Controllers\SmsController;
 
 
 /*
@@ -245,10 +248,13 @@ Route::get('/crm/leads/{lead}/export', [LeadController::class, 'exportSingleExce
     [GoogleScraperController::class, 'exportToLead'])
     ->name('client.google.export.lead.single');
 
-Route::post('/google/export-to-lead-by-scrapping', 
-    [GoogleScraperController::class, 'exportByScrapping'])
-    ->name('client.google.export.lead.scrapping');
+Route::post('/google/export-to-lead-by-scrapping-with-mails',
+    [GoogleScraperController::class, 'exportByScrappingWithMails'])
+    ->name('client.google.export.lead.scrapping.with-mails');
 
+Route::post('/google/export-to-lead-by-scrapping-without-mails',
+    [GoogleScraperController::class, 'exportByScrappingWithoutMails'])
+    ->name('client.google.export.lead.scrapping.without-mails');
 // MAILS
 Route::get('/mails/envoyes', [ClientMailController::class,'index'])
     ->name('client.mails.envoyes');
@@ -257,3 +263,70 @@ Route::get('/mails/envoyes', [ClientMailController::class,'index'])
 // routes/web.php
 Route::get('/dashboard', [\App\Http\Controllers\Client\DashboardController::class, 'index'])
     ->name('client.crm.dashboard');
+
+    /*
+|--------------------------------------------------------------------------
+| PROMPT IA
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/prompt-ia', [PromptIaController::class,'index'])
+    ->name('client.prompt-ia');
+
+Route::post('/prompt-ia', [PromptIaController::class,'store'])
+->name('client.prompt-ia.store');
+
+Route::put('/prompt-ia/{id}', [PromptIaController::class,'update'])
+->name('client.prompt-ia.update');
+
+Route::delete('/prompt-ia/{id}', [PromptIaController::class,'destroy'])
+->name('client.prompt-ia.delete');
+
+/*
+|--------------------------------------------------------------------------
+| COMMUNICATION
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/communication/whatsapp', function () {
+    return view('client.communication.whatsapp');
+})->name('client.communication.whatsapp');
+
+Route::get('/communication/sms', function () {
+    return view('client.communication.sms');
+})->name('client.communication.sms');
+
+Route::post('/send-whatsapp', [WhatsAppController::class, 'send'])->name('send.whatsapp');
+Route::post('/send-sms', [SmsController::class, 'send'])->name('send.sms');
+Route::post('/crm/leads/{lead}/inline-update', [LeadController::class, 'inlineUpdate'])->name('client.crm.leads.inline-update');
+
+/*
+|--------------------------------------------------------------------------
+| INVOICE
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/invoice/clients', fn() => view('client.invoice.clients'))
+    ->name('client.invoice.clients');
+
+Route::get('/invoice/devis', fn() => view('client.invoice.devis'))
+    ->name('client.invoice.devis');
+
+Route::get('/invoice/factures', fn() => view('client.invoice.factures'))
+    ->name('client.invoice.factures');
+
+Route::get('/invoice/flux-auto', fn() => view('client.invoice.flux'))
+    ->name('client.invoice.flux');
+
+Route::get('/invoice/parametres', fn() => view('client.invoice.params'))
+    ->name('client.invoice.params');
+
+
+/*
+|--------------------------------------------------------------------------
+| RESEAU IA
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/reseau-ia', fn() => view('client.reseau-ia'))
+    ->name('client.reseau-ia');
