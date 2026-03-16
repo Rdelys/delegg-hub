@@ -20,6 +20,8 @@ use App\Http\Controllers\Client\MailMassController;
 use App\Http\Controllers\Client\PromptIaController;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Controllers\SmsController;
+use App\Http\Controllers\Client\ClientInvoiceController;
+use App\Http\Controllers\Client\ClientAiNetworkController;
 
 
 /*
@@ -306,9 +308,20 @@ Route::post('/crm/leads/{lead}/inline-update', [LeadController::class, 'inlineUp
 |--------------------------------------------------------------------------
 */
 
-Route::get('/invoice/clients', fn() => view('client.invoice.clients'))
-    ->name('client.invoice.clients');
+Route::prefix('invoice/clients')->group(function(){
 
+    Route::get('/',[ClientInvoiceController::class,'index'])->name('clients.index');
+
+    Route::post('/store',[ClientInvoiceController::class,'store'])->name('clients.store');
+
+    Route::post('/update/{id}',[ClientInvoiceController::class,'update'])->name('clients.update');
+
+    Route::delete('/delete/{id}',[ClientInvoiceController::class,'destroy'])->name('clients.delete');
+
+    Route::get('/{id}/edit', [ClientInvoiceController::class, 'edit'])
+        ->name('clients.edit');
+
+});
 Route::get('/invoice/devis', fn() => view('client.invoice.devis'))
     ->name('client.invoice.devis');
 
@@ -328,5 +341,8 @@ Route::get('/invoice/parametres', fn() => view('client.invoice.params'))
 |--------------------------------------------------------------------------
 */
 
-Route::get('/reseau-ia', fn() => view('client.reseau-ia'))
-    ->name('client.reseau-ia');
+Route::get('/client/reseau-ia',[ClientAiNetworkController::class,'index'])
+->name('client.reseau.ia');
+
+Route::post('/client/reseau-ia/generate',[ClientAiNetworkController::class,'generate'])
+->name('client.reseau.ia.generate');
