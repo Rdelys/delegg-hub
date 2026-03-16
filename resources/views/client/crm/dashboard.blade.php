@@ -84,6 +84,17 @@
                 <span class="kpi-card__value">{{ $tauxConversion }}%</span>
             </div>
         </div>
+
+        <div class="kpi-card">
+            <div class="kpi-card__icon">👤</div>
+            <div class="kpi-card__content">
+                <span class="kpi-card__label">Nom + Prénom complétés</span>
+                <span class="kpi-card__value">
+                    {{ $completeNameCount }} / {{ $totalLeads }}
+                </span>
+                <small>{{ $completeNamePercentage }}%</small>
+            </div>
+        </div>
     </div>
 
     <!-- Graphiques -->
@@ -220,17 +231,17 @@
                         <th class="table__th">Rôle</th>
                         <th class="table__th">Total Leads</th>
                         <th class="table__th">Scrappings</th>
+                        <th class="table__th">Nom + Prénom</th>
                         <th class="table__th" colspan="5">Répartition par complétude</th>
                     </tr>
                     <tr class="table__subhead">
-                        <th colspan="3"></th>
-                        <th></th>
-                        <th class="table__th table__th--small">0-20%</th>
-                        <th class="table__th table__th--small">21-40%</th>
-                        <th class="table__th table__th--small">41-60%</th>
-                        <th class="table__th table__th--small">61-80%</th>
-                        <th class="table__th table__th--small">81-100%</th>
-                    </tr>
+    <th colspan="5"></th>
+    <th class="table__th table__th--small">0-20%</th>
+    <th class="table__th table__th--small">21-40%</th>
+    <th class="table__th table__th--small">41-60%</th>
+    <th class="table__th table__th--small">61-80%</th>
+    <th class="table__th table__th--small">81-100%</th>
+</tr>
                 </thead>
                 <tbody class="table__body">
                     @forelse($clientsPerformance as $client)
@@ -254,7 +265,23 @@
                         <td class="table__td">
                             <span class="stat-number">{{ $client['scraping_count'] }}</span>
                         </td>
-                        
+                        <td class="table__td table__td--percentage">
+    <div class="percentage-cell">
+        <span class="percentage-cell__value">
+            {{ $client['complete_names'] }}
+        </span>
+
+        <div class="percentage-cell__bar">
+            <div class="percentage-cell__fill percentage-cell__fill--high"
+                 style="width: {{ $client['complete_names_percentage'] }}%">
+            </div>
+        </div>
+
+        <span class="percentage-cell__percent">
+            {{ $client['complete_names_percentage'] }}%
+        </span>
+    </div>
+</td>
                         <!-- 0-20% -->
                         <td class="table__td table__td--percentage">
                             <div class="percentage-cell">
