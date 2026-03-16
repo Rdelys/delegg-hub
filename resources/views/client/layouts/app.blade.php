@@ -1124,7 +1124,7 @@
                 </a>
                 <ul class="submenu" id="invoice-submenu">
                     <li>
-                        <a href="{{ route('client.invoice.clients') }}">
+                        <a href="{{ route('clients.index') }}">
                             <i class="fa-solid fa-users"></i>
                             <span>Clients</span>
                         </a>
@@ -1152,7 +1152,7 @@
 
             <!-- RESEAU IA -->
             <li>
-                <a href="{{ route('client.reseau-ia') }}">
+                <a href="{{ route('client.reseau.ia') }}">
                     <i class="fa-solid fa-network-wired"></i>
                     <span>Réseau IA</span>
                 </a>
