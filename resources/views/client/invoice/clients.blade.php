@@ -14,9 +14,12 @@
             <button class="btn btn-export" type="button" onclick="exportToTiime()" id="exportTiimeBtn" disabled>
                 <i class="fas fa-file-export"></i> Exporter vers Tiime
             </button>
-            <button class="btn btn-sync" type="button" onclick="syncTiime()">
-                <i class="fas fa-sync-alt"></i> Synchronisation Tiime
-            </button>
+            <form action="{{ route('tiime.sync') }}" method="POST" style="display:inline;">
+                @csrf
+                <button class="btn btn-sync" type="submit">
+                    <i class="fas fa-sync-alt"></i> Synchronisation Tiime
+                </button>
+            </form>
         </div>
     </div>
 
@@ -1870,7 +1873,7 @@ function exportToTiime() {
     }, 2000);
 }
 
-function syncTiime() {
+/*function syncTiime() {
     showToast('Synchronisation avec Tiime en cours...', 'info');
     
     const syncBtn = document.querySelector('.btn-sync');
@@ -1886,7 +1889,7 @@ function syncTiime() {
             syncBtn.disabled = false;
         }, 2000);
     }
-}
+}*/
 
 // Toast notification
 function showToast(message, type = 'info') {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ClientInvoice;
+use Illuminate\Support\Facades\Http;
 
 class ClientInvoiceController extends Controller
 {
@@ -134,4 +135,18 @@ $client->update($data);
         return back()->with('success','Client supprimé');
     }
 
+    public function syncTiime()
+{
+    $webhookUrl = "https://hook.eu2.make.com/pbiaah4c1p2mrufjqqtway92nrm4vruw";
+
+    $response = Http::post($webhookUrl, [
+        'action' => 'sync_tiime',
+        'time' => now()
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Webhook envoyé à Make'
+    ]);
+}
 }
