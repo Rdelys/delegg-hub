@@ -139,14 +139,19 @@ $client->update($data);
 {
     $webhookUrl = "https://hook.eu2.make.com/pbiaah4c1p2mrufjqqtway92nrm4vruw";
 
+    // Récupérer tous les clients
+    $clients = ClientInvoice::all();
+
+    // Envoyer au webhook
     $response = Http::post($webhookUrl, [
         'action' => 'sync_tiime',
-        'time' => now()
+        'clients' => $clients
     ]);
 
     return response()->json([
         'success' => true,
-        'message' => 'Webhook envoyé à Make'
+        'message' => 'Tous les clients envoyés',
+        'count' => $clients->count()
     ]);
 }
 }
