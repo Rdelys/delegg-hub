@@ -18,7 +18,37 @@ class ClientInvoiceController extends Controller
         return view('client.invoice.clients', compact('clients'));
     }
 
+function convertCountryToISO($country)
+{
+    $map = [
+        'France' => 'FR',
+        'Suisse' => 'CH',
+        'Belgique' => 'BE',
+        'Luxembourg' => 'LU',
+    ];
 
+    return $map[$country] ?? $country;
+}
+
+function formatPhone($phone, $countryISO)
+{
+    if (!$phone) return null;
+
+    // enlever espaces et 0 au début
+    $phone = preg_replace('/\s+/', '', $phone);
+    $phone = ltrim($phone, '0');
+
+    $prefixes = [
+        'FR' => '+33',
+        'BE' => '+32',
+        'CH' => '+41',
+        'LU' => '+352',
+    ];
+
+    return isset($prefixes[$countryISO])
+        ? $prefixes[$countryISO] . $phone
+        : $phone;
+}
     // STORE
     public function store(Request $request)
     {
@@ -36,12 +66,6 @@ class ClientInvoiceController extends Controller
     'email'=>'required|email',
     'phone'=>'nullable',
 
-    'contact_firstname'=>'nullable|array',
-    'contact_lastname'=>'nullable|array',
-    'contact_function'=>'nullable|array',
-    'contact_email'=>'nullable|array',
-    'contact_phone'=>'nullable|array',
-
     'address'=>'required',
     'address_complement'=>'nullable',
     'postal_code'=>'required',
@@ -56,11 +80,8 @@ class ClientInvoiceController extends Controller
     'notes'=>'nullable'
 ]);
 
-$data['contact_firstname'] = json_encode($request->contact_firstname);
-$data['contact_lastname'] = json_encode($request->contact_lastname);
-$data['contact_function'] = json_encode($request->contact_function);
-$data['contact_email'] = json_encode($request->contact_email);
-$data['contact_phone'] = json_encode($request->contact_phone);
+$data['country'] = $this->convertCountryToISO($request->country);
+$data['phone'] = $this->formatPhone($request->phone, $data['country']);
 
 ClientInvoice::create($data);
 
@@ -93,11 +114,6 @@ $data = $request->validate([
 'email'=>'required|email',
 'phone'=>'nullable',
 
-'contact_firstname'=>'nullable|array',
-'contact_lastname'=>'nullable|array',
-'contact_function'=>'nullable|array',
-'contact_email'=>'nullable|array',
-'contact_phone'=>'nullable|array',
 
 'address'=>'required',
 'address_complement'=>'nullable',
@@ -109,14 +125,11 @@ $data = $request->validate([
 'bic'=>'nullable',
 
 'include_address'=>'nullable',
-'notes'=>'nullable'
 ]);
 
-$data['contact_firstname'] = json_encode($request->contact_firstname);
-$data['contact_lastname'] = json_encode($request->contact_lastname);
-$data['contact_function'] = json_encode($request->contact_function);
-$data['contact_email'] = json_encode($request->contact_email);
-$data['contact_phone'] = json_encode($request->contact_phone);
+
+$data['country'] = $this->convertCountryToISO($request->country);
+$data['phone'] = $this->formatPhone($request->phone, $data['country']);
 
 $client->update($data);
 

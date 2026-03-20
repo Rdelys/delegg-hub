@@ -145,9 +145,7 @@
                 <div class="modal-body">
                     {{-- TABS --}}
                     <div class="nav-tabs">
-                        <button class="nav-link active" type="button" onclick="switchTab('add', 'info', event)">Informations</button>
-                        <button class="nav-link" type="button" onclick="switchTab('add', 'contact', event)">Contacts</button>
-                        <button class="nav-link" type="button" onclick="switchTab('add', 'notes', event)">Notes</button>
+                        <button class="nav-link active" type="button">Informations</button>
                     </div>
 
                     <form id="addClientForm" method="POST" action="{{ route('clients.store') }}">
@@ -190,7 +188,18 @@
                                             <input type="email" class="form-control" name="email" placeholder="Mail *" required>
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" name="phone" placeholder="Téléphone">
+                                            <div class="form-row">
+                                                <div class="form-group" style="max-width:120px;">
+                                                    <select class="phonePrefix" class="form-control" style="max-width:120px;">
+                                                        <option value="+33">🇫🇷 +33</option>
+                                                        <option value="+32">🇧🇪 +32</option>
+                                                        <option value="+41">🇨🇭 +41</option>
+                                                        <option value="+352">🇱🇺 +352</option>
+                                                    </select>                                                </div>
+                                                <div class="form-group">
+                                                    <input type="tel" id="phoneInput" class="form-control" name="phone" placeholder="612345678">
+                                                </div>
+                                            </div>                                        
                                         </div>
                                     </div>
                                 </div>
@@ -213,7 +222,18 @@
                                             <input type="email" class="form-control" name="email" placeholder="Mail *" required>
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" name="phone" placeholder="Téléphone">
+                                            <div class="form-row">
+                                                <div class="form-group" style="max-width:120px;">
+                                                    <select class="phonePrefix" class="form-control" style="max-width:120px;">
+                                                        <option value="+33">🇫🇷 +33</option>
+                                                        <option value="+32">🇧🇪 +32</option>
+                                                        <option value="+41">🇨🇭 +41</option>
+                                                        <option value="+352">🇱🇺 +352</option>
+                                                    </select>                                                </div>
+                                                <div class="form-group">
+                                                    <input type="tel" id="phoneInput" class="form-control" name="phone" placeholder="612345678">
+                                                </div>
+                                            </div>                                        
                                         </div>
                                     </div>
                                 </div>
@@ -247,7 +267,12 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" id="addCountry" class="form-control" name="country" placeholder="Pays *" required value="France">
+                                    <select name="country" id="addCountry" class="form-control" required onchange="updatePhonePrefix(this.value)">
+                                        <option value="France">France</option>
+                                        <option value="Belgique">Belgique</option>
+                                        <option value="Suisse">Suisse</option>
+                                        <option value="Luxembourg">Luxembourg</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -266,56 +291,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        {{-- TAB CONTACTS MULTIPLES --}}
-                        <div class="tab-pane" id="add-contact-tab">
-                            <div class="form-section">
-                                <div class="section-header">
-                                    <h6 class="section-title">Contacts</h6>
-                                    <button type="button" class="btn-add-contact" onclick="addContactField('add')">
-                                        <i class="fas fa-plus"></i> Ajouter un contact
-                                    </button>
-                                </div>
-                                <div id="add-contacts-container">
-                                    {{-- Premier contact par défaut --}}
-                                    <div class="contact-card" id="add-contact-0">
-                                        <div class="contact-header">
-                                            <span class="contact-number">Contact 1</span>
-                                            <button type="button" class="btn-remove-contact" onclick="removeContactField('add', 0)" style="display: none;">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="contact_lastname[]" placeholder="Nom">
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="contact_firstname[]" placeholder="Prénom">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="contact_function[]" placeholder="Fonction">
-                                        </div>
-                                        <div class="form-row">
-                                            <div class="form-group">
-                                                <input type="email" class="form-control" name="contact_email[]" placeholder="Email">
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="tel" class="form-control" name="contact_phone[]" placeholder="Téléphone">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- TAB NOTES --}}
-                        <div class="tab-pane" id="add-notes-tab">
-                            <div class="form-section">
-                                <h6 class="section-title">Notes client</h6>
-                                <textarea class="form-control" name="notes" rows="6" placeholder="Informations complémentaires, remarques, historique des échanges..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -349,8 +324,6 @@
                     {{-- TABS --}}
                     <div class="nav-tabs">
                         <button class="nav-link active" type="button" onclick="switchTab('edit', 'info', event)">Informations</button>
-                        <button class="nav-link" type="button" onclick="switchTab('edit', 'contact', event)">Contacts</button>
-                        <button class="nav-link" type="button" onclick="switchTab('edit', 'notes', event)">Notes</button>
                     </div>
 
                     <form id="editClientForm" method="POST" action="">
@@ -395,7 +368,19 @@
                                             <input type="email" class="form-control" name="email" id="editEmail" placeholder="Mail *">
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" name="phone" id="editPhone" placeholder="Téléphone">
+                                            <div class="form-row">
+                                                <div class="form-group" style="max-width:120px;">
+                                                    <select class="phonePrefix" class="form-control" style="max-width:120px;">
+                                                        <option value="+33">🇫🇷 +33</option>
+                                                        <option value="+32">🇧🇪 +32</option>
+                                                        <option value="+41">🇨🇭 +41</option>
+                                                        <option value="+352">🇱🇺 +352</option>
+                                                    </select>                                                
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="tel" id="editPhone" class="form-control" name="phone">  
+                                                </div>
+                                            </div>                                        
                                         </div>
                                     </div>
                                 </div>
@@ -418,7 +403,19 @@
                                             <input type="email" class="form-control" name="email" id="editEmailParticulier" placeholder="Mail *">
                                         </div>
                                         <div class="form-group">
-                                            <input type="tel" class="form-control" name="phone" id="editPhoneParticulier" placeholder="Téléphone">
+                                            <div class="form-row">
+                                                <div class="form-group" style="max-width:120px;">
+                                                    <select class="phonePrefix" class="form-control" style="max-width:120px;">
+                                                        <option value="+33">🇫🇷 +33</option>
+                                                        <option value="+32">🇧🇪 +32</option>
+                                                        <option value="+41">🇨🇭 +41</option>
+                                                        <option value="+352">🇱🇺 +352</option>
+                                                    </select>                                                
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="tel" class="form-control" id="editPhoneParticulier" name="phone" placeholder="612345678">
+                                                </div>
+                                            </div>                                       
                                         </div>
                                     </div>
                                 </div>
@@ -452,7 +449,12 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" name="country" id="editCountry" placeholder="Pays *">
+                                    <select name="country" class="form-control" id="editCountry" required onchange="updatePhonePrefix(this.value)">
+                                        <option value="France">France</option>
+                                        <option value="Belgique">Belgique</option>
+                                        <option value="Suisse">Suisse</option>
+                                        <option value="Luxembourg">Luxembourg</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -471,29 +473,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        {{-- TAB CONTACTS MULTIPLES --}}
-                        <div class="tab-pane" id="edit-contact-tab">
-                            <div class="form-section">
-                                <div class="section-header">
-                                    <h6 class="section-title">Contacts</h6>
-                                    <button type="button" class="btn-add-contact" onclick="addContactField('edit')">
-                                        <i class="fas fa-plus"></i> Ajouter un contact
-                                    </button>
-                                </div>
-                                <div id="edit-contacts-container">
-                                    {{-- Les contacts seront chargés dynamiquement --}}
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- TAB NOTES --}}
-                        <div class="tab-pane" id="edit-notes-tab">
-                            <div class="form-section">
-                                <h6 class="section-title">Notes client</h6>
-                                <textarea class="form-control" name="notes" id="editNotes" rows="6" placeholder="Informations complémentaires..."></textarea>
                             </div>
                         </div>
                     </form>
@@ -575,22 +554,6 @@
 
 <p><strong>IBAN :</strong> <span id="viewIban"></span></p>
 <p><strong>BIC :</strong> <span id="viewBic"></span></p>
-
-</div>
-
-
-<div class="form-section">
-<h6 class="section-title">Contacts</h6>
-
-<div id="viewContacts"></div>
-
-</div>
-
-
-<div class="form-section">
-<h6 class="section-title">Notes</h6>
-
-<p id="viewNotes"></p>
 
 </div>
 
@@ -1619,38 +1582,6 @@ function resetAddForm() {
     document.querySelector('input[name="type"][value="professionnel"]').checked = true;
     document.getElementById('addIncludeAddress').checked = true;
     document.getElementById('addCountry').value = 'France';
-    
-    // Réinitialiser les contacts
-    const contactsContainer = document.getElementById('add-contacts-container');
-    contactsContainer.innerHTML = `
-        <div class="contact-card" id="add-contact-0">
-            <div class="contact-header">
-                <span class="contact-number">Contact 1</span>
-                <button type="button" class="btn-remove-contact" onclick="removeContactField('add', 0)" style="display: none;">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <input type="text" class="form-control" name="contact_lastname[]" placeholder="Nom">
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" name="contact_firstname[]" placeholder="Prénom">
-                </div>
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" name="contact_function[]" placeholder="Fonction">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <input type="email" class="form-control" name="contact_email[]" placeholder="Email">
-                </div>
-                <div class="form-group">
-                    <input type="tel" class="form-control" name="contact_phone[]" placeholder="Téléphone">
-                </div>
-            </div>
-        </div>
-    `;
 }
 
 // Gestion des onglets
@@ -1672,77 +1603,6 @@ function switchTab(modalType, tabName, event) {
     const targetPane = document.getElementById(`${modalType}-${tabName}-tab`);
     if (targetPane) {
         targetPane.classList.add('active');
-    }
-}
-
-// Gestion des contacts multiples
-function addContactField(modalType) {
-    const container = document.getElementById(`${modalType}-contacts-container`);
-    const contactCount = container.children.length;
-    
-    const contactCard = document.createElement('div');
-    contactCard.className = 'contact-card';
-    contactCard.id = `${modalType}-contact-${contactCount}`;
-    
-    contactCard.innerHTML = `
-        <div class="contact-header">
-            <span class="contact-number">Contact ${contactCount + 1}</span>
-            <button type="button" class="btn-remove-contact" onclick="removeContactField('${modalType}', ${contactCount})">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <input type="text" class="form-control" name="contact_lastname[]" placeholder="Nom">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" name="contact_firstname[]" placeholder="Prénom">
-            </div>
-        </div>
-        <div class="form-group">
-            <input type="text" class="form-control" name="contact_function[]" placeholder="Fonction">
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <input type="email" class="form-control" name="contact_email[]" placeholder="Email">
-            </div>
-            <div class="form-group">
-                <input type="tel" class="form-control" name="contact_phone[]" placeholder="Téléphone">
-            </div>
-        </div>
-    `;
-    
-    container.appendChild(contactCard);
-    
-    // Mettre à jour les numéros de contact
-    updateContactNumbers(modalType);
-}
-
-function removeContactField(modalType, index) {
-    const contactCard = document.getElementById(`${modalType}-contact-${index}`);
-    if (contactCard) {
-        contactCard.remove();
-        updateContactNumbers(modalType);
-    }
-}
-
-function updateContactNumbers(modalType) {
-    const container = document.getElementById(`${modalType}-contacts-container`);
-    const contacts = container.children;
-    
-    for (let i = 0; i < contacts.length; i++) {
-        const contact = contacts[i];
-        const numberSpan = contact.querySelector('.contact-number');
-        if (numberSpan) {
-            numberSpan.textContent = `Contact ${i + 1}`;
-        }
-        
-        // Mettre à jour l'ID et l'attribut onclick du bouton de suppression
-        const removeBtn = contact.querySelector('.btn-remove-contact');
-        if (removeBtn) {
-            contact.id = `${modalType}-contact-${i}`;
-            removeBtn.setAttribute('onclick', `removeContactField('${modalType}', ${i})`);
-        }
     }
 }
 
@@ -1955,122 +1815,34 @@ function openEditModal(clientId) {
         document.getElementById('editEmail').value = data.email ?? '';
         document.getElementById('editEmailParticulier').value = data.email ?? '';
 
-        document.getElementById('editPhone').value = data.phone ?? '';
-        document.getElementById('editPhoneParticulier').value = data.phone ?? '';
+       const phoneData = splitPhone(data.phone);
 
+// SET PREFIX
+const prefixSelects = document.querySelectorAll('#editClientModal .phonePrefix');
+prefixSelects.forEach(select => select.value = phoneData.prefix);
+
+// SET COUNTRY (IMPORTANT)
+const country = getCountryFromPrefix(phoneData.prefix);
+document.getElementById('editCountry').value = country;
+
+// SET PHONE
+document.getElementById('editPhone').value = phoneData.number;
+document.getElementById('editPhoneParticulier').value = phoneData.number;
         // ADRESSE
         document.getElementById('editAddress').value = data.address ?? '';
         document.getElementById('editAddressComplement').value = data.address_complement ?? '';
         document.getElementById('editPostalCode').value = data.postal_code ?? '';
         document.getElementById('editCity').value = data.city ?? '';
-        document.getElementById('editCountry').value = data.country ?? '';
 
         // BANQUE
         document.getElementById('editIban').value = data.iban ?? '';
         document.getElementById('editBic').value = data.bic ?? '';
-
-        // NOTES
-        document.getElementById('editNotes').value = data.notes ?? '';
 
         // CHECKBOX
         document.getElementById('editIncludeAddress').checked = data.include_address == 1;
 
         // AFFICHER BON TYPE
         toggleClientTypeFields('edit');
-
-        // -----------------------
-        // CONTACTS
-        // -----------------------
-
-        const container = document.getElementById('edit-contacts-container');
-        container.innerHTML = '';
-
-        let firstnames = [];
-        let lastnames = [];
-        let functions = [];
-        let emails = [];
-        let phones = [];
-
-        try {
-            firstnames = JSON.parse(data.contact_firstname ?? "[]");
-            lastnames = JSON.parse(data.contact_lastname ?? "[]");
-            functions = JSON.parse(data.contact_function ?? "[]");
-            emails = JSON.parse(data.contact_email ?? "[]");
-            phones = JSON.parse(data.contact_phone ?? "[]");
-        } catch (e) {
-            console.warn("Erreur parsing contacts JSON", e);
-        }
-
-        const maxContacts = Math.max(
-            firstnames.length,
-            lastnames.length,
-            functions.length,
-            emails.length,
-            phones.length
-        );
-
-        if (maxContacts === 0) {
-            addContactField('edit');
-        } else {
-
-            for (let i = 0; i < maxContacts; i++) {
-
-                let contactCard = document.createElement("div");
-                contactCard.className = "contact-card";
-                contactCard.id = "edit-contact-" + i;
-
-                contactCard.innerHTML = `
-                    <div class="contact-header">
-                        <span class="contact-number">Contact ${i + 1}</span>
-                        <button type="button" class="btn-remove-contact"
-                            onclick="removeContactField('edit', ${i})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input class="form-control"
-                                name="contact_lastname[]"
-                                value="${lastnames[i] ?? ''}"
-                                placeholder="Nom">
-                        </div>
-
-                        <div class="form-group">
-                            <input class="form-control"
-                                name="contact_firstname[]"
-                                value="${firstnames[i] ?? ''}"
-                                placeholder="Prénom">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <input class="form-control"
-                            name="contact_function[]"
-                            value="${functions[i] ?? ''}"
-                            placeholder="Fonction">
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input class="form-control"
-                                name="contact_email[]"
-                                value="${emails[i] ?? ''}"
-                                placeholder="Email">
-                        </div>
-
-                        <div class="form-group">
-                            <input class="form-control"
-                                name="contact_phone[]"
-                                value="${phones[i] ?? ''}"
-                                placeholder="Téléphone">
-                        </div>
-                    </div>
-                `;
-
-                container.appendChild(contactCard);
-            }
-        }
 
         // ouvrir modal
         openModal('editClientModal');
@@ -2080,6 +1852,35 @@ function openEditModal(clientId) {
         console.error(error);
         alert("Impossible de charger les données du client.");
     });
+}
+
+function splitPhone(phone) {
+
+    if (!phone) return { prefix: '+33', number: '' };
+
+    const prefixes = ['+33', '+32', '+41', '+352'];
+
+    for (let p of prefixes) {
+        if (phone.startsWith(p)) {
+            return {
+                prefix: p,
+                number: phone.replace(p, '')
+            };
+        }
+    }
+ 
+
+    return { prefix: '+33', number: phone };
+}
+
+function getCountryFromPrefix(prefix) {
+    const map = {
+        '+33': 'France',
+        '+32': 'Belgique',
+        '+41': 'Suisse',
+        '+352': 'Luxembourg'
+    };
+    return map[prefix] ?? 'France';
 }
 // Sauvegarde des modifications
 function saveClientChanges() {
@@ -2216,67 +2017,6 @@ fetch("/invoice/clients/" + clientId + "/edit")
     document.getElementById("viewIban").innerText = data.iban ?? "-";
     document.getElementById("viewBic").innerText = data.bic ?? "-";
 
-    /* NOTES */
-
-    document.getElementById("viewNotes").innerText = data.notes ?? "Aucune note";
-
-    /* CONTACTS */
-
-    const container = document.getElementById("viewContacts");
-    container.innerHTML = "";
-
-    let first = [];
-    let last = [];
-    let func = [];
-    let mail = [];
-    let phone = [];
-
-    try {
-
-        first = JSON.parse(data.contact_firstname ?? "[]");
-        last = JSON.parse(data.contact_lastname ?? "[]");
-        func = JSON.parse(data.contact_function ?? "[]");
-        mail = JSON.parse(data.contact_email ?? "[]");
-        phone = JSON.parse(data.contact_phone ?? "[]");
-
-    } catch (error) {
-
-        console.warn("Erreur parsing contacts JSON", error);
-
-    }
-
-    const maxContacts = Math.max(
-        first.length,
-        last.length,
-        func.length,
-        mail.length,
-        phone.length
-    );
-
-    if (maxContacts === 0) {
-
-        container.innerHTML = "<p>Aucun contact enregistré</p>";
-
-    } else {
-
-        for (let i = 0; i < maxContacts; i++) {
-
-            const div = document.createElement("div");
-            div.className = "contact-card";
-
-            div.innerHTML = `
-                <strong>${first[i] ?? ""} ${last[i] ?? ""}</strong><br>
-                ${func[i] ?? ""}<br>
-                ${mail[i] ?? ""}<br>
-                ${phone[i] ?? ""}
-            `;
-
-            container.appendChild(div);
-
-        }
-
-    }
-
     /* OUVRIR MODAL */
 
     openModal("viewClientModal");
@@ -2292,5 +2032,34 @@ fetch("/invoice/clients/" + clientId + "/edit")
 
 }
 
+function updatePhonePrefix(country) {
+
+    const prefixes = {
+        'France': '+33',
+        'Belgique': '+32',
+        'Suisse': '+41',
+        'Luxembourg': '+352'
+    };
+
+    const prefixInputs = document.querySelectorAll('.phonePrefix');
+
+    prefixInputs.forEach(input => {
+        if (prefixes[country]) {
+            input.value = prefixes[country];
+        }
+    });
+}
+
+document.getElementById('editClientForm').addEventListener('submit', function() {
+
+    const prefix = document.querySelector('#editClientModal .phonePrefix')?.value ?? '';
+    
+    const phoneInput = document.getElementById('editPhone') 
+        || document.getElementById('editPhoneParticulier');
+
+    if (phoneInput && phoneInput.value && !phoneInput.value.startsWith('+')) {
+        phoneInput.value = prefix + phoneInput.value;
+    }
+});
 </script>
 @endsection
