@@ -148,23 +148,40 @@ $client->update($data);
         return back()->with('success','Client supprimé');
     }
 
-    public function syncTiime()
+    public function syncTiime(Request $request)
 {
     $webhookUrl = "https://hook.eu2.make.com/pbiaah4c1p2mrufjqqtway92nrm4vruw";
 
-    // Récupérer tous les clients
-    $clients = ClientInvoice::all();
+    $ids = $request->client_ids
+        ? explode(',', $request->client_ids)
+        : [];
 
-    // Envoyer au webhook
-    $response = Http::post($webhookUrl, [
+    // 🔥 CAS 1 : sélection
+    if (!empty($ids)) {
+
+        $clients = ClientInvoice::whereIn('id', $ids)
+            ->where('exported_to_tiime', false)
+            ->get();
+
+    } else {
+        // 🔥 CAS 2 : aucun sélection → tous les NON exportés
+        $clients = ClientInvoice::where('exported_to_tiime', false)->get();
+    }
+
+    if ($clients->isEmpty()) {
+        return back()->with('error', 'Aucun client à exporter');
+    }
+
+    // Envoi webhook
+    Http::post($webhookUrl, [
         'action' => 'sync_tiime',
         'clients' => $clients
     ]);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Tous les clients envoyés',
-        'count' => $clients->count()
-    ]);
+    // ✅ Marquer comme exporté
+    ClientInvoice::whereIn('id', $clients->pluck('id'))
+        ->update(['exported_to_tiime' => true]);
+
+    return back()->with('success', $clients->count().' client(s) exporté(s)');
 }
 }

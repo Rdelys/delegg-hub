@@ -24,6 +24,7 @@ class ClientInvoice extends Model
         'country',
         'iban',
         'bic',
-        'include_address'
+        'include_address',
+        'exported_to_tiime'
     ];
 }

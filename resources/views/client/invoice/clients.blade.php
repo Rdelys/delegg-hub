@@ -11,13 +11,11 @@
             <button class="btn btn-success" type="button" onclick="openModal('addClientModal')">
                 <i class="fas fa-plus"></i> Ajouter un client
             </button>
-            <button class="btn btn-export" type="button" onclick="exportToTiime()" id="exportTiimeBtn" disabled>
-                <i class="fas fa-file-export"></i> Exporter vers Tiime
-            </button>
-            <form action="{{ route('tiime.sync') }}" method="POST" style="display:inline;">
+            <form id="exportForm" action="{{ route('tiime.sync') }}" method="POST">
                 @csrf
-                <button class="btn btn-sync" type="submit">
-                    <i class="fas fa-sync-alt"></i> Synchronisation Tiime
+                <input type="hidden" name="client_ids" id="client_ids">
+                <button class="btn btn-sync" type="button" onclick="submitExport()">
+                    <i class="fas fa-sync-alt"></i> Exporter vers Tiime
                 </button>
             </form>
         </div>
@@ -55,6 +53,7 @@
                         <th>Téléphone</th>
                         <th>Ville</th>
                         <th>Type</th>
+                        <th>Exporté</th>
                         <th class="actions-column">Actions</th>
                     </tr>
                 </thead>
@@ -98,6 +97,13 @@
                                 <span class="badge badge-pro">Professionnel</span>
                             @else
                                 <span class="badge badge-part">Particulier</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($client->exported_to_tiime)
+                                <span class="badge badge-success">Oui</span>
+                            @else
+                                <span class="badge badge-warning">Non</span>
                             @endif
                         </td>
                         <td class="actions-cell">
@@ -954,6 +960,16 @@ Modifier
     to { opacity: 1; }
 }
 
+.badge-success {
+    background: rgba(34,197,94,0.1);
+    color: #16a34a;
+}
+
+.badge-warning {
+    background: rgba(245,158,11,0.1);
+    color: #f59e0b;
+}
+
 .modal-dialog {
     position: relative;
     width: auto;
@@ -1700,38 +1716,6 @@ function deselectAll() {
     updateSelectionBar();
 }
 
-// Fonctions Tiime
-function exportToTiime() {
-    const checkboxes = document.querySelectorAll('.client-checkbox:checked');
-    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
-    
-    if (selectedIds.length === 0) {
-        showToast('Veuillez sélectionner au moins un client à exporter', 'error');
-        return;
-    }
-    
-    // Simuler l'export
-    showToast(`Export de ${selectedIds.length} client(s) vers Tiime en cours...`, 'info');
-    
-    // Désactiver temporairement le bouton
-    const exportBtn = document.getElementById('exportTiimeBtn');
-    if (exportBtn) {
-        exportBtn.disabled = true;
-        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Export...';
-    }
-    
-    // Simuler un délai d'export
-    setTimeout(() => {
-        showToast(`${selectedIds.length} client(s) exporté(s) avec succès vers Tiime !`, 'success');
-        if (exportBtn) {
-            exportBtn.disabled = false;
-            exportBtn.innerHTML = '<i class="fas fa-file-export"></i> Exporter vers Tiime';
-        }
-        
-        // Désélectionner tous les clients après export
-        deselectAll();
-    }, 2000);
-}
 
 /*function syncTiime() {
     showToast('Synchronisation avec Tiime en cours...', 'info');
@@ -2061,5 +2045,19 @@ document.getElementById('editClientForm').addEventListener('submit', function() 
         phoneInput.value = prefix + phoneInput.value;
     }
 });
+
+function submitExport() {
+
+    const checkboxes = document.querySelectorAll('.client-checkbox:checked');
+    let ids = [];
+
+    checkboxes.forEach(cb => {
+        ids.push(cb.value);
+    });
+
+    document.getElementById('client_ids').value = ids.join(',');
+
+    document.getElementById('exportForm').submit();
+}
 </script>
 @endsection
