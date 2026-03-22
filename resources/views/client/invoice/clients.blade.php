@@ -54,6 +54,7 @@
                             <th>Ville</th>
                             <th>Type</th>
                             <th>Exporté</th>
+                            <th>Exporté après modification</th>
                             <th class="actions-column">Actions</th>
                         </tr>
                     </thead>
@@ -104,6 +105,13 @@
                             </td>
                             <td>
                                 @if($client->exported_to_tiime)
+                                    <span class="badge badge-success">Oui</span>
+                                @else
+                                    <span class="badge badge-warning">Non</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($client->exported_after_update)
                                     <span class="badge badge-success">Oui</span>
                                 @else
                                     <span class="badge badge-warning">Non</span>
