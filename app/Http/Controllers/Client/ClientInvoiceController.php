@@ -156,25 +156,27 @@ $client->update($data);
         ? explode(',', $request->client_ids)
         : [];
 
-    // 🔥 CAS 1 : sélection
-    if (!empty($ids)) {
-
-        $clients = ClientInvoice::whereIn('id', $ids)
-            ->where('exported_to_tiime', false)
-            ->get();
-
-    } else {
-        // 🔥 CAS 2 : aucun sélection → tous les NON exportés
-        $clients = ClientInvoice::where('exported_to_tiime', false)->get();
+    // ❌ AUCUNE SÉLECTION → STOP
+    if (empty($ids)) {
+        return back()->with('error', 'Veuillez sélectionner au moins un client');
     }
+
+    // ✅ Récupérer uniquement les sélectionnés NON exportés
+    $clients = ClientInvoice::whereIn('id', $ids)
+        ->where('exported_to_tiime', false)
+        ->get();
 
     if ($clients->isEmpty()) {
-        return back()->with('error', 'Aucun client à exporter');
+        return back()->with('error', 'Tous les clients sélectionnés sont déjà exportés');
     }
+
+    // 🔥 Détection type
+    $hasParticulier = $clients->contains('type', 'particulier');
 
     // Envoi webhook
     Http::post($webhookUrl, [
         'action' => 'sync_tiime',
+        'mode' => $hasParticulier ? 'particulier' : 'professionnel',
         'clients' => $clients
     ]);
 
