@@ -96,46 +96,38 @@ public function edit($id)
 }
     // UPDATE
     public function update(Request $request,$id)
-    {
+{
+    $client = ClientInvoice::findOrFail($id);
 
-        $client = ClientInvoice::findOrFail($id);
+    $data = $request->validate([
+        'type'=>'required',
+        'company_name'=>'nullable',
+        'siret'=>'nullable',
+        'tva'=>'nullable',
+        'first_name'=>'nullable',
+        'last_name'=>'nullable',
+        'email'=>'required|email',
+        'phone'=>'nullable',
+        'address'=>'required',
+        'address_complement'=>'nullable',
+        'postal_code'=>'required',
+        'city'=>'required',
+        'country'=>'required',
+        'iban'=>'nullable',
+        'bic'=>'nullable',
+        'include_address'=>'nullable',
+    ]);
 
-$data = $request->validate([
+    $data['country'] = $this->convertCountryToISO($request->country);
+    $data['phone'] = $this->formatPhone($request->phone, $data['country']);
 
-'type'=>'required',
+    // 🔥 IMPORTANT : après modification → PAS exporté
+    $data['exported_after_update'] = false;
 
-'company_name'=>'nullable',
-'siret'=>'nullable',
-'tva'=>'nullable',
+    $client->update($data);
 
-'first_name'=>'nullable',
-'last_name'=>'nullable',
-
-'email'=>'required|email',
-'phone'=>'nullable',
-
-
-'address'=>'required',
-'address_complement'=>'nullable',
-'postal_code'=>'required',
-'city'=>'required',
-'country'=>'required',
-
-'iban'=>'nullable',
-'bic'=>'nullable',
-
-'include_address'=>'nullable',
-]);
-
-
-$data['country'] = $this->convertCountryToISO($request->country);
-$data['phone'] = $this->formatPhone($request->phone, $data['country']);
-
-$client->update($data);
-
-        return back()->with('success','Client modifié');
-    }
-
+    return back()->with('success','Client modifié');
+}
 
     // DELETE
     public function destroy($id)
