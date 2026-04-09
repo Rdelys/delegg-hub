@@ -18,6 +18,14 @@
                         <i class="fas fa-sync-alt"></i> Exporter professionnels
                     </button>
                 </form>
+                <form id="exportUpdateForm" action="{{ route('tiime.sync.update') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="client_ids" id="client_ids_update">
+
+                    <button class="btn btn-warning" type="button" onclick="submitExportUpdate()">
+                        <i class="fas fa-sync"></i> Exporter modifications
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -2211,5 +2219,30 @@
         event.stopPropagation();
     }
 
+    function submitExportUpdate() {
+
+    const checkboxes = document.querySelectorAll('.client-checkbox:checked');
+
+    let ids = [];
+
+    for (let cb of checkboxes) {
+
+        // ❌ pas encore exporté
+        if (cb.dataset.exported == "0") {
+            showErrorModal("Client jamais exporté ❌");
+            return;
+        }
+
+        ids.push(cb.value);
+    }
+
+    if (ids.length === 0) {
+        showErrorModal("Aucun client sélectionné");
+        return;
+    }
+
+    document.getElementById('client_ids_update').value = ids.join(',');
+    document.getElementById('exportUpdateForm').submit();
+}
     </script>
     @endsection

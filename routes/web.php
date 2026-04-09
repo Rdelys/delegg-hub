@@ -320,8 +320,12 @@ Route::prefix('invoice/clients')->group(function(){
 
     Route::get('/{id}/edit', [ClientInvoiceController::class, 'edit'])
         ->name('clients.edit');
+        
     Route::post('/tiime/sync', [ClientInvoiceController::class, 'syncTiime'])
     ->name('tiime.sync');
+
+    Route::post('/tiime/sync-update', [ClientInvoiceController::class, 'syncTiimeUpdate'])
+    ->name('tiime.sync.update');
 
 });
 Route::get('/invoice/devis', fn() => view('client.invoice.devis'))
