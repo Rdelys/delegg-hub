@@ -9,10 +9,10 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up()
+  public function up()
 {
     Schema::table('clients_invoice', function (Blueprint $table) {
-        $table->string('tiime_id')->nullable()->after('exported_after_update');
+        $table->string('tiime_id')->nullable();
     });
 }
 

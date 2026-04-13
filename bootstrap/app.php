@@ -17,14 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin'  => AdminAuth::class,
             'client' => ClientAuth::class,
         ]);
-    })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })
-    ->withMiddleware(function ($middleware) {
+
         $middleware->validateCsrfTokens(except: [
             'tiime/save-id',
         ]);
     })
-
+    ->withExceptions(function (Exceptions $exceptions): void {
+        //
+    })
     ->create();

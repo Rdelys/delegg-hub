@@ -353,4 +353,4 @@ Route::get('/client/reseau-ia',[ClientAiNetworkController::class,'index'])
 Route::post('/client/reseau-ia/generate',[ClientAiNetworkController::class,'generate'])
 ->name('client.reseau.ia.generate');
 
-Route::post('/tiime/save-id', [ClientController::class, 'saveTiimeId']);
+Route::post('/tiime/save-id', [ClientInvoiceController::class, 'saveTiimeId']);
