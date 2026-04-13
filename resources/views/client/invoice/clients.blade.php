@@ -72,11 +72,12 @@
                                 <td class="checkbox-column">
                                 <label class="checkbox-label">
                                     <input type="checkbox"
-                                        class="client-checkbox"
-                                        value="{{ $client->id }}"
-                                        data-type="{{ $client->type }}"
-                                        data-exported="{{ $client->exported_to_tiime }}"
-                                        onclick="handleCheckboxClick(event)">
+                                            class="client-checkbox"
+                                            value="{{ $client->id }}"
+                                            data-type="{{ $client->type }}"
+                                            data-exported="{{ $client->exported_to_tiime }}"
+                                            data-exported-update="{{ $client->exported_after_update }}"
+                                            onclick="handleCheckboxClick(event)">
                                     <span class="checkbox-custom"></span>
                                 </label>
                             </td>
@@ -1745,73 +1746,39 @@
         const checkboxes = document.querySelectorAll('.client-checkbox');
         const checked = Array.from(checkboxes).filter(cb => cb.checked);
 
-        const selectedCount = checked.length;
-        const selectionBar = document.getElementById('selectionBar');
         const exportBtn = document.getElementById('exportBtn');
+        const exportUpdateBtn = document.querySelector('[onclick="submitExportUpdate()"]');
 
-        let selectedType = null;
-        let hasConflict = false;
+        let canExport = false;
+        let canExportUpdate = false;
 
-        // 🔥 Détecter type unique
         checked.forEach(cb => {
-            if (!selectedType) {
-                selectedType = cb.dataset.type;
-            } else if (selectedType !== cb.dataset.type) {
-                hasConflict = true;
+
+            const exported = cb.dataset.exported == "1";
+            const exportedUpdate = cb.dataset.exportedUpdate == "1";
+
+            // 🔥 EXPORT NORMAL
+            if (!exported) {
+                canExport = true;
+            }
+
+            // 🔥 EXPORT UPDATE
+            if (exported && !exportedUpdate) {
+                canExportUpdate = true;
             }
         });
 
-        if (hasConflict) {
-
-                if (event && event.target) {
-                    event.target.checked = false;
-                }
-
-                const exportBtn = document.getElementById('exportBtn');
-                if (exportBtn) {
-                    exportBtn.disabled = true;
-                }
-
-                showErrorModal("Impossible de mélanger professionnels et particuliers");
-
-                return;
-            }
-
-        // UI sélection
-        if (selectedCount > 0) {
-            selectionBar.style.display = 'flex';
-            document.getElementById('selectedCount').textContent = selectedCount;
-        } else {
-            selectionBar.style.display = 'none';
-        }
-
-        // 🔥 Bouton dynamique
+        // 🎯 bouton export normal
         if (exportBtn) {
-            if (selectedCount === 0) {
-                exportBtn.disabled = true;
-                exportBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Exporter';
-            } else if (selectedType === 'particulier') {
-                exportBtn.disabled = false;
-                exportBtn.classList.remove('btn-sync');
-                exportBtn.classList.add('btn-success');
-                exportBtn.innerHTML = '<i class="fas fa-user"></i> Exporter particuliers';
-            } else {
-                exportBtn.disabled = false;
-                exportBtn.classList.remove('btn-success');
-                exportBtn.classList.add('btn-sync');
-                exportBtn.innerHTML = '<i class="fas fa-building"></i> Exporter professionnels';
-            }
+            exportBtn.disabled = !canExport;
         }
 
-        // 🔥 BONUS : bloquer les autres types
-        checkboxes.forEach(cb => {
-            if (selectedType && cb.dataset.type !== selectedType && !cb.checked) {
-                cb.disabled = true;
-            } else {
-                cb.disabled = false;
-            }
-        });
+        // 🎯 bouton export update
+        if (exportUpdateBtn) {
+            exportUpdateBtn.disabled = !canExportUpdate;
+        }
     }
+
 
     function showErrorModal(message) {
         document.getElementById('errorMessage').innerText = message;
@@ -2200,21 +2167,28 @@
         document.getElementById('exportForm').submit();
     }
 
-    function handleCheckboxClick(event) {
+  
+        function handleCheckboxClick(event) {
 
         const checkbox = event.target;
-        const isExported = checkbox.dataset.exported == "1";
 
-        if (isExported) {
+        const isExported = checkbox.dataset.exported == "1";
+        const isUpdated = checkbox.dataset.exportedUpdate == "1";
+
+        // ❌ SEUL cas interdit : OUI + OUI
+        if (isExported && isUpdated) {
+
             event.preventDefault();
             event.stopPropagation();
 
-            showErrorModal("Ce client est déjà exporté ❌");
+            checkbox.checked = false;
+
+            showErrorModal("Client déjà à jour ✅");
             return;
         }
 
-        // ✅ seulement ici on met à jour
-        updateSelectionBar(event);
+        // ✅ Tous les autres cas autorisés
+        updateSelectionBar();
 
         event.stopPropagation();
     }

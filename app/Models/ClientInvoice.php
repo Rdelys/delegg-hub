@@ -26,6 +26,7 @@ class ClientInvoice extends Model
         'bic',
         'include_address',
         'exported_to_tiime',
-        'exported_after_update'
+        'exported_after_update',
+        'tiime_id'
     ];
 }

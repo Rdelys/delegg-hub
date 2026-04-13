@@ -155,8 +155,14 @@ public function edit($id)
 
     // ✅ Récupérer uniquement les sélectionnés NON exportés
     $clients = ClientInvoice::whereIn('id', $ids)
-        ->where('exported_to_tiime', false)
-        ->get();
+    ->where(function($q) {
+        $q->where('exported_to_tiime', false)
+          ->orWhere(function($q2) {
+              $q2->where('exported_to_tiime', true)
+                 ->where('exported_after_update', true);
+          });
+    })
+    ->get();
 
     if ($clients->isEmpty()) {
         return back()->with('error', 'Tous les clients sélectionnés sont déjà exportés');
@@ -179,37 +185,56 @@ public function edit($id)
     return back()->with('success', $clients->count().' client(s) exporté(s)');
 }
 
-public function syncTiimeUpdate(Request $request)
-{
-    $webhookUrl = "https://hook.eu2.make.com/pbiaah4c1p2mrufjqqtway92nrm4vruw";
+    public function syncTiimeUpdate(Request $request)
+    {
+        $webhookUrl = "https://hook.eu2.make.com/l1ygxjifvi1ssrsbbfah3yz41f1r6ee2";
 
-    $ids = $request->client_ids
-        ? explode(',', $request->client_ids)
-        : [];
+        $ids = $request->client_ids
+            ? explode(',', $request->client_ids)
+            : [];
 
-    if (empty($ids)) {
-        return back()->with('error', 'Veuillez sélectionner au moins un client');
+        if (empty($ids)) {
+            return back()->with('error', 'Veuillez sélectionner au moins un client');
+        }
+
+        // 🔥 UNIQUEMENT ceux à réexporter
+        $clients = ClientInvoice::whereIn('id', $ids)
+            ->where('exported_to_tiime', true)
+            ->where('exported_after_update', false)
+            ->get();
+
+        if ($clients->isEmpty()) {
+            return back()->with('error', 'Aucun client à réexporter');
+        }
+
+        Http::post($webhookUrl, [
+            'action' => 'update_tiime',
+            'clients' => $clients
+        ]);
+
+        // ✅ marquer comme à jour
+        ClientInvoice::whereIn('id', $clients->pluck('id'))
+            ->update(['exported_after_update' => true]);
+
+        return back()->with('success', $clients->count().' client(s) mis à jour');
     }
 
-    // 🔥 UNIQUEMENT ceux à réexporter
-    $clients = ClientInvoice::whereIn('id', $ids)
-        ->where('exported_to_tiime', true)
-        ->where('exported_after_update', false)
-        ->get();
+    public function saveTiimeId(Request $request)
+    {
+        $request->validate([
+            'tiime_id' => 'required',
+            'local_id' => 'required|exists:clients_invoice,id'
+        ]);
 
-    if ($clients->isEmpty()) {
-        return back()->with('error', 'Aucun client à réexporter');
+        $client = ClientInvoice::find($request->local_id);
+
+        $client->tiime_id = $request->tiime_id;
+        $client->exported_to_tiime = true;
+
+        $client->save();
+
+        return response()->json([
+            'success' => true
+        ]);
     }
-
-    Http::post($webhookUrl, [
-        'action' => 'update_tiime',
-        'clients' => $clients
-    ]);
-
-    // ✅ marquer comme à jour
-    ClientInvoice::whereIn('id', $clients->pluck('id'))
-        ->update(['exported_after_update' => true]);
-
-    return back()->with('success', $clients->count().' client(s) mis à jour');
-}
 }
