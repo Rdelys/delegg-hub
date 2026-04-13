@@ -320,6 +320,12 @@ Route::prefix('invoice/clients')->group(function(){
 
     Route::get('/{id}/edit', [ClientInvoiceController::class, 'edit'])
         ->name('clients.edit');
+        
+    Route::post('/tiime/sync', [ClientInvoiceController::class, 'syncTiime'])
+    ->name('tiime.sync');
+
+    Route::post('/tiime/sync-update', [ClientInvoiceController::class, 'syncTiimeUpdate'])
+    ->name('tiime.sync.update');
 
 });
 Route::get('/invoice/devis', fn() => view('client.invoice.devis'))
@@ -346,3 +352,5 @@ Route::get('/client/reseau-ia',[ClientAiNetworkController::class,'index'])
 
 Route::post('/client/reseau-ia/generate',[ClientAiNetworkController::class,'generate'])
 ->name('client.reseau.ia.generate');
+
+Route::post('/tiime/save-id', [ClientController::class, 'saveTiimeId']);
