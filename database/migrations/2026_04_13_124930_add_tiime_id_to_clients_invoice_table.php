@@ -9,20 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::table('clients_invoice', function (Blueprint $table) {
-            //
-        });
-    }
+public function up()
+{
+    Schema::table('clients_invoice', function (Blueprint $table) {
+        $table->string('tiime_id')->nullable()->after('exported_after_update');
+    });
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('clients_invoice', function (Blueprint $table) {
-            //
-        });
-    }
+public function down()
+{
+    Schema::table('clients_invoice', function (Blueprint $table) {
+        $table->dropColumn('tiime_id');
+    });
+}
 };
