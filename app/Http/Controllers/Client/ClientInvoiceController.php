@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ClientInvoice;
+use Illuminate\Support\Facades\Http;
 
 class ClientInvoiceController extends Controller
 {
@@ -17,7 +18,37 @@ class ClientInvoiceController extends Controller
         return view('client.invoice.clients', compact('clients'));
     }
 
+function convertCountryToISO($country)
+{
+    $map = [
+        'France' => 'FR',
+        'Suisse' => 'CH',
+        'Belgique' => 'BE',
+        'Luxembourg' => 'LU',
+    ];
 
+    return $map[$country] ?? $country;
+}
+
+function formatPhone($phone, $countryISO)
+{
+    if (!$phone) return null;
+
+    // enlever espaces et 0 au début
+    $phone = preg_replace('/\s+/', '', $phone);
+    $phone = ltrim($phone, '0');
+
+    $prefixes = [
+        'FR' => '+33',
+        'BE' => '+32',
+        'CH' => '+41',
+        'LU' => '+352',
+    ];
+
+    return isset($prefixes[$countryISO])
+        ? $prefixes[$countryISO] . $phone
+        : $phone;
+}
     // STORE
     public function store(Request $request)
     {
@@ -35,12 +66,6 @@ class ClientInvoiceController extends Controller
     'email'=>'required|email',
     'phone'=>'nullable',
 
-    'contact_firstname'=>'nullable|array',
-    'contact_lastname'=>'nullable|array',
-    'contact_function'=>'nullable|array',
-    'contact_email'=>'nullable|array',
-    'contact_phone'=>'nullable|array',
-
     'address'=>'required',
     'address_complement'=>'nullable',
     'postal_code'=>'required',
@@ -55,11 +80,8 @@ class ClientInvoiceController extends Controller
     'notes'=>'nullable'
 ]);
 
-$data['contact_firstname'] = json_encode($request->contact_firstname);
-$data['contact_lastname'] = json_encode($request->contact_lastname);
-$data['contact_function'] = json_encode($request->contact_function);
-$data['contact_email'] = json_encode($request->contact_email);
-$data['contact_phone'] = json_encode($request->contact_phone);
+$data['country'] = $this->convertCountryToISO($request->country);
+$data['phone'] = $this->formatPhone($request->phone, $data['country']);
 
 ClientInvoice::create($data);
 
@@ -74,54 +96,38 @@ public function edit($id)
 }
     // UPDATE
     public function update(Request $request,$id)
-    {
+{
+    $client = ClientInvoice::findOrFail($id);
 
-        $client = ClientInvoice::findOrFail($id);
+    $data = $request->validate([
+        'type'=>'required',
+        'company_name'=>'nullable',
+        'siret'=>'nullable',
+        'tva'=>'nullable',
+        'first_name'=>'nullable',
+        'last_name'=>'nullable',
+        'email'=>'required|email',
+        'phone'=>'nullable',
+        'address'=>'required',
+        'address_complement'=>'nullable',
+        'postal_code'=>'required',
+        'city'=>'required',
+        'country'=>'required',
+        'iban'=>'nullable',
+        'bic'=>'nullable',
+        'include_address'=>'nullable',
+    ]);
 
-$data = $request->validate([
+    $data['country'] = $this->convertCountryToISO($request->country);
+    $data['phone'] = $this->formatPhone($request->phone, $data['country']);
 
-'type'=>'required',
+    // 🔥 IMPORTANT : après modification → PAS exporté
+    $data['exported_after_update'] = false;
 
-'company_name'=>'nullable',
-'siret'=>'nullable',
-'tva'=>'nullable',
+    $client->update($data);
 
-'first_name'=>'nullable',
-'last_name'=>'nullable',
-
-'email'=>'required|email',
-'phone'=>'nullable',
-
-'contact_firstname'=>'nullable|array',
-'contact_lastname'=>'nullable|array',
-'contact_function'=>'nullable|array',
-'contact_email'=>'nullable|array',
-'contact_phone'=>'nullable|array',
-
-'address'=>'required',
-'address_complement'=>'nullable',
-'postal_code'=>'required',
-'city'=>'required',
-'country'=>'required',
-
-'iban'=>'nullable',
-'bic'=>'nullable',
-
-'include_address'=>'nullable',
-'notes'=>'nullable'
-]);
-
-$data['contact_firstname'] = json_encode($request->contact_firstname);
-$data['contact_lastname'] = json_encode($request->contact_lastname);
-$data['contact_function'] = json_encode($request->contact_function);
-$data['contact_email'] = json_encode($request->contact_email);
-$data['contact_phone'] = json_encode($request->contact_phone);
-
-$client->update($data);
-
-        return back()->with('success','Client modifié');
-    }
-
+    return back()->with('success','Client modifié');
+}
 
     // DELETE
     public function destroy($id)
@@ -134,4 +140,101 @@ $client->update($data);
         return back()->with('success','Client supprimé');
     }
 
+    public function syncTiime(Request $request)
+{
+    $webhookUrl = "https://hook.eu2.make.com/pbiaah4c1p2mrufjqqtway92nrm4vruw";
+
+    $ids = $request->client_ids
+        ? explode(',', $request->client_ids)
+        : [];
+
+    // ❌ AUCUNE SÉLECTION → STOP
+    if (empty($ids)) {
+        return back()->with('error', 'Veuillez sélectionner au moins un client');
+    }
+
+    // ✅ Récupérer uniquement les sélectionnés NON exportés
+    $clients = ClientInvoice::whereIn('id', $ids)
+    ->where(function($q) {
+        $q->where('exported_to_tiime', false)
+          ->orWhere(function($q2) {
+              $q2->where('exported_to_tiime', true)
+                 ->where('exported_after_update', true);
+          });
+    })
+    ->get();
+
+    if ($clients->isEmpty()) {
+        return back()->with('error', 'Tous les clients sélectionnés sont déjà exportés');
+    }
+
+    // 🔥 Détection type
+    $hasParticulier = $clients->contains('type', 'particulier');
+
+    // Envoi webhook
+    Http::post($webhookUrl, [
+        'action' => 'sync_tiime',
+        'mode' => $hasParticulier ? 'particulier' : 'professionnel',
+        'clients' => $clients
+    ]);
+
+    // ✅ Marquer comme exporté
+    ClientInvoice::whereIn('id', $clients->pluck('id'))
+        ->update(['exported_to_tiime' => true]);
+
+    return back()->with('success', $clients->count().' client(s) exporté(s)');
+}
+
+    public function syncTiimeUpdate(Request $request)
+    {
+        $webhookUrl = "https://hook.eu2.make.com/l1ygxjifvi1ssrsbbfah3yz41f1r6ee2";
+
+        $ids = $request->client_ids
+            ? explode(',', $request->client_ids)
+            : [];
+
+        if (empty($ids)) {
+            return back()->with('error', 'Veuillez sélectionner au moins un client');
+        }
+
+        // 🔥 UNIQUEMENT ceux à réexporter
+        $clients = ClientInvoice::whereIn('id', $ids)
+            ->where('exported_to_tiime', true)
+            ->where('exported_after_update', false)
+            ->get();
+
+        if ($clients->isEmpty()) {
+            return back()->with('error', 'Aucun client à réexporter');
+        }
+
+        Http::post($webhookUrl, [
+            'action' => 'update_tiime',
+            'clients' => $clients
+        ]);
+
+        // ✅ marquer comme à jour
+        ClientInvoice::whereIn('id', $clients->pluck('id'))
+            ->update(['exported_after_update' => true]);
+
+        return back()->with('success', $clients->count().' client(s) mis à jour');
+    }
+
+    public function saveTiimeId(Request $request)
+    {
+        $request->validate([
+            'tiime_id' => 'required',
+            'local_id' => 'required|exists:clients_invoice,id'
+        ]);
+
+        $client = ClientInvoice::find($request->local_id);
+
+        $client->tiime_id = $request->tiime_id;
+        $client->exported_to_tiime = true;
+
+        $client->save();
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
 }
