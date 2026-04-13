@@ -22,6 +22,7 @@ use App\Http\Controllers\WhatsAppController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\Client\ClientInvoiceController;
 use App\Http\Controllers\Client\ClientAiNetworkController;
+use App\Http\Controllers\Client\ClientDevisController;
 
 
 /*
@@ -328,8 +329,6 @@ Route::prefix('invoice/clients')->group(function(){
     ->name('tiime.sync.update');
 
 });
-Route::get('/invoice/devis', fn() => view('client.invoice.devis'))
-    ->name('client.invoice.devis');
 
 Route::get('/invoice/factures', fn() => view('client.invoice.factures'))
     ->name('client.invoice.factures');
@@ -354,3 +353,6 @@ Route::post('/client/reseau-ia/generate',[ClientAiNetworkController::class,'gene
 ->name('client.reseau.ia.generate');
 
 Route::post('/tiime/save-id', [ClientInvoiceController::class, 'saveTiimeId']);
+
+Route::get('/invoice/devis', [ClientDevisController::class, 'index'])
+    ->name('client.invoice.devis');
