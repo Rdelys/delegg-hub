@@ -356,3 +356,6 @@ Route::post('/tiime/save-id', [ClientInvoiceController::class, 'saveTiimeId']);
 
 Route::get('/invoice/devis', [ClientDevisController::class, 'index'])
     ->name('client.invoice.devis');
+
+Route::post('/invoice/devis/store', [ClientDevisController::class, 'store'])
+    ->name('client.invoice.devis.store');
