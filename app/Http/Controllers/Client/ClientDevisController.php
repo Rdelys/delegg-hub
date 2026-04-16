@@ -59,4 +59,38 @@ class ClientDevisController extends Controller
 
         return back()->with('success', 'Devis créé');
     }
+
+    public function update(Request $request, $id)
+    {
+        $devis = Devis::findOrFail($id);
+
+        $totalHT = 0;
+        $totalTVA = 0;
+
+        foreach ($request->lines as $line) {
+            $lineTotal = $line['quantity'] * $line['price_ht'];
+            $tvaAmount = $lineTotal * ($line['tva'] / 100);
+            $totalHT += $lineTotal;
+            $totalTVA += $tvaAmount;
+        }
+
+        $devis->update([
+            'label'          => $request->label,
+            'date_emission'  => $request->date_emission,
+            'date_validite'  => $request->date_validite,
+            'note'           => $request->note,
+            'address'        => $request->address,
+            'city'           => $request->city,
+            'postal_code'    => $request->postal_code,
+            'country'        => $request->country,
+            'tva_exoneration'=> $request->tva_exoneration,
+            'lines'          => $request->lines,
+            'total_ht'       => $totalHT,
+            'total_tva'      => $totalTVA,
+            'total_ttc'      => $totalHT + $totalTVA,
+        ]);
+
+        return back()->with('success', 'Devis mis à jour');
+    }
+
 }

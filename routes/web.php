@@ -359,3 +359,6 @@ Route::get('/invoice/devis', [ClientDevisController::class, 'index'])
 
 Route::post('/invoice/devis/store', [ClientDevisController::class, 'store'])
     ->name('client.invoice.devis.store');
+
+Route::put('/invoice/devis/{id}', [ClientDevisController::class, 'update'])
+    ->name('client.invoice.devis.update');

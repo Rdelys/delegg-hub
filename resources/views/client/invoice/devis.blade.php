@@ -74,6 +74,7 @@
                     <th><i class="fas fa-user"></i> Client</th>
                     <th><i class="fas fa-calendar-alt"></i> Date</th>
                     <th><i class="fas fa-euro-sign"></i> Montant TTC</th>
+                    <th><i class="fas fa-cog"></i> Action</th>
                     <!-- <th>Statut</th> -->
                 </tr>
             </thead>
@@ -96,6 +97,12 @@
                         <strong>{{ number_format($d->total_ttc, 2, ',', ' ') }} €</strong>
                     </td>
 
+                    <td class="text-right">
+                        <button class="btn-create"
+                            onclick="openEditModal({{ json_encode($d) }})">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                    </td>
                     <!-- <td>
                         <span class="badge pending">
                             <i class="fas fa-clock"></i> En attente
@@ -271,6 +278,102 @@
     </div>
 </div>
 
+<!-- ================= MODAL EDIT ================= -->
+<div id="modal-edit" class="modal">
+    <div class="modal-box">
+
+        <div class="modal-header">
+            <h3><i class="fas fa-edit"></i> Modifier le devis</h3>
+            <span class="close-icon" onclick="closeEditModal()">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+
+        <form method="POST" id="edit-form" action="">
+        @csrf
+        @method('PUT')
+
+        <div class="modal-body">
+
+            <input type="hidden" name="client_id" id="edit_client_id">
+
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> Libellé du devis</label>
+                <input type="text" name="label" id="edit_label" class="input">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-check"></i> Date d'émission *</label>
+                    <input type="date" name="date_emission" id="edit_date_emission" class="input" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-hourglass-end"></i> Date fin validité *</label>
+                    <input type="date" name="date_validite" id="edit_date_validite" class="input" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> Champ libre</label>
+                <input type="text" name="note" id="edit_note" class="input">
+            </div>
+
+            <h4 class="section"><i class="fas fa-truck"></i> Adresse de livraison</h4>
+
+            <div class="form-group">
+                <label><i class="fas fa-home"></i> Adresse</label>
+                <input type="text" name="address" id="edit_address" class="input">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-city"></i> Ville</label>
+                    <input type="text" name="city" id="edit_city" class="input">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-mail-bulk"></i> Code postal</label>
+                    <input type="text" name="postal_code" id="edit_postal_code" class="input">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-globe"></i> Pays</label>
+                <select name="country" id="edit_country" class="input">
+                    <option value="FR">France</option>
+                    <option value="BE">Belgique</option>
+                    <option value="CH">Suisse</option>
+                    <option value="LU">Luxembourg</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-percent"></i> Motif exonération TVA</label>
+                <input type="text" name="tva_exoneration" id="edit_tva_exoneration" class="input">
+            </div>
+
+            <h4 class="section"><i class="fas fa-list-ul"></i> Lignes du devis</h4>
+
+            <div id="edit-lines-container"></div>
+
+            <button type="button" class="btn-add" onclick="addEditLine(event)">
+                <i class="fas fa-plus"></i> Ajouter une ligne
+            </button>
+
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" onclick="closeEditModal()" class="btn-light">
+                <i class="fas fa-times"></i> Annuler
+            </button>
+            <button type="submit" class="btn-main">
+                <i class="fas fa-check-circle"></i> Enregistrer
+            </button>
+        </div>
+
+        </form>
+    </div>
+</div>
+
 <!-- ================= JS ================= -->
 <script>
 function showTab(tab) {
@@ -333,6 +436,83 @@ function addLine(e) {
         </div>
     `);
 }
+
+let editLineIndex = 0;
+
+function openEditModal(devis) {
+    // Remplir le formulaire
+    document.getElementById('edit_client_id').value   = devis.client_id;
+    document.getElementById('edit_label').value        = devis.label ?? '';
+    document.getElementById('edit_date_emission').value= devis.date_emission ?? '';
+    document.getElementById('edit_date_validite').value= devis.date_validite ?? '';
+    document.getElementById('edit_note').value         = devis.note ?? '';
+    document.getElementById('edit_address').value      = devis.address ?? '';
+    document.getElementById('edit_city').value         = devis.city ?? '';
+    document.getElementById('edit_postal_code').value  = devis.postal_code ?? '';
+    document.getElementById('edit_country').value      = devis.country ?? 'FR';
+    document.getElementById('edit_tva_exoneration').value = devis.tva_exoneration ?? '';
+
+    // Action du formulaire
+    document.getElementById('edit-form').action =
+        '/invoice/devis/' + devis.id;
+
+    // Lignes existantes
+    const container = document.getElementById('edit-lines-container');
+    container.innerHTML = '';
+    editLineIndex = 0;
+
+    const lines = typeof devis.lines === 'string'
+        ? JSON.parse(devis.lines)
+        : (devis.lines ?? []);
+
+    // lines est un objet { "1": {...}, "2": {...} } ou un tableau
+    const linesArray = Array.isArray(lines) ? lines : Object.values(lines);
+
+    linesArray.forEach(line => addEditLine(null, line));
+
+    document.getElementById('modal-edit').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('modal-edit').style.display = 'none';
+}
+
+function addEditLine(e, data = {}) {
+    if (e) e.preventDefault();
+    editLineIndex++;
+
+    const tvaOptions = ['20', '10', '5.5', '2.1', '0'].map(v =>
+        `<option value="${v}" ${String(data.tva) === v ? 'selected' : ''}>${v}%</option>`
+    ).join('');
+
+    document.getElementById('edit-lines-container').insertAdjacentHTML('beforeend', `
+        <div class="line">
+            <div class="line-header">
+                <i class="fas fa-cube"></i> Ligne ${editLineIndex}
+                <span class="remove-line" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-trash-alt"></i>
+                </span>
+            </div>
+            <div class="form-row">
+                <input type="number" name="lines[${editLineIndex}][quantity]"
+                    placeholder="Quantité" class="input" value="${data.quantity ?? ''}" required>
+                <input type="text" name="lines[${editLineIndex}][unit]"
+                    placeholder="Unité" class="input" value="${data.unit ?? ''}">
+            </div>
+            <div class="form-row">
+                <input type="number" step="0.01" name="lines[${editLineIndex}][price_ht]"
+                    placeholder="Prix HT" class="input" value="${data.price_ht ?? ''}" required>
+                <select name="lines[${editLineIndex}][tva]" class="input">
+                    ${tvaOptions}
+                </select>
+            </div>
+            <input type="text" name="lines[${editLineIndex}][label]"
+                placeholder="Libellé du produit/service" class="input"
+                value="${data.label ?? ''}" required>
+        </div>
+    `);
+}
+
 </script>
 
 <!-- ================= STYLE ================= -->
