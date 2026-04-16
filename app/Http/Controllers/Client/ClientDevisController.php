@@ -93,4 +93,17 @@ class ClientDevisController extends Controller
         return back()->with('success', 'Devis mis à jour');
     }
 
+    public function destroy($id)
+    {
+        try {
+            $devis = Devis::findOrFail($id);
+            $devis->delete();
+            
+            return redirect()->route('client.invoice.devis')
+                ->with('success', 'Devis supprimé avec succès');
+        } catch (\Exception $e) {
+            return redirect()->route('client.invoice.devis')
+                ->with('error', 'Erreur lors de la suppression du devis');
+        }
+    }
 }

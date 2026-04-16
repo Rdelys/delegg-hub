@@ -362,3 +362,6 @@ Route::post('/invoice/devis/store', [ClientDevisController::class, 'store'])
 
 Route::put('/invoice/devis/{id}', [ClientDevisController::class, 'update'])
     ->name('client.invoice.devis.update');
+
+Route::delete('/invoice/devis/{id}', [ClientDevisController::class, 'destroy'])
+    ->name('client.invoice.devis.destroy'); 

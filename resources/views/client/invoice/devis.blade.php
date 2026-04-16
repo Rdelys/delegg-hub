@@ -64,8 +64,8 @@
 
     </div>
 
-    <!-- ================= DEVIS ================= -->
-   <div id="devis" class="tab-content" style="display:none;">
+   <!-- ================= DEVIS ================= -->
+    <div id="devis" class="tab-content" style="display:none;">
 
         <table class="table">
             <thead>
@@ -75,7 +75,6 @@
                     <th><i class="fas fa-calendar-alt"></i> Date</th>
                     <th><i class="fas fa-euro-sign"></i> Montant TTC</th>
                     <th><i class="fas fa-cog"></i> Action</th>
-                    <!-- <th>Statut</th> -->
                 </tr>
             </thead>
 
@@ -83,31 +82,31 @@
                 @forelse($devis as $d)
                 <tr>
                     <td class="devis-id">#{{ $d->id }}</td>
-
                     <td class="client-name">
                         {{ $d->client->company_name 
                             ?? $d->client->first_name . ' ' . $d->client->last_name }}
                     </td>
-
                     <td class="devis-date">
                         {{ \Carbon\Carbon::parse($d->date_emission)->format('d/m/Y') }}
                     </td>
-
                     <td class="devis-amount">
                         <strong>{{ number_format($d->total_ttc, 2, ',', ' ') }} €</strong>
                     </td>
-
                     <td class="text-right">
                         <button class="btn-create"
                             onclick="openEditModal({{ json_encode($d) }})">
                             <i class="fas fa-edit"></i> Modifier
                         </button>
+                        <button class="btn-delete"
+                            onclick="deleteDevis({{ $d->id }})">
+                            <i class="fas fa-trash-alt"></i> Supprimer
+                        </button>
                     </td>
-                    <!-- <td>
-                        <span class="badge pending">
-                            <i class="fas fa-clock"></i> En attente
-                        </span>
-                    </td> -->
+                    <!-- ================= FORMULAIRE DE SUPPRESSION ================= -->
+                    <form id="delete-form" method="POST" style="display: none;">
+                        @csrf
+                        @method('DELETE')
+                    </form>
                 </tr>
                 @empty
                 <tr>
@@ -513,6 +512,14 @@ function addEditLine(e, data = {}) {
     `);
 }
 
+function deleteDevis(devisId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible.')) {
+        const form = document.getElementById('delete-form');
+        form.action = '/invoice/devis/' + devisId;
+        form.submit();
+    }
+}
+
 </script>
 
 <!-- ================= STYLE ================= -->
@@ -520,6 +527,34 @@ function addEditLine(e, data = {}) {
 
 * {
     box-sizing: border-box;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin-left: 8px;
+}
+
+.btn-delete:hover { 
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive pour les petits écrans */
+@media (max-width: 640px) {
+    .btn-create, .btn-delete {
+        font-size: 11px;
+        padding: 6px 10px;
+        margin-left: 4px;
+    }
 }
 
 .container { 
