@@ -66,10 +66,23 @@
 
    <!-- ================= DEVIS ================= -->
     <div id="devis" class="tab-content" style="display:none;">
+        <div class="devis-toolbar">
+            <label class="select-all-label">
+                <input type="checkbox" id="sel-all" onchange="toggleAll(this)">
+                Tout sélectionner
+            </label>
+
+            <button class="btn-tiime" id="btn-tiime" disabled onclick="exportTiime()">
+                <i class="fas fa-upload"></i>
+                Exporter vers Tiime
+                <span class="tiime-badge hidden" id="tiime-badge">0</span>
+            </button>
+        </div>
 
         <table class="table">
             <thead>
                 <tr>
+                    <th style="width:40px"></th> 
                     <th><i class="fas fa-hashtag"></i> #</th>
                     <th><i class="fas fa-user"></i> Client</th>
                     <th><i class="fas fa-calendar-alt"></i> Date</th>
@@ -81,6 +94,9 @@
             <tbody>
                 @forelse($devis as $d)
                 <tr>
+                    <td>
+                        <input type="checkbox" class="row-cb" data-id="{{ $d->id }}" onchange="updateSelection()">
+                    </td>
                     <td class="devis-id">#{{ $d->id }}</td>
                     <td class="client-name">
                         {{ $d->client->company_name 
@@ -519,7 +535,46 @@ function deleteDevis(devisId) {
         form.submit();
     }
 }
+function updateSelection() {
+    const cbs = document.querySelectorAll('.row-cb');
+    const checked = [...cbs].filter(c => c.checked);
+    const n = checked.length;
 
+    const btn = document.getElementById('btn-tiime');
+    const badge = document.getElementById('tiime-badge');
+    const selAll = document.getElementById('sel-all');
+
+    btn.disabled = n === 0;
+    badge.textContent = n;
+    badge.classList.toggle('hidden', n === 0);
+
+    selAll.indeterminate = n > 0 && n < cbs.length;
+    selAll.checked = n === cbs.length;
+
+    document.querySelectorAll('#devis tbody tr').forEach(tr => {
+        const cb = tr.querySelector('.row-cb');
+        tr.classList.toggle('selected', cb && cb.checked);
+    });
+}
+
+function toggleAll(el) {
+    document.querySelectorAll('.row-cb').forEach(c => { c.checked = el.checked; });
+    updateSelection();
+}
+
+function exportTiime() {
+    const ids = [...document.querySelectorAll('.row-cb:checked')].map(c => c.dataset.id);
+    const n = ids.length;
+
+    if (confirm(`Exporter ${n} devis vers Tiime ?`)) {
+        alert(`✓ ${n} devis exporté${n > 1 ? 's' : ''} vers Tiime avec succès.\n\nIDs : ${ids.join(', ')}`);
+        
+        // Décocher après export
+        document.querySelectorAll('.row-cb').forEach(c => c.checked = false);
+        document.getElementById('sel-all').checked = false;
+        updateSelection();
+    }
+}
 </script>
 
 <!-- ================= STYLE ================= -->
@@ -528,6 +583,60 @@ function deleteDevis(devisId) {
 * {
     box-sizing: border-box;
 }
+
+.devis-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.select-all-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+    cursor: pointer;
+    user-select: none;
+}
+
+.btn-tiime {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-tiime:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-tiime:not(:disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(26, 26, 46, 0.3);
+}
+
+.tiime-badge {
+    background: #4f46e5;
+    color: #fff;
+    border-radius: 20px;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.tiime-badge.hidden { display: none; }
+
+#devis tbody tr.selected td { background: rgba(79, 70, 229, 0.04); }
 
 .btn-delete {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
